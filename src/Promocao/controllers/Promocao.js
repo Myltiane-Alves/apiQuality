@@ -1,7 +1,9 @@
 import { createPromocao, getPromocaoAtiva, updatePromocao } from "../repositories/promocaoAtiva.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
+// let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
 // let url = `http://164.152.245.77:8000/quality/concentrador`;
 import axios from "axios";
+import 'dotenv/config';
+const url = process.env.API_URL;
 class PromocaoControllers  {
 
 
