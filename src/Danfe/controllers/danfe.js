@@ -1,47 +1,70 @@
-import fs from 'fs';
-import path from 'path';
 import { fileURLToPath } from 'url';
-
-import danfe from 'danfe-pdf';
+import path from 'path';
+import { DANFe, DANFCe } from 'node-sped-pdf';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function ensureDestInXml(xml) {
+    if (!xml.includes('<dest>')) {
+        const destFake = `
+<dest>
+  <CPF>00000000000</CPF>
+  <xNome>CONSUMIDOR NÃO IDENTIFICADO</xNome>
+  <enderDest>
+    <xLgr>NAO INFORMADO</xLgr>
+    <nro>0</nro>
+    <xBairro>NAO INFORMADO</xBairro>
+    <cMun>5300108</cMun>
+    <xMun>BRASILIA</xMun>
+    <UF>DF</UF>
+    <CEP>00000000</CEP>
+    <cPais>1058</cPais>
+    <xPais>BRASIL</xPais>
+  </enderDest>
+</dest>`;
+        return xml.replace(/<\/emit>/, '</emit>' + destFake);
+    }
+    return xml;
+}
+
+function getModelo(xml) {
+    // Extrai o modelo do XML (ex: <mod>65</mod> ou <mod>55</mod>)
+    const match = xml.match(/<mod>(\d+)<\/mod>/);
+    return match ? match[1] : null;
+}
+
 class DanfeControllers {
-    // Função para gerar DANFE a partir do XML (usando danfe-pdf localmente)
-    async gerarDanfeLocal(xml, idVenda) {
-        console.log(xml, idVenda, 'xml, idVenda');
+    async gerarDanfeLocal(req, res) {
         try {
-            if (!xml || typeof xml !== 'string' || xml.trim() === '') {
-                throw new Error('XML inválido ou vazio');
+            const { xml, idVenda } = req.body;
+            if (!xml || !idVenda) {
+                return res.status(400).json({ error: 'XML e ID da venda são obrigatórios.' });
             }
 
-            return new Promise((resolve, reject) => {
-                danfe(xml, {}, (err, pdfBuffer) => {
-                    if (err) {
-                        console.error('Erro ao gerar DANFE:', err);
-                        return reject(new Error('Falha na geração do DANFE'));
-                    }
+            const modelo = getModelo(xml);
+            if (!modelo) {
+                return res.status(400).json({ error: 'Não foi possível identificar o modelo do XML.' });
+            }
 
-                    // Opcional: salvar o arquivo em disco
-                    const nomeArquivo = `danfe_venda_${idVenda}.pdf`;
-                    const caminho = path.join(__dirname, '../danfes', nomeArquivo);
-                    
-                    
-                    // Certifique-se que a pasta /danfes existe
-                    fs.writeFileSync(caminho, pdfBuffer);
+            const xmlCorrigido = ensureDestInXml(xml);
 
-                    // Retorna o caminho ou o buffer
-                    resolve({
-                        nome: nomeArquivo,
-                        buffer: pdfBuffer,
-                        caminho
-                    });
-                });
-            });
+            let pdfBuffer;
+            if (modelo === '65') {
+                pdfBuffer = await DANFCe({ xml: xmlCorrigido });
+            } else if (modelo === '55') {
+                pdfBuffer = await DANFe({ xml: xmlCorrigido });
+            } else {
+                return res.status(400).json({ error: 'Modelo de documento não suportado.' });
+            }
+
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="DANFE_${idVenda}.pdf"`);
+            res.send(pdfBuffer);
+
         } catch (error) {
             console.error('Erro ao gerar DANFE:', error);
-            throw new Error(`Erro ao gerar DANFE: ${error.message}`);
+            res.status(500).json({ error: 'Erro ao gerar DANFE.' });
         }
     }
 }
