@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 class DanfeControllers {
     // Função para gerar DANFE a partir do XML (usando danfe-pdf localmente)
     async gerarDanfeLocal(xml, idVenda) {
+        console.log(xml, idVenda, 'xml, idVenda');
         try {
             if (!xml || typeof xml !== 'string' || xml.trim() === '') {
                 throw new Error('XML inválido ou vazio');
@@ -25,6 +26,7 @@ class DanfeControllers {
                     // Opcional: salvar o arquivo em disco
                     const nomeArquivo = `danfe_venda_${idVenda}.pdf`;
                     const caminho = path.join(__dirname, '../danfes', nomeArquivo);
+                    
                     
                     // Certifique-se que a pasta /danfes existe
                     fs.writeFileSync(caminho, pdfBuffer);
