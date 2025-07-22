@@ -1,28 +1,47 @@
-import axios from "axios";
-import { dataFormatada } from "../utils/dataFormatada.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import danfe from 'danfe-pdf';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class DanfeControllers {
-
-    async generateDANFE(req, res) {
+    // Função para gerar DANFE a partir do XML (usando danfe-pdf localmente)
+    async gerarDanfeLocal(xml, idVenda) {
         try {
-            const xmlData = req.body.xmlData; // Assuming XML data is sent in the request body
-            if (!xmlData) {
-                return res.status(400).json({ error: 'XML data is required' });
+            if (!xml || typeof xml !== 'string' || xml.trim() === '') {
+                throw new Error('XML inválido ou vazio');
             }
 
-            const danfeService = new DanfeService();
-            const pdfBuffer = await danfeService.convertXMLToDANFE(xmlData);
+            return new Promise((resolve, reject) => {
+                danfe(xml, {}, (err, pdfBuffer) => {
+                    if (err) {
+                        console.error('Erro ao gerar DANFE:', err);
+                        return reject(new Error('Falha na geração do DANFE'));
+                    }
 
-            res.set({
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="danfe.pdf"',
+                    // Opcional: salvar o arquivo em disco
+                    const nomeArquivo = `danfe_venda_${idVenda}.pdf`;
+                    const caminho = path.join(__dirname, '../danfes', nomeArquivo);
+                    
+                    // Certifique-se que a pasta /danfes existe
+                    fs.writeFileSync(caminho, pdfBuffer);
+
+                    // Retorna o caminho ou o buffer
+                    resolve({
+                        nome: nomeArquivo,
+                        buffer: pdfBuffer,
+                        caminho
+                    });
+                });
             });
-            res.send(pdfBuffer);
         } catch (error) {
-            res.status(500).json({ error: 'An error occurred while generating the DANFE' });
+            console.error('Erro ao gerar DANFE:', error);
+            throw new Error(`Erro ao gerar DANFE: ${error.message}`);
         }
     }
 }
 
-export default new DanfeControllers()
+export default new DanfeControllers();

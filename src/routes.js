@@ -69,7 +69,7 @@ import GERAlteracaoPrecoControllers from './Gerencia/AlteracaoPreco/controllers/
 import ComercialProdutoControllers from './Comercial/Produto/controllers/index.js'
 
 import ModulosControllers from './Modulos/controllers/modulos.js';
-
+import DanfeControllers from './Danfe/controllers/danfe.js';
 const routes = new Router();
 // routes.use(authMiddleware)
 
@@ -81,6 +81,7 @@ routes.get('/ping', ApiPing.index);
 
 routes.post('/login', AuthentiCationController.login);
 routes.post('/login2', AuthentiCationController.login);
+routes.post('/gerar-danfe', DanfeControllers.gerarDanfeLocal);
 
 // routes.use(authMiddleware)
 
