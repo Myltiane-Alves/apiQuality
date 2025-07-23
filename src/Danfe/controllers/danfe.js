@@ -39,7 +39,7 @@ class DanfeControllers {
                 });
                 console.log('DANFe gerado');
             }
-            fs.writeFileSync(`DANFE_${idVenda || 'nfe'}.pdf`, pdfBuffer);
+            // fs.writeFileSync(`DANFE_${idVenda || 'nfe'}.pdf`, pdfBuffer);
 
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename="DANFE_${idVenda || 'nfe'}.pdf"`);
