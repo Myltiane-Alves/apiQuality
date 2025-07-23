@@ -1,70 +1,52 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { DANFe, DANFCe } from 'node-sped-pdf';
-
+import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import axios from 'axios';
 
-function ensureDestInXml(xml) {
-    if (!xml.includes('<dest>')) {
-        const destFake = `
-<dest>
-  <CPF>00000000000</CPF>
-  <xNome>CONSUMIDOR NÃO IDENTIFICADO</xNome>
-  <enderDest>
-    <xLgr>NAO INFORMADO</xLgr>
-    <nro>0</nro>
-    <xBairro>NAO INFORMADO</xBairro>
-    <cMun>5300108</cMun>
-    <xMun>BRASILIA</xMun>
-    <UF>DF</UF>
-    <CEP>00000000</CEP>
-    <cPais>1058</cPais>
-    <xPais>BRASIL</xPais>
-  </enderDest>
-</dest>`;
-        return xml.replace(/<\/emit>/, '</emit>' + destFake);
-    }
-    return xml;
-}
-
-function getModelo(xml) {
-    // Extrai o modelo do XML (ex: <mod>65</mod> ou <mod>55</mod>)
-    const match = xml.match(/<mod>(\d+)<\/mod>/);
-    return match ? match[1] : null;
-}
 
 class DanfeControllers {
     async gerarDanfeLocal(req, res) {
         try {
-            const { xml, idVenda } = req.body;
-            if (!xml || !idVenda) {
-                return res.status(400).json({ error: 'XML e ID da venda são obrigatórios.' });
+            const { xml, consulta, idVenda } = req.body;
+            if (!xml) {
+                return res.status(400).json({ error: 'XML não enviado' });
             }
 
-            const modelo = getModelo(xml);
-            if (!modelo) {
-                return res.status(400).json({ error: 'Não foi possível identificar o modelo do XML.' });
-            }
+            // Detecta o modelo pelo XML
+            let modelo = '55';
+            const match = xml.match(/<mod>(\d+)<\/mod>/);
+            if (match && match[1] === '65') modelo = '65';
+            console.log(modelo)
 
-            const xmlCorrigido = ensureDestInXml(xml);
+            // Extrai apenas o conteúdo <NFe>...</NFe>
+            const nfeMatch = xml.match(/<NFe[\s\S]*<\/NFe>/);
+            const xmlNFe = nfeMatch ? nfeMatch[0] : xml;
 
             let pdfBuffer;
             if (modelo === '65') {
-                pdfBuffer = await DANFCe({ xml: xmlCorrigido });
-            } else if (modelo === '55') {
-                pdfBuffer = await DANFe({ xml: xmlCorrigido });
+                pdfBuffer = await DANFCe({
+                    xml: xmlNFe,
+                    consulta: consulta || '',
+                });
+                console.log('DANFCe gerado');
             } else {
-                return res.status(400).json({ error: 'Modelo de documento não suportado.' });
+                pdfBuffer = await DANFe({
+                    xml: xmlNFe,
+                    consulta: consulta || '',
+                });
+                console.log('DANFe gerado');
             }
+            fs.writeFileSync(`DANFE_${idVenda || 'nfe'}.pdf`, pdfBuffer);
 
             res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename="DANFE_${idVenda}.pdf"`);
-            res.send(pdfBuffer);
-
+            res.setHeader('Content-Disposition', `attachment; filename="DANFE_${idVenda || 'nfe'}.pdf"`);
+            res.end(pdfBuffer);
         } catch (error) {
-            console.error('Erro ao gerar DANFE:', error);
-            res.status(500).json({ error: 'Erro ao gerar DANFE.' });
+            console.error('Erro no processo:', error.stack);
+            res.status(500).json({ error: error.message });
         }
     }
 }
