@@ -80,7 +80,7 @@ class CormercialControllers {
        
           
             try {
-                const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/comercial/empresa.xsjs?idmarca=${idMarca}`;
+                const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/comercial/empresa.xsjs?idmarca=${idMarca}`;
                 const response = await axios.get(apiUrl)
                 // const response = await getEmpresas(idMarca, idEmpresa, ufProd, page, pageSize)
                 return res.json(response.data); // Retorna
