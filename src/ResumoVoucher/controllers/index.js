@@ -401,9 +401,9 @@ class ResumoVoucherControllers {
    
             // const response = await createCliente(dados);
 
-            if(!IDCLIENTE) {
-                return res.status(400).json({ error: 'IDCLIENTE é obrigatório.' });
-            }   
+            // if(!IDCLIENTE) {
+            //     return res.status(400).json({ error: 'IDCLIENTE é obrigatório.' });
+            // }   
 
             if(!IDFUNCIONARIO) {
                 return res.status(400).json({ error: 'IDFUNCIONARIO é obrigatório.' });
@@ -412,9 +412,8 @@ class ResumoVoucherControllers {
             if(!NUCPFCNPJ) {
                 return res.status(400).json({ error: 'NUCPFCNPJ é obrigatório.' });
             }
-
+            console.log(req.body, 'body')
             const response = await axios.post(`${url}/api/gerencia/cliente.xsjs`, {
-                IDCLIENTE,
                 IDEMPRESA,
                 DSNOMERAZAOSOCIAL,
                 DSAPELIDONOMEFANTASIA,
