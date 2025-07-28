@@ -33,8 +33,8 @@ class PromocaoControllers  {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
         try {   
-            // const apiUrl = `${url}/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
-            const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `${url}/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             // const response = await getPromocaoAtiva(idResumoPromocao, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
 
