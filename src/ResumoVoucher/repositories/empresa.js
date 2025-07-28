@@ -9,46 +9,46 @@ export const getEmpresasVoucher = async (idEmpresa, idSubGrupoEmpresa, page, pag
         pageSize = pageSize && !isNaN(pageSize) ? parseInt(pageSize) : 1000;
 
         var query = `
-      SELECT 
-        tbe.IDEMPRESA,
-        tbe.STGRUPOEMPRESARIAL,
-        tbe.IDGRUPOEMPRESARIAL,
-        tbe.IDSUBGRUPOEMPRESARIAL,
-        tbe.NORAZAOSOCIAL,
-        tbe.NOFANTASIA,
-        tbe.NUCNPJ,
-        tbe.NUINSCESTADUAL,
-        tbe.NUINSCMUNICIPAL,
-        tbe.CNAE,
-        tbe.EENDERECO,
-        tbe.ECOMPLEMENTO,
-        tbe.EBAIRRO,
-        tbe.ECIDADE,
-        tbe.SGUF,
-        tbe.NUUF,
-        tbe.NUCEP,
-        tbe.NUIBGE,
-        tbe.EEMAILPRINCIPAL,
-        tbe.EEMAILCOMERCIAL,
-        tbe.EEMAILFINANCEIRO,
-        tbe.EEMAILCONTABILIDADE,
-        tbe.NUTELPUBLICO,
-        tbe.NUTELCOMERCIAL,
-        tbe.NUTELFINANCEIRO,
-        tbe.NUTELGERENCIA,
-        tbe.EURL,
-        tbe.PATHIMG,
-        tbe.NUCNAE,
-        tbe.STECOMMERCE,
-        TO_VARCHAR(tbe.DTULTATUALIZACAO,'YYYY-MM-DD HH24:MI:SS') AS DTULTATUALIZACAO,
-        tbe.STATIVO,
-        tbe.ALIQPIS,
-        tbe.ALIQCOFINS
-      FROM 
-        "${databaseSchema}".EMPRESA tbe
-      WHERE 
-        1 = ?
-    `;
+            SELECT 
+                tbe.IDEMPRESA,
+                tbe.STGRUPOEMPRESARIAL,
+                tbe.IDGRUPOEMPRESARIAL,
+                tbe.IDSUBGRUPOEMPRESARIAL,
+                tbe.NORAZAOSOCIAL,
+                tbe.NOFANTASIA,
+                tbe.NUCNPJ,
+                tbe.NUINSCESTADUAL,
+                tbe.NUINSCMUNICIPAL,
+                tbe.CNAE,
+                tbe.EENDERECO,
+                tbe.ECOMPLEMENTO,
+                tbe.EBAIRRO,
+                tbe.ECIDADE,
+                tbe.SGUF,
+                tbe.NUUF,
+                tbe.NUCEP,
+                tbe.NUIBGE,
+                tbe.EEMAILPRINCIPAL,
+                tbe.EEMAILCOMERCIAL,
+                tbe.EEMAILFINANCEIRO,
+                tbe.EEMAILCONTABILIDADE,
+                tbe.NUTELPUBLICO,
+                tbe.NUTELCOMERCIAL,
+                tbe.NUTELFINANCEIRO,
+                tbe.NUTELGERENCIA,
+                tbe.EURL,
+                tbe.PATHIMG,
+                tbe.NUCNAE,
+                tbe.STECOMMERCE,
+                TO_VARCHAR(tbe.DTULTATUALIZACAO,'YYYY-MM-DD HH24:MI:SS') AS DTULTATUALIZACAO,
+                tbe.STATIVO,
+                tbe.ALIQPIS,
+                tbe.ALIQCOFINS
+            FROM 
+                "${databaseSchema}".EMPRESA tbe
+            WHERE 
+            1 = ?
+        `;
 
         const params = [1];
 
