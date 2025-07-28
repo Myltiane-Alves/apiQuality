@@ -446,12 +446,47 @@ class ResumoVoucherControllers {
     }
     async postResumoVoucher(req, res) {
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body];
-            // const { MATRICULA, SENHA, IDGRUPOEMPRESARIAL, IDEMPRESALOGADA, IDVOUCHER, DTINVOUCHER } = dados[0] || {};
-   
-            const response = await createResumoVoucher(dados);
-    
-            return res.json(response);
+            let { 
+                IDVOUCHER,
+                IDEMPRESAORIGEM,
+                IDCAIXAORIGEM,
+                IDNFEDEVOLUCAO,
+                DTINVOUCHER,
+                IDUSRINVOUCHER,
+                IDVENDEDOR,
+                IDCLIENTE,
+                VRVOUCHER,
+                NUVOUCHER,
+                STATIVO,
+                STCANCELADO,
+                IDRESUMOVENDAWEB,
+                STSTATUS,
+                STTIPOTROCA,
+                MOTIVOTROCA,
+                IDUSRLIBERACAOCRIACAO
+             } = req.body;
+
+            const response = await axios.post(`${url}/api/resumo-voucher/todos-web.xsjs`, {
+               IDVOUCHER,
+                IDEMPRESAORIGEM,
+                IDCAIXAORIGEM,
+                IDNFEDEVOLUCAO,
+                DTINVOUCHER,
+                IDUSRINVOUCHER,
+                IDVENDEDOR,
+                IDCLIENTE,
+                VRVOUCHER,
+                NUVOUCHER,
+                STATIVO,
+                STCANCELADO,
+                IDRESUMOVENDAWEB,
+                STSTATUS,
+                STTIPOTROCA,
+                MOTIVOTROCA,
+                IDUSRLIBERACAOCRIACAO
+            });
+
+            return res.status(200).json({ message: 'Voucher criado com sucesso!' });
         } catch (error) {
             console.error("Erro no ResumoVoucherControllers.postResumoVoucher:", error);
             return res.status(400).json({ error: error.message });
@@ -487,8 +522,8 @@ class ResumoVoucherControllers {
                 IDEMPRESALOGADA,
                 IDGRUPOEMPRESARIAL
             })
-    
-            return res.stStatusus(200).json({ message: 'Voucher atualizado com sucesso!' });
+
+            return res.status(200).json({ message: 'Voucher atualizado com sucesso!' });
         } catch (error) {
             console.error("Erro no ResumoVoucherControllers.putResumoVoucher:", error);
             return res.status(400).json({ error: error.message });
