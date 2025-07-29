@@ -388,7 +388,25 @@ class FinanceiroVendasControllers {
       throw error;
     }
   }
-  
+
+  async getListaVendasTotalTO(req, res) {
+    let { dataPesquisa, idGrupo, page, pageSize } = req.query;
+
+      dataPesquisa = dataPesquisa ? dataPesquisa : '';
+      idGrupo = idGrupo ? idGrupo : '';
+      page = page ? page : '';
+      pageSize = pageSize ? pageSize : '';
+    try {
+      const apiUrl = `${url}/api/financeiro/venda-total-to.xsjs?dataPesquisa=${dataPesquisa}&idGrupo=${idGrupo}`
+      const response = await axios.get(apiUrl)
+      // const response = await getVendaTotalTO(dataPesquisa, idGrupo, page, pageSize)
+      return res.json(response.data);
+    } catch (error) {
+      console.error("erro ao buscar vendas totais por hora: no controller Vendas", error);
+      throw error;
+    }
+  }
+
   async putListaVendaPixStatusConferido(req, res) {
     try {
       const vendas = Array.isArray(req.body) ? req.body : [req.body];
@@ -400,8 +418,6 @@ class FinanceiroVendasControllers {
       return res.status(500).json({ error: error.message });
     }
   }
-
-
 }
 
 export default new FinanceiroVendasControllers();
