@@ -218,7 +218,7 @@ class ModulosControllers  {
          
             // const response = await updateMenuFilho(dados)
          
-            const response = await axios.post(`${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs`, [{
+            const response = await axios.post(`${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs`, {
                 IDUSUARIO,
                 CRIAR,
                 ALTERAR,
@@ -253,7 +253,7 @@ class ModulosControllers  {
                 N1,
                 IDMENU,
                 IDMENUFILHO,
-            }]);
+            });
             console.log("response", response.data);
             return res.json(response.data);
         } catch (error) {
