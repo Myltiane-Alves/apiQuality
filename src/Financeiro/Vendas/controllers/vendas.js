@@ -352,6 +352,24 @@ class FinanceiroVendasControllers {
     }
   }
 
+  async getListaVendasTotalLojaHora(req, res) {
+    let { dataPesquisa, horaFinal, page, pageSize } = req.query;
+
+      dataPesquisa = dataPesquisa ? dataPesquisa : '';
+      horaFinal = horaFinal ? horaFinal : '';
+      page = page ? page : '';
+      pageSize = pageSize ? pageSize : '';
+    try {
+      const apiUrl = `${url}/api/dashboard/venda-total-loja-hora.xsjs?dataPesquisa=${dataPesquisa}&horaFinal=${horaFinal}`
+      const response = await axios.get(apiUrl)
+      // const response = await getVendaTotalLojaHora(dataPesquisa, horaFinal, page, pageSize) 
+      return res.json(response.data);
+    } catch (error) {
+      console.error("erro ao buscar vendas totais por hora: no controller Vendas", error);
+      throw error;
+    }
+  }
+
   async putListaVendaPixStatusConferido(req, res) {
     try {
       const vendas = Array.isArray(req.body) ? req.body : [req.body];
