@@ -333,6 +333,25 @@ class FinanceiroVendasControllers {
 
   }
 
+   async getListaVendasTotalMes(req, res) {
+    let { dataPesquisaInicio, dataPesquisaFim, horaFinal, page, pageSize } = req.query;
+
+      dataPesquisaInicio = dataPesquisaInicio ? dataPesquisaInicio : '';
+      dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';
+      horaFinal = horaFinal ? horaFinal : '';
+      page = page ? page : '';
+      pageSize = pageSize ? pageSize : '';
+    try {
+      const apiUrl = `${url}/api/financeiro/venda-total-mes.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisa=${dataPesquisaFim}&horaFinal=${horaFinal}`
+      const response = await axios.get(apiUrl)
+      // const response = await getVendaTotalMes(dataPesquisaInicio, dataPesquisaFim, page, pageSize)
+      return res.json(response.data);
+    } catch (error) {
+      console.error("erro ao buscar vendas totais por mes: no controller Vendas", error);
+      throw error;
+    }
+  }
+
   async putListaVendaPixStatusConferido(req, res) {
     try {
       const vendas = Array.isArray(req.body) ? req.body : [req.body];
