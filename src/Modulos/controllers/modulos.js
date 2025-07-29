@@ -169,7 +169,92 @@ class ModulosControllers  {
                 IDMENU,
                 IDMENUFILHO,
             });
+            
+            return res.json(response.data);
+        } catch (error) {
+            console.error("Erro no ModulosControllers.putPerfilUsuarioMenu: ", error);
+            throw error;
+        }
+    }
 
+    async postPerfilUsuarioMenu(req, res) {
+        try {
+            let {
+                IDUSUARIO,
+                CRIAR,
+                ALTERAR,
+                STATIVO,
+                DATAULTIMAALTERACAO,
+                DATA_CRIACAO,
+                IDMODULO,
+                IDMODULOADMINISTRATIVO,
+                IDMODULOCOMERCIAL,
+                IDMODULOCONTABILIDADE,
+                IDMODULOFINANCEIRO,
+                IDMODULOGERENCIA,
+                IDMODULOINFORMATICA,
+                IDMODULOMARKETING,
+                IDMODULOCOMPRAS,
+                IDMODULOCADASTRO,
+                IDMODULOEXPEDICAO,
+                IDMODULOCOMPRASADM,
+                IDMODULOETIQUETAGEM,
+                IDMODULOCONFERENCIACEGA,
+                IDMODULOVOUCHER,
+                IDMODULOMALOTE,
+                IDMODULORH,
+                IDUSERULTIMAALTERACAO,
+                IDPERMISSAO,
+                IDMODULORESUMOVENDAS,
+                IDMODULOPROMOCAO,
+                ADMINISTRADOR,
+                N4,
+                N3,
+                N2,
+                N1,
+                IDMENU,
+                IDMENUFILHO,
+            } = req.body 
+         
+            // const response = await updateMenuFilho(dados)
+         
+            const response = await axios.post(`${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs`, [{
+                IDUSUARIO,
+                CRIAR,
+                ALTERAR,
+                STATIVO,
+                DATAULTIMAALTERACAO,
+                DATA_CRIACAO,
+                IDMODULO,
+                IDMODULOADMINISTRATIVO,
+                IDMODULOCOMERCIAL,
+                IDMODULOCONTABILIDADE,
+                IDMODULOFINANCEIRO,
+                IDMODULOGERENCIA,
+                IDMODULOINFORMATICA,
+                IDMODULOMARKETING,
+                IDMODULOCOMPRAS,
+                IDMODULOCADASTRO,
+                IDMODULOEXPEDICAO,
+                IDMODULOCOMPRASADM,
+                IDMODULOETIQUETAGEM,
+                IDMODULOCONFERENCIACEGA,
+                IDMODULOVOUCHER,
+                IDMODULOMALOTE,
+                IDMODULORH,
+                IDUSERULTIMAALTERACAO,
+                IDPERMISSAO,
+                IDMODULORESUMOVENDAS,
+                IDMODULOPROMOCAO,
+                ADMINISTRADOR,
+                N4,
+                N3,
+                N2,
+                N1,
+                IDMENU,
+                IDMENUFILHO,
+            }]);
+            console.log("response", response.data);
             return res.json(response.data);
         } catch (error) {
             console.error("Erro no ModulosControllers.putPerfilUsuarioMenu: ", error);

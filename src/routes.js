@@ -110,6 +110,7 @@ routes.get('/menus', ModulosControllers.getListaSubMenusUsuario)
 
 routes.put('/perfil-permissao/:id', ModulosControllers.putPerfilPermissoes)
 routes.put('/perfil-usuario/:id', ModulosControllers.putPerfilUsuarioMenu)
+routes.post('/criar-perfil-usuario', ModulosControllers.postPerfilUsuarioMenu)
 
 // routes.get('/listaCaixasMovimento', AdministrativoControllers.getListaCaixasMovimento);
 //Início Administrativo
