@@ -254,7 +254,7 @@ class ModulosControllers  {
                 IDMENU,
                 IDMENUFILHO,
             });
-            console.log("response", response.data);
+          
             return res.json(response.data);
         } catch (error) {
             console.error("Erro no ModulosControllers.putPerfilUsuarioMenu: ", error);
