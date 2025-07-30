@@ -129,8 +129,8 @@ class FinanceiroControllers {
     pageSize = pageSize ? pageSize : '';
     // ajaxGet('api/dashboard/extrato-loja-periodo.xsjs?pageSize=500&page=1&idEmpresa=' + idemp + '&dataPesquisaInicio=' + datapesq + '&dataPesquisaFim=' + datapesq)
     try {
-      // const apiUrl = `${url}/api/financeiro/extrato-loja-periodo.xsjs?pageSize=${pageSize}&page=${page}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/financeiro/extrato-loja-periodo.xsjs?pageSize=${pageSize}&page=${page}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
+      const apiUrl = `${url}/api/financeiro/extrato-loja-periodo.xsjs?pageSize=${pageSize}&page=${page}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
+      // const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/financeiro/extrato-loja-periodo.xsjs?pageSize=${pageSize}&page=${page}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
       const response = await axios.get(apiUrl)
       // const response = await getExtratoLojaPeriodo(idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
 
@@ -1305,7 +1305,7 @@ class FinanceiroControllers {
     let { IDADIANTAMENTOSALARIO, STATIVO } = req.body;
 
     try {
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/atualizacao-adiantamento-status.xsjs`
+      const apiUrl = `${url}/api/financeiro/atualizacao-adiantamento-status.xsjs`
       const response = await axios.put(apiUrl, {
         IDADIANTAMENTOSALARIO,
         STATIVO
