@@ -266,6 +266,35 @@ class PromocaoControllers  {
     }
 
 
+    async putStatusPromocao(req, res) {
+        try {
+            let {
+                IDRESUMOPROMOCAOMARKETING,
+                STATIVO,
+                IDEMPRESA,
+                IDEMPRESAPROMOCAOMARKETING
+            } = req.body;
+
+            if(!IDRESUMOPROMOCAOMARKETING) {
+                return res.status(400).json({ error: "IDRESUMOPROMOCAOMARKETING é obrigatório." });
+            }
+            const response = await axios.put(`${url}/api/promocoes-ativas/desativar-status-promocao.xsjs`, [{
+                STATIVO,
+                IDRESUMOPROMOCAOMARKETING,
+                IDEMPRESA,
+                IDEMPRESAPROMOCAOMARKETING
+            }]);
+
+            return res.status(200).json({
+                message: "Empresa da Promoção atualizada com sucesso",
+                data: response.data
+            });
+
+        } catch (error) {
+            console.error("Erro ao atualizar Empresa da Promoção:", error);
+            return res.status(500).json({ error: "Erro ao atualizar Empresa da Promoção." });
+        }
+    }
     
     async postPromocao(req, res) {
         try {
