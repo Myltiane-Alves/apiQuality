@@ -20,7 +20,7 @@ class ExtratosControllers {
       pageSize = pageSize ? pageSize : '';
       
       try {
-        const apiUrl = `${url}/api/financeiro/extrato-loja-periodo.xsjs?page=${page}&pageSize=${pageSize}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
+        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/extrato-loja-periodo.xsjs?page=${page}&pageSize=${pageSize}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
         // const response = await getListaTotal(idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
         const response = await axios.get(apiUrl)
         return res.json(response.data);
