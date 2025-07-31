@@ -712,6 +712,8 @@ routes.get('/listaPreco', ListaPrecoControllers.getListaPrecoPorMarca)
 
 routes.get('/promocoes-ativas', PromocaoControllers.getListaPromocoesAtivas)
 routes.get('/produto-promocao-ativa', PromocaoControllers.getListaProdutosPromocoesAtiva)
+routes.get('/produto-promocao-destino', PromocaoControllers.getListaProdutosDestinoPromocoesAtiva)
+routes.get('/produto-promocao-origem', PromocaoControllers.getListaProdutosOrigemPromocoesAtiva)
 routes.get('/mecanicas-ativas', PromocaoControllers.getListaMecanicaAtivas)
 routes.get('/detalhe-promocoes-ativas', PromocaoControllers.getListaDetalhesPromocoesAtivas)
 routes.get('/empresa-promocoes-ativas', PromocaoControllers.getListaEmpresasPromocoesAtiva)

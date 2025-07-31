@@ -65,13 +65,14 @@ class PromocaoControllers  {
         idEmpresa = idEmpresa ? idEmpresa : '';        
         idProduto = idProduto ? idProduto : '';
         dsProduto = dsProduto ? dsProduto : '';
-;
+        codBarras = codBarras ? codBarras : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
     
         try {   
             const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-ativa.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
+          
             return res.json(response.data); // Retorna
         } catch(error) {
             console.error("Erro no PromoçãoControllers getListaProdutosPromocoesAtiva:", error);
@@ -87,7 +88,7 @@ class PromocaoControllers  {
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch(error) {
