@@ -65,7 +65,7 @@ class PromocaoControllers  {
         idEmpresa = idEmpresa ? idEmpresa : '';        
         idProduto = idProduto ? idProduto : '';
         dsProduto = dsProduto ? dsProduto : '';
-        codBarras = codBarras ? codBarras : '';
+;
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
     
@@ -78,6 +78,42 @@ class PromocaoControllers  {
             return res.status(500).json({ error: "Erro no servidor ao buscar produtos." });
         } 
     }
+
+    async getListaProdutosDestinoPromocoesAtiva(req, res) {
+        let {  idProduto, dsProduto,  page, pageSize  } = req.query;      
+        idProduto = idProduto ? idProduto : '';
+        dsProduto = dsProduto ? dsProduto : '';
+        page = page ? page : '';
+        pageSize = pageSize ? pageSize : '';
+    
+        try {   
+            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&page=${page}&pageSize=${pageSize}`;
+            const response = await axios.get(apiUrl)
+            return res.json(response.data); // Retorna
+        } catch(error) {
+            console.error("Erro no PromoçãoControllers getListaProdutosDestinoPromocoesAtiva:", error);
+            return res.status(500).json({ error: "Erro no servidor ao buscar produtos." });
+        } 
+    }
+
+    async getListaProdutosOrigemPromocoesAtiva(req, res) {
+        let {  idProduto, dsProduto,  page, pageSize  } = req.query;      
+        idProduto = idProduto ? idProduto : '';
+        dsProduto = dsProduto ? dsProduto : '';
+        page = page ? page : '';
+        pageSize = pageSize ? pageSize : '';
+    
+        try {   
+            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&page=${page}&pageSize=${pageSize}`;
+            const response = await axios.get(apiUrl)
+            return res.json(response.data); // Retorna
+        } catch(error) {
+            console.error("Erro no PromoçãoControllers getListaProdutosOrigemPromocoesAtiva:", error);
+            return res.status(500).json({ error: "Erro no servidor ao buscar produtos." });
+        } 
+    }
+
+
     async getListaEmpresasPromocoesAtiva(req, res) {
         let { idResumoPromocao, page, pageSize  } = req.query; 
         idResumoPromocao = idResumoPromocao ? idResumoPromocao : '';
