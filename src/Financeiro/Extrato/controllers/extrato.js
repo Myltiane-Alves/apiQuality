@@ -71,6 +71,34 @@ class ExtratosControllers {
       return res.status(500).json({ error: error.message });
     }
   }
+  async postListaAjusteExtrato(req, res) {
+    try {
+      let {
+        IDEMPRESA,
+        DSHISTORIO,
+        VRDEBITO,
+        VRCREDITO,
+        STATIVO,
+        STCANCELADO,
+        IDOPERADOR,
+        DATACADASTRO,
+      } = req.body; 
+      const response = await axios.post(`${url}/api/financeiro/ajuste-extrato.xsjs`, {
+        IDEMPRESA,
+        DSHISTORIO,
+        VRDEBITO,
+        VRCREDITO,
+        STATIVO,
+        STCANCELADO,
+        IDOPERADOR,
+        DATACADASTRO,
+      });
+      return res.json(response);
+    } catch (error) {
+      console.error("Unable to connect to the database:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default new ExtratosControllers();
