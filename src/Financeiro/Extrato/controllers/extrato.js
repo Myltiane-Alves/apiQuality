@@ -75,7 +75,7 @@ class ExtratosControllers {
     try {
       let {
         IDEMPRESA,
-        DSHISTORIO,
+        HISTORICO,
         VRDEBITO,
         VRCREDITO,
         STATIVO,
@@ -85,7 +85,7 @@ class ExtratosControllers {
       } = req.body;
       const response = await axios.post(`${url}/api/financeiro/ajuste-extrato.xsjs`, {
         IDEMPRESA,
-        DSHISTORIO,
+        HISTORICO,
         VRDEBITO,
         VRCREDITO,
         STATIVO,
