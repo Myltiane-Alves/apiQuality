@@ -262,7 +262,8 @@ routes.post('/motivoDevolucao', FinanceiroControllers.createMotivoDevolucao)
 
 routes.get('/primeira-venda', ExtratosControllers.getPrimeiraVenda)
 routes.get('/lista-extrato', ExtratosControllers.getListaExtratoDaLojaPeriodoFinanceiro)
-routes.put('/ajuste-extrato', ExtratosControllers.putListaAjusteExtrato)
+routes.put('/ajuste-extrato/:id', ExtratosControllers.putListaAjusteExtrato)
+routes.post('/ajuste-extrato', ExtratosControllers.postListaAjusteExtrato)
 
 routes.get('/resumo-voucher', VoucherControllers.getListaResumoVoucherFinanceiro)
 // routes.put('/atualizacaoAdiantamentoStatus', FinanceiroControllers.updateAdiantamentoStatus)
