@@ -81,14 +81,15 @@ class PromocaoControllers  {
     }
 
     async getListaProdutosDestinoPromocoesAtiva(req, res) {
-        let {  idProduto, dsProduto,  page, pageSize  } = req.query;      
+        let {  idProduto, dsProduto, codBarras, page, pageSize  } = req.query;      
         idProduto = idProduto ? idProduto : '';
         dsProduto = dsProduto ? dsProduto : '';
+        codBarras = codBarras ? codBarras : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch(error) {
@@ -98,14 +99,15 @@ class PromocaoControllers  {
     }
 
     async getListaProdutosOrigemPromocoesAtiva(req, res) {
-        let {  idProduto, dsProduto,  page, pageSize  } = req.query;      
+        let {  idProduto, dsProduto, codBarras, page, pageSize  } = req.query;      
         idProduto = idProduto ? idProduto : '';
         dsProduto = dsProduto ? dsProduto : '';
+        codBarras = codBarras ? codBarras : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch(error) {
