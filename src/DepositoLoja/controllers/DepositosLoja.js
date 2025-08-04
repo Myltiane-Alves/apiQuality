@@ -92,6 +92,25 @@ class DepositosLojaControllers  {
         }
        
     }
+    async putAtualizarStatusDepositoLoja(req, res) {
+        try {
+            let {IDDEPOSITOLOJA, STCANCELADO } = req.body;
+
+            if(!IDDEPOSITOLOJA) {
+                return res.status(400).json({ error: "IDDEPOSITOLOJA is required." });
+            }
+            const response = await axios.post(`${url}/api/deposito-loja/atualizacao-status.xsjs`, {
+                IDDEPOSITOLOJA,
+                STCANCELADO
+            });
+
+            return res.status(201).json(response.data);
+        } catch (error) {
+            console.error("Erro no servidor:", error);
+            return res.status(500).json({ error: error.message });
+        }
+       
+    }
 
     async cadastroDepositoLoja(req, res) {
         
