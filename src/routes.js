@@ -641,8 +641,8 @@ routes.get('/depositosLoja', DepositosLojaControllers.getListaDepositosLojaEmpre
 routes.get('/deposito-loja-empresa', DepositosLojaControllers.getListaDepositosLojaEmpresa)
 
 routes.post('/cadastrar-deposito-loja', DepositosLojaControllers.cadastroDepositoLoja)
-// routes.post('/cadastrar-deposito-loja', DepositosLojaControllers.postListaDepositosLoja)
 routes.put('/atualizar-deposito-loja', DepositosLojaControllers.putListaDepositosLoja)
+routes.put('/atualizacao-status-conferido/:id', DepositosLojaControllers.putAtualizarStatusConferido)
 
 // Conta Banco
 routes.get('/contaBanco', ContaBancoControllers.getListaContaBanco)

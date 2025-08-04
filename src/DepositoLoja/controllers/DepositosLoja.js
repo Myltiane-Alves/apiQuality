@@ -72,13 +72,22 @@ class DepositosLojaControllers  {
        
     }
     
-    async postListaDepositosLoja(req, res) {
+    async putAtualizarStatusConferido(req, res) {
         try {
-            const depositos = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await  createDepositoLoja(depositos);
-            return res.json(response);
+            let {IDDEPOSITOLOJA, STCONFERIDO, DTCOMPENSACAO } = req.body;
+
+            if(!IDDEPOSITOLOJA) {
+                return res.status(400).json({ error: "IDDEPOSITOLOJA is required." });
+            }
+            const response = await axios.post(`${url}/api/deposito-loja/atualizacao-status-conferido.xsjs`, {
+                IDDEPOSITOLOJA,
+                STCONFERIDO,
+                DTCOMPENSACAO
+            });
+
+            return res.status(201).json(response.data);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("Erro no servidor:", error);
             return res.status(500).json({ error: error.message });
         }
        
