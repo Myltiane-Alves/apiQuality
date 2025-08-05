@@ -44,7 +44,8 @@ class DepositosControllers {
     page = page ? page : '';
     pageSize = pageSize ? pageSize : '';
     try {
-      const apiUrl = `${url}/api/financeiro/deposito-loja.xsjs?page=${page}&pagesize=${pageSize}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
+      // http://164.152.245.77:8000/quality/concentrador/api/financeiro/deposito-loja.xsjs?&idConta=10&dataPesquisaInicio=2025-07-05&dataPesquisaFim=2025-07-31&dataCompInicio=&dataCompFim=&datamovinicio=&datamovfim=&page=1
+      const apiUrl = `${url}/api/financeiro/deposito-loja.xsjs?idDeposito=${idDeposito}&idConta=${idConta}&idEmpresa=${idEmpresa}&dataCompInicio=${dataCompInicio}&dataCompFim=${dataCompFim}&dataMovInicio=${dataMovInicio}&dataMovFim=${dataMovFim}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
       // const response = await getDepositoLoja(idDeposito, idConta, idEmpresa, dataCompInicio, dataCompFim, dataMovInicio, dataMovFim, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
 
