@@ -60,6 +60,7 @@ import DashBoardFuncionariosControllers from './DashBoard/Funcionario/controller
 import DashBoardAdiantamentoSalarialControllers from './DashBoard/AdiantamentoSalarial/controllers/index.js';
 import GerenciaControllers from './Gerencia/controllers/index.js';
 
+import ServiceLayerControllers from './ServiceLayer/controllers/index.js'
 
 //  Gerencia
 import GERAlteracaoPrecoControllers from './Gerencia/AlteracaoPreco/controllers/index.js'
@@ -727,6 +728,9 @@ routes.put('/desativar-produto-promocao-origem', PromocaoControllers.putProdutoO
 routes.put('/desativar-empresa-promocao', PromocaoControllers.putEmpresaPromocao)
 routes.put('/desativar-status-promocao', PromocaoControllers.putStatusPromocao)
 // routes.post('/criar-mecanica', PromocaoControllers.postMecanicaAtivas)
+
+routes.post('/deposito-integracao', ServiceLayerControllers.postDepositoIntegrarNoSAP)
+
 
 // // Logs
 // routes.get('/log-web', LogsControllers.getListaLogsUsuario)
