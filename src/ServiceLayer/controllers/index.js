@@ -15,9 +15,9 @@ class ServiceLayerControllers {
                 return res.status(400).json({ message: 'ID do depósito é obrigatório.' });
             }
 
-           const response = await axios.post(`api/service-layer/deposito/jobs/depositos-integracao.xsjs?`, {
+           const response = await axios.post(`api/service-layer/deposito/jobs/depositos-integracao.xsjs?`, [{
                IDDEPOSITOLOJA
-           })
+           }])
             res.status(200).json({ message: 'Depósito integrado no SAP com sucesso.' });
         } catch (error) {
             console.error('Erro ao integrar depósito no SAP:', error);
