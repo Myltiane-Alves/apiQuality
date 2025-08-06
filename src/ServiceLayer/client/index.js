@@ -11,8 +11,8 @@ export class ServiceLayerClient {
             timeout: 80000,
         });
     }
-
     async integrarDeposito(IDDEPOSITOLOJA) {
+        console.log('IDDEPOSITOLOJA recebido no client:', IDDEPOSITOLOJA);
         return this.api.post(`${url}/api/service-layer/deposito/jobs/depositos-integracao.xsjs`, { IDDEPOSITOLOJA });
     }
 }
