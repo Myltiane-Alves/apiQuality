@@ -45,11 +45,13 @@ class DepositosControllers {
     pageSize = pageSize ? pageSize : '';
     try {
       // http://164.152.245.77:8000/quality/concentrador/api/financeiro/deposito-loja.xsjs?&idConta=10&dataPesquisaInicio=2025-07-05&dataPesquisaFim=2025-07-31&dataCompInicio=&dataCompFim=&datamovinicio=&datamovfim=&page=1
-      // http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/deposito-loja.xsjs?&idConta=10&dataPesquisaInicio=2024-08-06&dataPesquisaFim=2025-08-06&dataCompInicio=&dataCompFim=&datamovinicio=&datamovfim=&page=1
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/deposito-loja.xsjs?idDeposito=${idDeposito}&idConta=${idConta}&idEmpresa=${idEmpresa}&dataCompInicio=${dataCompInicio}&dataCompFim=${dataCompFim}&dataMovInicio=${dataMovInicio}&dataMovFim=${dataMovFim}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`
+      
+
+      //http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/deposito-loja.xsjs?idDeposito=&idConta=10&idEmpresa=&dataCompInicio=&dataCompFim=&dataMovInicio=&dataMovFim=&dataPesquisaInicio=2024-08-07&dataPesquisaFim=2025-08-07&page=1&pageSize=
+      const apiUrl = `${url}/api/financeiro/deposito-loja.xsjs?idDeposito=${idDeposito}&idConta=${idConta}&idEmpresa=${idEmpresa}&dataCompInicio=${dataCompInicio}&dataCompFim=${dataCompFim}&dataMovInicio=${dataMovInicio}&dataMovFim=${dataMovFim}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
       // const response = await getDepositoLoja(idDeposito, idConta, idEmpresa, dataCompInicio, dataCompFim, dataMovInicio, dataMovFim, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
-
+      // console.log(apiUrl, 'APIuRL')
       return res.json(response.data);
     } catch (error) {
       console.error("Unable to connect to the database:", error);
