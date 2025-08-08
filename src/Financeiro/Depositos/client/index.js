@@ -9,7 +9,7 @@ export class DepositoClient {
         });
     }
     async cancelarDeposito(IDDEPOSITOLOJA) {
-        console.log(IDDEPOSITOLOJA, 'IDDEPOSITOLOJA');
+        
         const response = await this.api.put('/api/financeiro/atualizar-deposito-loja.xsjs', IDDEPOSITOLOJA);
         return response.data;
     }
