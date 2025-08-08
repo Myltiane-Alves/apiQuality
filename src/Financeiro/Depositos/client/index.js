@@ -5,12 +5,12 @@ const url = process.env.API_URL;
 export class DepositoClient {
     constructor(baseURL) {
         this.api = axios.create({
-            baseURL: baseURL || url,
-            timeout: 80000,
+            baseURL: baseURL || url
         });
     }
-    async integrarDeposito(IDDEPOSITOLOJA) {
-        const response = await this.api.post(`${url}/api/service-layer/deposito/jobs/depositos-integracao.xsjs`, IDDEPOSITOLOJA);
+    async cancelarDeposito(IDDEPOSITOLOJA) {
+        console.log(IDDEPOSITOLOJA, 'IDDEPOSITOLOJA');
+        const response = await this.api.put('/api/financeiro/atualizar-deposito-loja.xsjs', IDDEPOSITOLOJA);
         return response.data;
     }
 }

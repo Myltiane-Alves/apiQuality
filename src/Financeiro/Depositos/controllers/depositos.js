@@ -2,7 +2,11 @@
 import axios from "axios";
 import { getDepositoLoja, putDepositoLoja } from "../repositories/depositoLoja.js";
 import 'dotenv/config';
+import { DepositoService } from "../services/index.js";
+import { DepositoClient } from "../client/index.js";
 const url = process.env.API_URL;
+const client = new DepositoClient(process.env.API_URL);
+const cancelarDeposito = new DepositoService(client);
 
 class DepositosControllers {
   async getListaConciliarBanco(req, res) {
@@ -60,18 +64,14 @@ class DepositosControllers {
 
   }
 
-  async updateDepositoLoja(req, res) {
-    let { IDDEPOSITOLOJA } = req.body;
-
-    if(!IDDEPOSITOLOJA) {
-      return res.status(400).json({ error: "IDDEPOSITOLOJA is required" });
-    }
-
+  async updateDepositoLoja(req, res) {    
+   
     try {
-      // const response = await putDepositoLoja(IDDEPOSITOLOJA)
-      // const despesas = Array.isArray(req.body) ? req.body : [req.body]; 
-      const response = await axios.put(`${url}/api/financeiro/atualizar-deposito-loja.xsjs`, {IDDEPOSITOLOJA: IDDEPOSITOLOJA});
-      return res.json(response.data);
+
+      let { IDDEPOSITOLOJA } = req.body;
+
+      const result = await cancelarDeposito.cancelarDeposito({IDDEPOSITOLOJA})
+      return res.json(result);  
     } catch (error) {
       console.error("Erro no DepositosControllers:", error);
       res.status(500).json({ error: "Erro ao atualizar depósito loja" });
