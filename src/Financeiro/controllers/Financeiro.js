@@ -34,9 +34,12 @@ import { getExtratoLojaPeriodo } from "../Extrato/repositories/extratoLojaPeriod
 // import { getMotivoDevolucao, putMotivoDevolucao } from "../Financeiro/Devolucao/repositories/motivoDevolucao.js";
 // import { getVendas } from "../repositories/repositoriesVendaTotal.js";
 import 'dotenv/config';
+import { MaloteClient } from "../Malotes/client/index.js";
+import { MaloteService } from "../Malotes/services/index.js";
 const url = process.env.API_URL;
 
-
+const maloteClient = new MaloteClient(process.env.API_URL);
+const maloteService = new MaloteService(maloteClient);
 class FinanceiroControllers {
 
   async getListasHistoricosMalotes(req, res) {
@@ -1380,22 +1383,35 @@ class FinanceiroControllers {
   async putMalotesLoja(req, res) {
         
     try {
-        let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
+        // let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
     
-        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
-          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
-        }
+        // if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
+        //   return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
+        // }
 
-        const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
+        // const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
+        //   IDMALOTE,
+        //   STATUS,
+        //   OBSERVACAOADMINISTRATIVO,
+        //   PENDENCIAS,
+        //   IDUSERULTIMAALTERACAO
+        // })
+        // // const response = await updateMalote(IDMALOTE, IDUSERULTIMAALTERACAO)
+
+        // return res.status(200).json(response.data);
+
+        let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
+
+
+        const response = await maloteService.updateMalote({
           IDMALOTE,
           STATUS,
           OBSERVACAOADMINISTRATIVO,
           PENDENCIAS,
           IDUSERULTIMAALTERACAO
-        })
-        // const response = await updateMalote(IDMALOTE, IDUSERULTIMAALTERACAO)
-
-        return res.status(200).json(response.data);
+        });
+        console.log("controller", response);
+        return res.status(200).json(response);
       } catch (error) {
         console.error("Erro no FinanceiroControllers.putMalotes:", error);
         return res.status(500).json({ error: "Erro no servidor" });
