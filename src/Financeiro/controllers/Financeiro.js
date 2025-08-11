@@ -1382,12 +1382,11 @@ class FinanceiroControllers {
     try {
         let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
     
-        if(!IDMALOTE || IDUSERULTIMAALTERACAO) {
-          console.error("Erro no FinanceiroControllers.putMalotes: Faltando Parametos obrigatórios", error);
-          return res.status(400).json({ error: "Faltando Parametos obrigatórios" });
+        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
+          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
         }
-        const apiUrl = `${url}/api/financeiro/malote-loja.xsjs`;
-        const response = await axios.put(apiUrl, {
+
+        const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
           IDMALOTE,
           STATUS,
           OBSERVACAOADMINISTRATIVO,
@@ -1396,10 +1395,6 @@ class FinanceiroControllers {
         })
         // const response = await updateMalote(IDMALOTE, IDUSERULTIMAALTERACAO)
 
-        if (response.status !== 200) {
-          console.error("Erro no FinanceiroControllers.putMalotes: Erro ao atualizar malote", response.data);
-          return res.status(response.status).json({ error: "Erro ao atualizar malote" });
-        }
         return res.status(200).json(response.data);
       } catch (error) {
         console.error("Erro no FinanceiroControllers.putMalotes:", error);
