@@ -11,4 +11,5 @@ export class DepositoService {
         await this.client.integrarDeposito(IDDEPOSITOLOJA);
         return;
     }
+    
 }

@@ -1377,7 +1377,7 @@ class FinanceiroControllers {
   //   }
   // }
 
-   async putMalotesLoja(req, res) {
+  async putMalotesLoja(req, res) {
         
     try {
         let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
