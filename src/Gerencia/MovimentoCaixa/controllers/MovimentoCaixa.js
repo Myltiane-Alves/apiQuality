@@ -99,11 +99,11 @@ class MovimentoCaixaControllers {
     async putListaAtualizacaoStatus(req, res) {
         try {
             let {IDSUPERVISOR, STCONFERIDO, ID} = req.body;
-            const dados = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await axios.put(`${url}/api/movimento-caixa/atualizacao-status.xsjs`, dados);
-            // const response = await putAtualizacaoStatus(status);
+            
+            const response = await movimentoCaixaService.updateStatus(IDSUPERVISOR, STCONFERIDO, ID)
+          
 
-            return res.json(response.data);
+            return res.status(200).json(response);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             return res.status(500).json({ error: error.message });
