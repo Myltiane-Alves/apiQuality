@@ -22,4 +22,5 @@ export class MaloteService {
         
         return result;
     }
+    
 }
