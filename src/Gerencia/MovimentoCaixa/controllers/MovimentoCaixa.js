@@ -90,7 +90,7 @@ class MovimentoCaixaControllers {
          
         }
       
-      }
+    }
 
     async putListaAtualizacaoStatus(req, res) {
         try {
@@ -103,6 +103,7 @@ class MovimentoCaixaControllers {
             return res.status(500).json({ error: error.message });
         }
     }
+
     async putListaAjusteRecebimento(req, res) {
         try {
             let {ID, VRAJUSTDINHEIRO, VRAJUSTTEF, VRAJUSTPOS, VRAJUSTFATURA, VRAJUSTVOUCHER, VRAJUSTCONVENIO, VRAJUSTPIX, VRAJUSTPL, TXT_OBS, VRQUEBRACAIXA} = req.body; 
