@@ -105,7 +105,7 @@ class MovimentoCaixaControllers {
 
             return res.status(200).json(response);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("Erro no MovimentoCaixaControllers.putListaAtualizacaoStatus:", error);
             return res.status(500).json({ error: error.message });
         }
     }
