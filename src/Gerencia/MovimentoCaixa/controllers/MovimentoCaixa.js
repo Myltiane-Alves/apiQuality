@@ -5,8 +5,12 @@ import { putAtualizacaoStatus } from "../repositories/atualizacaoStatus.js";
 import { putAjusteRecebimento } from "../repositories/ajusteRecebimento.js";
 import { getFechamentoCaixa } from "../repositories/fechamentoCaixa.js";
 import 'dotenv/config';
+import { MovimentoCaixaClient } from "../client/index.js";
+import { MovimentoCaixaService } from "../services/index.js";
 const url = process.env.API_URL;
 
+const movimentoCaixaClient = new MovimentoCaixaClient(process.env.API_URL);
+const movimentoCaixaService = new MovimentoCaixaService(movimentoCaixaClient);
 class MovimentoCaixaControllers {
 
     async listaCaixasMovimentojuste(req, res) {
@@ -94,9 +98,11 @@ class MovimentoCaixaControllers {
 
     async putListaAtualizacaoStatus(req, res) {
         try {
+            let {IDSUPERVISOR, STCONFERIDO, ID} = req.body;
             const dados = Array.isArray(req.body) ? req.body : [req.body]; 
             const response = await axios.put(`${url}/api/movimento-caixa/atualizacao-status.xsjs`, dados);
             // const response = await putAtualizacaoStatus(status);
+
             return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);

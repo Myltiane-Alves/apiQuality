@@ -17,7 +17,6 @@ export class MaloteFinanceiroController {
         IDUSERULTIMAALTERACAO
       );
 
-
       return res.status(200).json(response);
     } catch (error) {
       console.error("Erro no MaloteFinanceiroController.putMalotes:", error);
