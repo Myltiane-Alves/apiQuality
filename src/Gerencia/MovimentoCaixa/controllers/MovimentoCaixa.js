@@ -104,6 +104,8 @@ class MovimentoCaixaControllers {
                 return res.status(400).json({ error: "IDSUPERVISOR é obrigatório." });
             }
 
+            const response = await movimentoCaixaService.updateStatus(IDSUPERVISOR, STCONFERIDO, ID);
+
             return res.status(200).json(response);
         } catch (error) {
             console.error("Erro no MovimentoCaixaControllers.putListaAtualizacaoStatus:", error);
