@@ -11,16 +11,16 @@ export class MaloteClient {
     }
 
     
-    async atualizarMalote(IDMALOTE, IDUSERULTIMAALTERACAO, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS) {
-        // console.log(IDMALOTE, IDUSERULTIMAALTERACAO, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, 'CLIENT')
-        const response = await this.api.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, 
-            IDMALOTE,
-            IDUSERULTIMAALTERACAO,
-            STATUS,
-            OBSERVACAOADMINISTRATIVO,
-            PENDENCIAS
-        );
-        console.log(response.data, 'CLIENT');
+    async atualizarMalote(IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO) {
+
+        const response = await this.api.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
+          IDMALOTE,
+          STATUS,
+          OBSERVACAOADMINISTRATIVO,
+          PENDENCIAS,
+          IDUSERULTIMAALTERACAO
+        });
+     
         return response.data;
     }
 }

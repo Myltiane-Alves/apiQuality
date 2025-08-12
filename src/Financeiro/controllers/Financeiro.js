@@ -1380,37 +1380,47 @@ class FinanceiroControllers {
   //   }
   // }
 
-  async putMalotesLoja(req, res) {
+  async putMalotesLoja2(req, res) {
         
     try {
-        // let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
-    
-        // if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
-        //   return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
-        // }
-
-        // const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
-        //   IDMALOTE,
-        //   STATUS,
-        //   OBSERVACAOADMINISTRATIVO,
-        //   PENDENCIAS,
-        //   IDUSERULTIMAALTERACAO
-        // })
-        // // const response = await updateMalote(IDMALOTE, IDUSERULTIMAALTERACAO)
-
-        // return res.status(200).json(response.data);
-
         let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
+    
+        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
+          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
+        }
 
-
-        const response = await maloteService.updateMalote({
+        const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
           IDMALOTE,
           STATUS,
           OBSERVACAOADMINISTRATIVO,
           PENDENCIAS,
           IDUSERULTIMAALTERACAO
-        });
-        console.log("controller", response);
+        })
+
+        return res.status(200).json(response.data);
+      } catch (error) {
+        console.error("Erro no FinanceiroControllers.putMalotes:", error);
+        return res.status(500).json({ error: "Erro no servidor" });
+    }
+  }
+
+  async putMalotesLoja(req, res) {
+        
+    try {
+        let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
+
+        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
+          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
+        }
+
+        const response = await maloteService.updateMalote(
+          IDMALOTE,
+          STATUS,
+          OBSERVACAOADMINISTRATIVO,
+          PENDENCIAS,
+          IDUSERULTIMAALTERACAO
+        );
+        
         return res.status(200).json(response);
       } catch (error) {
         console.error("Erro no FinanceiroControllers.putMalotes:", error);
