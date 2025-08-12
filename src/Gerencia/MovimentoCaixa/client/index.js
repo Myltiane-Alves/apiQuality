@@ -9,4 +9,14 @@ export class MovimentoCaixaClient {
             timeout: 80000
         });
     }
+
+    async atuaizarStatus(IDSUPERVISOR, STCONFERIDO, ID) {
+        const response = await this.api.put(`${url}/api/movimento-caixa/atualizacao-status.xsjs`, {
+            IDSUPERVISOR,
+            STCONFERIDO,
+            ID,
+        })
+
+        return response.data;
+    }
 }
