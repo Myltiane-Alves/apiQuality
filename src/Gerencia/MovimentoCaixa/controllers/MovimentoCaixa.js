@@ -99,9 +99,10 @@ class MovimentoCaixaControllers {
     async putListaAtualizacaoStatus(req, res) {
         try {
             let {IDSUPERVISOR, STCONFERIDO, ID} = req.body;
-            
-            const response = await movimentoCaixaService.updateStatus(IDSUPERVISOR, STCONFERIDO, ID)
-          
+
+            if (!IDSUPERVISOR) {
+                return res.status(400).json({ error: "IDSUPERVISOR é obrigatório." });
+            }
 
             return res.status(200).json(response);
         } catch (error) {
