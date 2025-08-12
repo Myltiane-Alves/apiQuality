@@ -141,7 +141,7 @@ class FinanceiroControllers {
     } catch (error) {
       console.error("Erro no FinanceiroControllers.getListaExtratoDaLojaPeriodoFinan verifique se os parâmetros estão sendo preenchidos:", error);
       return res.status(500).json({ error: "Erro ao buscar extrato da loja por período." });
-      
+
     }
 
   }
@@ -1280,7 +1280,7 @@ class FinanceiroControllers {
   async putFaturaFinanceiro(req, res) {
     let { IDDETALHEFATURA, NUCODAUTORIZACAO, VRRECEBIDO, NUAUTORIZACAO, STPIX, STCANCELADO } = req.body;
 
-    if(!IDDETALHEFATURA) {
+    if (!IDDETALHEFATURA) {
       console.error("Erro no FinanceiroControllers.putFaturaFinanceiro: Faltando Parametos obrigatórios");
       return res.status(400).json({ error: "Faltando Parametos obrigatórios" });
     }
@@ -1380,51 +1380,27 @@ class FinanceiroControllers {
   //   }
   // }
 
-  async putMalotesLoja2(req, res) {
-        
-    try {
-        let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
-    
-        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
-          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
-        }
-
-        const response = await axios.put(`${url}/api/financeiro/malotes-por-loja.xsjs`, {
-          IDMALOTE,
-          STATUS,
-          OBSERVACAOADMINISTRATIVO,
-          PENDENCIAS,
-          IDUSERULTIMAALTERACAO
-        })
-
-        return res.status(200).json(response.data);
-      } catch (error) {
-        console.error("Erro no FinanceiroControllers.putMalotes:", error);
-        return res.status(500).json({ error: "Erro no servidor" });
-    }
-  }
-
   async putMalotesLoja(req, res) {
-        
+
     try {
-        let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
+      let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
 
-        if(!IDMALOTE || !IDUSERULTIMAALTERACAO) {
-          return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
-        }
+      if (!IDMALOTE || !IDUSERULTIMAALTERACAO) {
+        return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
+      }
 
-        const response = await maloteService.updateMalote(
-          IDMALOTE,
-          STATUS,
-          OBSERVACAOADMINISTRATIVO,
-          PENDENCIAS,
-          IDUSERULTIMAALTERACAO
-        );
-        
-        return res.status(200).json(response);
-      } catch (error) {
-        console.error("Erro no FinanceiroControllers.putMalotes:", error);
-        return res.status(500).json({ error: "Erro no servidor" });
+      const response = await maloteService.updateMalote(
+        IDMALOTE,
+        STATUS,
+        OBSERVACAOADMINISTRATIVO,
+        PENDENCIAS,
+        IDUSERULTIMAALTERACAO
+      );
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.error("Erro no FinanceiroControllers.putMalotes:", error);
+      return res.status(500).json({ error: "Erro no servidor" });
     }
   }
 }
