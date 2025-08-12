@@ -189,9 +189,18 @@ class AdmVendasControllers {
 
     async putAlterarVendasPagamento(req, res) {
         try {
-            const vendas = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await  updateAlterarVendaPagamento(vendas);
-            return res.json(response);
+            let {IDVENDA, STCANCELADO, DTULTIMAALTERACAO, IDFUNCIONARIOCANCELA, TXTMOTIVOCANCELA } = req.body; 
+            // const response = await  updateAlterarVendaPagamento(vendas);
+            console.log(req.body)
+            const response = axios.put(`${url}/api/administrativo/altera-venda-pagamento.xsjs`, {
+                IDVENDA,
+                STCANCELADO,
+                DTULTIMAALTERACAO,
+                IDFUNCIONARIOCANCELA,
+                TXTMOTIVOCANCELA
+            });
+            console.log('response', response.data);
+            return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             return res.status(500).json({ error: error.message });
