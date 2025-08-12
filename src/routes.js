@@ -175,7 +175,7 @@ routes.get('/inventariomovimento', EstoqueControllers. getListaEstoqueAtual)
 
 
 
-// routes.get('/recebimento', AdministrativoControllers.getRetornoListaPagamentoVenda)
+routes.get('/recebimento-resumo', AdministrativoControllers.getRetornoListaPagamentoVenda)
 routes.get('/lista-venda-cliente', AdmVendasControllers.getListaVendaCliente);
 routes.get('/lista-venda', AdmVendasControllers.getListaVendasById)
 routes.get('/alterar-venda-pagamento', AdmVendasControllers.getListaAlterarVendasPagamento);

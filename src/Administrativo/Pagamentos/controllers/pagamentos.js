@@ -3,7 +3,8 @@ import { dataFormatada } from "../../../utils/dataFormatada.js";
 import { getFormaPagamento } from "../repositories/formaPagamento.js";
 import { getPagamentoTef } from "../repositories/pagamento-tef.js";
 import { getPagamentoPos } from "../repositories/pagamento-pos.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
+import 'dotenv/config';
+const url = process.env.API_URL;
 
 class AdmPagamentosControllers {
  
@@ -45,9 +46,9 @@ class AdmPagamentosControllers {
             numeroPos = numeroPos ? numeroPos : '';
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
-            const response = await getPagamentoPos(numeroPos, page, pageSize)
+            const response = `${url}/api/administrativo/pagamento-pos.xsjs`
         
-            return res.json(response); 
+            return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;
