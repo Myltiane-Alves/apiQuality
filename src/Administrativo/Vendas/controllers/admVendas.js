@@ -110,10 +110,12 @@ class AdmVendasControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-            // http://164.152.245.77:8000/quality/concentrador/api/administrativo/venda-ativa.xsjs?idMarca=0&idEmpresa=&dataFechamento=2024-12-07&dataFechamentoFim=2024-12-07&status=True&stCanceladoWeb=&stCanceladoPDVEmitida=&stCanceladoApos30Min=&stCanceladoPDVEmTela=&page=1
-           
+
+            // http://164.152.245.77:8000/quality/concentrador/api/administrativo/venda-ativa.xsjs?idMarca=1&idEmpresa=0&dataFechamento=2025-07-01&dataFechamentoFim=2025-07-13&status=&stCanceladoWeb=&stCanceladoPDVEmitida=&stCanceladoApos30Min=True&stCanceladoPDVEmTela=&page=1
+            // http://164.152.245.77:8000/quality/concentrador/api/administrativo/venda-ativa.xsjs?cpfCliente=&idMarca=&idEmpresa=&dataFechamento=2025-07-01&dataFechamentoFim=2025-07-13&status=&stCanceladoWeb=&stCanceladoPDVEmitida=&stCanceladoApos30Min=True&stCanceladoPDVEmTela=&page=1&pageSize=
             const apiUrl = `${url}/api/administrativo/venda-ativa.xsjs?cpfCliente=${cpfCliente}&idMarca=${idGrupo}&idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisaInicio}&dataFechamentoFim=${dataPesquisaFim}&status=${statusCancelado}&stCanceladoWeb=${statusCanceladoWeb}&stCanceladoPDVEmitida=${stCanceladoPDVEmitida}&stCanceladoApos30Min=${statusCanceladoDepois30Minutos}&stCanceladoPDVEmTela=${stCanceladoPDVEmTela}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl) 
+            console.log(apiUrl)
             // const response = await getVendaAtiva(statusCancelado, statusContingencia, statusCanceladoWeb, stCanceladoPDVEmitida, stCanceladoPDVEmTela, statusCanceladoDepois30Minutos, cpfCliente, idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
             return res.json(response.data); 
         } catch (error) {
