@@ -9,14 +9,20 @@ export class VendasClient {
         });
     }
 
-    async atualizarVendaPagamento(IDVENDA, STCANCELADO, DTULTIMAALTERACAO, IDFUNCIONARIOCANCELA, TXTMOTIVOCANCELA) {
-        const response = await this.api.put(`${url}/api/administrativo/altera-venda-pagamento.xsjs`, {
-            IDVENDA,
+    async atualizarVendaPagamento(
+        STCANCELADO,
+        DTULTIMAALTERACAO,
+        IDFUNCIONARIOCANCELA,
+        TXTMOTIVOCANCELA,
+        IDVENDA
+    ) {
+        const response = await this.api.put(`${url}/api/administrativo/altera-venda-pagamento.xsjs`, [{
             STCANCELADO,
             DTULTIMAALTERACAO,
             IDFUNCIONARIOCANCELA,
-            TXTMOTIVOCANCELA
-        });
+            TXTMOTIVOCANCELA,
+            IDVENDA
+        }]);
         return response.data;
     }
 }

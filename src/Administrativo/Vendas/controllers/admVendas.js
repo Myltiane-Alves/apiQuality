@@ -197,7 +197,7 @@ class AdmVendasControllers {
                 abortEarly: false,
                 stripUnknown: true
             });
-
+      
             if (error) {
                 return res.status(400).json({
                     message: 'Dados inválidos',
@@ -209,11 +209,11 @@ class AdmVendasControllers {
             }
 
             const response = await vendaPagamentoService.updateVendaPagamento(
-                value.IDVENDA,
                 value.STCANCELADO,
                 value.DTULTIMAALTERACAO,
                 value.IDFUNCIONARIOCANCELA,
-                value.TXTMOTIVOCANCELA
+                value.TXTMOTIVOCANCELA,
+                value.IDVENDA
             )
             
             return res.status(200).json(response);

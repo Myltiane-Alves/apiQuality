@@ -1,9 +1,9 @@
 import Joi from 'joi';
 
 const alterarVendaPagamentoSchema = Joi.object({
-    IDVENDA: Joi.number().integer().required()
+    IDVENDA: Joi.string().required()
     .messages({
-        'number.base': 'IDVENDA deve ser um número inteiro.',
+        'string.base': 'IDVENDA deve ser uma string.',
         'any.required': 'IDVENDA é um campo obrigatório.'
     }),
     STCANCELADO: Joi.string().valid('True', 'False')
@@ -13,7 +13,6 @@ const alterarVendaPagamentoSchema = Joi.object({
     DTULTIMAALTERACAO: Joi.date().iso()
     .messages({
         'date.base': 'DTULTIMAALTERACAO deve ser uma data válida.',
-        'date.format': 'DTULTIMAALTERACAO deve estar no formato ISO 8601.'
     }),
     IDFUNCIONARIOCANCELA: Joi.number().integer().required()
     .messages({
