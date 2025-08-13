@@ -1,7 +1,7 @@
 import { MaloteClient } from "../client/index.js";
 import { MaloteService } from "../services/index.js";
-import maloteSchema from "../schema/index.js";
 
+import maloteSchema from "../schema/index.js";
 const maloteClient = new MaloteClient(process.env.API_URL);
 const maloteService = new MaloteService(maloteClient);
 
@@ -33,7 +33,7 @@ export class MaloteFinanceiroController {
         value.PENDENCIAS,
         value.IDUSERULTIMAALTERACAO
       );
-      console.log("Malote atualizado com sucesso:", response);
+      
       return res.status(200).json(response);
     } catch (error) {
       console.error("Erro no MaloteFinanceiroController.putMalotes:", error);
