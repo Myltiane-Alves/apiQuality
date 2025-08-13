@@ -40,6 +40,7 @@ const url = process.env.API_URL;
 
 const maloteClient = new MaloteClient(process.env.API_URL);
 const maloteService = new MaloteService(maloteClient);
+import maloteSchema from "../Malotes/schema/index.js";
 class FinanceiroControllers {
 
   async getListasHistoricosMalotes(req, res) {
@@ -1383,18 +1384,29 @@ class FinanceiroControllers {
   async putMalotesLoja(req, res) {
 
     try {
-      let { IDMALOTE, STATUS, OBSERVACAOADMINISTRATIVO, PENDENCIAS, IDUSERULTIMAALTERACAO } = req.body;
-
-      if (!IDMALOTE || !IDUSERULTIMAALTERACAO) {
-        return res.status(400).json({ message: "Faltando Parametos obrigatórios" });
+      const { error, value } = maloteSchema.validate(req.body, { 
+        abortEarly: false,    // Mostra todos os erros, não apenas o primeiro
+        stripUnknown: true    // Remove campos não definidos no schema
+      });
+      
+      // Se houver erros de validação, retornar erro 400
+      if (error) {
+        return res.status(400).json({
+          message: 'Dados inválidos',
+          errors: error.details.map(detail => ({
+            field: detail.path.join('.'),
+            message: detail.message
+          }))
+        });
       }
 
+      // Usar os dados validados (value) em vez de req.body
       const response = await maloteService.updateMalote(
-        IDMALOTE,
-        STATUS,
-        OBSERVACAOADMINISTRATIVO,
-        PENDENCIAS,
-        IDUSERULTIMAALTERACAO
+        value.IDMALOTE,
+        value.STATUS,
+        value.OBSERVACAOADMINISTRATIVO,
+        value.PENDENCIAS,
+        value.IDUSERULTIMAALTERACAO
       );
 
       return res.status(200).json(response);
