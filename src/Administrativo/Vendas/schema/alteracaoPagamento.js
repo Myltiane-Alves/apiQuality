@@ -22,7 +22,7 @@ const alterarVendaPagamentoSchema = Joi.object({
     TXTMOTIVOCANCELA: Joi.string().max(255).required()
     .messages({
         'string.base': 'TXTMOTIVOCANCELA deve ser uma string.',
-        'string.max': 'TXTMOTIVOCANCELA deve ter no máximo 255 caracteres.',
+        'string.max': 'TXTMOTIVOCANCELA deve ter no máximo 500 caracteres.',
         'any.required': 'TXTMOTIVOCANCELA é um campo obrigatório.'
     })
 })
