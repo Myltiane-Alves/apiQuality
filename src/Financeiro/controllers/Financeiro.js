@@ -34,9 +34,9 @@ import { getExtratoLojaPeriodo } from "../Extrato/repositories/extratoLojaPeriod
 // import { getMotivoDevolucao, putMotivoDevolucao } from "../Financeiro/Devolucao/repositories/motivoDevolucao.js";
 // import { getVendas } from "../repositories/repositoriesVendaTotal.js";
 import 'dotenv/config';
+const url = process.env.API_URL;
 import { MaloteClient } from "../Malotes/client/index.js";
 import { MaloteService } from "../Malotes/services/index.js";
-const url = process.env.API_URL;
 
 const maloteClient = new MaloteClient(process.env.API_URL);
 const maloteService = new MaloteService(maloteClient);
@@ -1385,11 +1385,10 @@ class FinanceiroControllers {
 
     try {
       const { error, value } = maloteSchema.validate(req.body, { 
-        abortEarly: false,    // Mostra todos os erros, não apenas o primeiro
-        stripUnknown: true    // Remove campos não definidos no schema
+        abortEarly: false,   
+        stripUnknown: true    
       });
       
-      // Se houver erros de validação, retornar erro 400
       if (error) {
         return res.status(400).json({
           message: 'Dados inválidos',
@@ -1400,7 +1399,6 @@ class FinanceiroControllers {
         });
       }
 
-      // Usar os dados validados (value) em vez de req.body
       const response = await maloteService.updateMalote(
         value.IDMALOTE,
         value.STATUS,
