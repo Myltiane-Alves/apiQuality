@@ -10,10 +10,11 @@ export class MotivoDevolucaoClient {
         });
     }
 
-    async criarMotivo(data) {
+    async criarMotivo( IDUSUARIO, DSMOTIVO) {
         
         const response = await this.client.post('/motivo-devolucao', {
-            
+            IDUSUARIO, 
+            DSMOTIVO
         });
         return response.data;
      
