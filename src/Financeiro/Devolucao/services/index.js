@@ -3,7 +3,7 @@ export class MotivoDevolucaoService {
         this.client = client;
     }
 
-    async createMotivo( IDUSUARIO, DSMOTIVO) {
+    async createMotivo(IDUSUARIO, DSMOTIVO) {
         const result = await this.client.criarMotivo(IDUSUARIO, DSMOTIVO);
   
         return result;

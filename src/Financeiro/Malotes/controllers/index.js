@@ -8,13 +8,13 @@ const maloteService = new MaloteService(maloteClient);
 export class MaloteFinanceiroController {
   async putMalotesLoja(req, res) {
     try {
-      // Validar dados usando o schema
+    
       const { error, value } = maloteSchema.validate(req.body, { 
-        abortEarly: false,    // Mostra todos os erros, não apenas o primeiro
-        stripUnknown: true    // Remove campos não definidos no schema
+        abortEarly: false,
+        stripUnknown: true
       });
       
-      // Se houver erros de validação, retornar erro 400
+    
       if (error) {
         return res.status(400).json({
           message: 'Dados inválidos',
@@ -25,7 +25,7 @@ export class MaloteFinanceiroController {
         });
       }
 
-      // Usar os dados validados (value) em vez de req.body
+
       const response = await maloteService.updateMalote(
         value.IDMALOTE,
         value.STATUS,

@@ -2,9 +2,12 @@
 import axios from "axios";
 import { getMotivoDevolucao, postMotivoDevolucao, putMotivoDevolucao } from "../repositories/motivoDevolucao.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
-
-
+const url = process.env.API_URL || 'localhost:6001'
+import criarDevolucaoSchema from "../schema/criarDevolucaoSchema.js";
+import { MotivoDevolucaoClient } from "../client/index.js";
+import { MotivoDevolucaoService } from "../services/index.js";
+const criarDevolucaoClient = new MotivoDevolucaoClient(process.env.API_URL);
+const criarDevolucaoService = new MotivoDevolucaoService(criarDevolucaoClient);
 
 class DevolucaoControllers {
   async getListaMotivosDevolucao(req, res) {
@@ -29,7 +32,7 @@ class DevolucaoControllers {
 
   async updateMotivoDevolucao(req, res) {
     try {
-      let {IDUSUARIO, IDMOTIVODEVOLUCAO, DSMOTIVO, STATIVO} = req.body;
+      let { IDUSUARIO, IDMOTIVODEVOLUCAO, DSMOTIVO, STATIVO } = req.body;
       // const response = await putMotivoDevolucao(devolucoes)
       if (!IDUSUARIO || !IDMOTIVODEVOLUCAO || !DSMOTIVO || STATIVO === undefined) {
         return res.status(400).json({ error: "IDUSUARIO, IDMOTIVODEVOLUCAO, DSMOTIVO and STATIVO are required." });
@@ -45,26 +48,39 @@ class DevolucaoControllers {
     } catch (error) {
       console.error("Erro no DevolucaoControllers.updateMotivoDevolucao", error);
       return res.status(500).json({ error: "Internal Server Error" });
-      
+
     }
   }
 
 
   async createMotivoDevolucao(req, res) {
-    
+
     try {
-      let {IDUSUARIO, DSMOTIVO} = req.body;
-      // const response = await postMotivoDevolucao(devolucao)
+      // let {IDUSUARIO, DSMOTIVO } = req.body
+        const { error, value } = criarDevolucaoSchema.validate(req.body, {
+          abortEarly: false,
+          stripUnknown: true
+        });
 
-      if (!IDUSUARIO || !DSMOTIVO) {
-        return res.status(400).json({ error: "IDUSUARIO and DSMOTIVO are required." });
-      }
-      const response = await axios.post(`${url}/api/financeiro/motivo-devolucao.xsjs`, {IDUSUARIO, DSMOTIVO});
+        if (error) {
+          return res.status(400).json({
+            message: 'Dados inválidos',
+            errors: error.details.map(detail => ({
+              field: detail.path.join('.'),
+              message: detail.message
+            }))
+          });
+        }
 
-      return res.json(response.data);
+      const response = await criarDevolucaoService.createMotivo(
+        value.IDUSUARIO,
+        value.DSMOTIVO
+      );
+
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Erro no DevolucaoControllers.createMotivoDevolucao", error);
-      throw error;
+      return res.status(500).json({ error: "Erro no servidor" });
     }
   }
 }
