@@ -12,7 +12,7 @@ export class MotivoDevolucaoClient {
 
     async criarMotivo( IDUSUARIO, DSMOTIVO) {
         
-        const response = await this.client.post('/motivo-devolucao', {
+        const response = await this.client.post(`${url}/api/financeiro/motivo-devolucao.xsjs`, {
             IDUSUARIO, 
             DSMOTIVO
         });
