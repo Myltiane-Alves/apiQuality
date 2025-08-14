@@ -1,12 +1,12 @@
 import Joi from "joi";
 
 const criarMotivoDevolucaoSchema = Joi.object({
-    IDFUNCIONARIO: Joi.integer().required()
+    IDFUNCIONARIO: Joi.number().integer().required()
     .messages({
         "any.required": "O ID é obrigatório",
         "number.base": "O ID deve ser um número"
     }),
-    IDFUNCIONARIORESP: Joi.integer().required()
+    IDFUNCIONARIORESP: Joi.number().integer().required()
     .messages({
         "any.required": "O ID do funcionário responsável é obrigatório",
         "number.base": "O ID do funcionário responsável deve ser um número"

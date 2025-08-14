@@ -5,9 +5,12 @@ import { dataFormatada } from "../../../utils/dataFormatada.js";
 import { getMovimentoSaldoBonificacaoById, postMovimentoSaldoBonificacao } from "../repositories/movimentoSaldoBonificacao.js";
 import { getLojaSaldoPorGrupo } from "../repositories/saldoLojaPorGrupo.js";
 import 'dotenv/config';
+import { SaldosClient } from "../client/index.js";
+import { SaldoService } from "../services/index.js";
+import criarMotivoDevolucaoSchema from  '../schema/criarMotivoDevolucaoSchema.js';
 const url = process.env.API_URL;
-
-
+const saldoClient = new SaldosClient(process.env.API_URL);
+const saldoService = new SaldoService(saldoClient);
 class SaldosControllers {
   async getListaExtratoBonificacaoById(req, res) {
     let { idFuncionario, page, pageSize } = req.query;
@@ -48,14 +51,38 @@ class SaldosControllers {
 
 
     try {
-      const despesas = Array.isArray(req.body) ? req.body : [req.body];
+      const { error, value } = criarMotivoDevolucaoSchema.validate(req.body, { 
+        abortEarly: false,
+        stripUnknown: true
+      });
+      
+    
+      if (error) {
+        return res.status(400).json({
+          message: 'Dados inválidos',
+          errors: error.details.map(detail => ({
+            field: detail.path.join('.'),
+            message: detail.message
+          }))
+        });
+      }
 
-      const response = await axios.post(`${url}/api/financeiro/movimento-saldo-bonificacao.xsjs`, despesas);
-      // const response = await postMovimentoSaldoBonificacao(IDFUNCIONARIO, TIPOMOVIMENTO, VRMOVIMENTO, OBSERVACAO, IDFUNCIONARIORESP)
-      return res.json(response.data);
+
+      const response = await saldoService.createMovimentoSaldoBonificacao(
+        value.IDFUNCIONARIO,
+        value.TIPOMOVIMENTO,
+        value.VRMOVIMENTO,
+        value.OBSERVACAO,
+        value.IDFUNCIONARIORESP
+      );
+     
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Unable to connect to the database:", error);
-      throw error;
+      return res.status(500).json({
+        message: 'Erro interno do servidor',
+        error: error.message
+      });
     }
   }
 }
