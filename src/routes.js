@@ -327,7 +327,7 @@ routes.get('/estabelecimento', EstabelecimentoControllers.getListaEstabeleciment
 
 // Devolução
 routes.get('/motivo-devolucao', DevolucaoControllers.getListaMotivosDevolucao)
-routes.put('/atualizar-motivo-devolucao', DevolucaoControllers.updateMotivoDevolucao)
+routes.put('/atualizar-motivo-devolucao', DevolucaoControllers.putMotivoDevolucao)
 routes.post('/criar-motivo-devolucao', DevolucaoControllers.createMotivoDevolucao)
 
 // Despesas

@@ -19,6 +19,7 @@ class PedidosControllers {
     idPedido = idPedido ? idPedido : '';
     // numeroPedido = numeroPedido ? numeroPedido : '';
     try {
+
       const apiUrl = `${url}/api/financeiro/pedidos_compra.xsjs?pageSize=${pageSize}&page=${page}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFornPesquisa=${idFornecedor}&idMarcaPesquisa=${idMarca}&idpedido=${idPedido}`
       const response = await axios.get(apiUrl);
       // const response = await getPedidosCompras(id, idContaPagar, idPedido, idMarca, idFornecedor, dataPesquisaInicio, dataPesquisaFim, page, pageSize)

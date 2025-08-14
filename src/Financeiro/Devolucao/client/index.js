@@ -19,4 +19,15 @@ export class MotivoDevolucaoClient {
         return response.data;
      
     }
+
+    async atualizarMotivoDevolucao(DSMOTIVO, STATIVO, IDUSUARIO, IDMOTIVODEVOLUCAO) {
+        const response = await this.client.put(`${url}/api/financeiro/motivo-devolucao.xsjs`, {
+            DSMOTIVO,
+            STATIVO,
+            IDUSUARIO,
+            IDMOTIVODEVOLUCAO,
+        });
+  
+        return response.data;
+    }
 }
