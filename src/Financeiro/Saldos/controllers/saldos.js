@@ -7,7 +7,7 @@ import { getLojaSaldoPorGrupo } from "../repositories/saldoLojaPorGrupo.js";
 import 'dotenv/config';
 import { SaldosClient } from "../client/index.js";
 import { SaldoService } from "../services/index.js";
-import criarMotivoDevolucaoSchema from  '../schema/criarMotivoDevolucaoSchema.js';
+import criarMovimentoBonificaoSchema from  '../schema/criarMovimentoSaldoSchema.js';
 const url = process.env.API_URL;
 const saldoClient = new SaldosClient(process.env.API_URL);
 const saldoService = new SaldoService(saldoClient);
@@ -47,11 +47,11 @@ class SaldosControllers {
 
 
   async createMovimentoSaldoBonificacao(req, res) {
-    // let { IDFUNCIONARIO, TIPOMOVIMENTO, VRMOVIMENTO, OBSERVACAO, IDFUNCIONARIORESP } = req.body;
+    let { IDFUNCIONARIO, TIPOMOVIMENTO, VRMOVIMENTO, OBSERVACAO, IDFUNCIONARIORESP } = req.body;
 
 
     try {
-      const { error, value } = criarMotivoDevolucaoSchema.validate(req.body, { 
+      const { error, value } = criarMovimentoBonificaoSchema.validate(req.body, { 
         abortEarly: false,
         stripUnknown: true
       });
@@ -67,8 +67,12 @@ class SaldosControllers {
         });
       }
 
-
-      const response = await saldoService.createMovimentoSaldoBonificacao(
+      console.log( value.IDFUNCIONARIO,
+        value.TIPOMOVIMENTO,
+        value.VRMOVIMENTO,
+        value.OBSERVACAO,
+        value.IDFUNCIONARIORESP)
+      const response = await saldoService.createSaldoMovimento(
         value.IDFUNCIONARIO,
         value.TIPOMOVIMENTO,
         value.VRMOVIMENTO,

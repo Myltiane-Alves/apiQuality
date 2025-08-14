@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const criarMotivoDevolucaoSchema = Joi.object({
+const criarMovimentoSaldoBonificacaoSchema = Joi.object({
     IDFUNCIONARIO: Joi.number().integer().required()
     .messages({
         "any.required": "O ID é obrigatório",
@@ -30,4 +30,4 @@ const criarMotivoDevolucaoSchema = Joi.object({
     })
 });
 
-export default criarMotivoDevolucaoSchema;
+export default criarMovimentoSaldoBonificacaoSchema;

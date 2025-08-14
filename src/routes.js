@@ -302,7 +302,7 @@ routes.post('/cadastrarMotivoDevolucao', FinanceiroControllers.createMotivoDevol
 //  Saldos
 routes.get('/movimento-saldo-bonificacao', SaldosControllers.getListaExtratoBonificacaoById)
 routes.get('/saldo-loja-por-grupo', SaldosControllers.getListaSaldoExtratoLoja)
-routes.post('/movimento-saldo-bonificacao', SaldosControllers.createMovimentoSaldoBonificacao)
+routes.post('/criar-movimento-saldo-bonificacao', SaldosControllers.createMovimentoSaldoBonificacao)
 
 //  Pedidos
 routes.get('/pedido-compras', PedidosControllers.getListaPedidosCompras)
