@@ -47,9 +47,6 @@ class SaldosControllers {
 
 
   async createMovimentoSaldoBonificacao(req, res) {
-    let { IDFUNCIONARIO, TIPOMOVIMENTO, VRMOVIMENTO, OBSERVACAO, IDFUNCIONARIORESP } = req.body;
-
-
     try {
       const { error, value } = criarMovimentoBonificaoSchema.validate(req.body, { 
         abortEarly: false,
@@ -67,11 +64,6 @@ class SaldosControllers {
         });
       }
 
-      console.log( value.IDFUNCIONARIO,
-        value.TIPOMOVIMENTO,
-        value.VRMOVIMENTO,
-        value.OBSERVACAO,
-        value.IDFUNCIONARIORESP)
       const response = await saldoService.createSaldoMovimento(
         value.IDFUNCIONARIO,
         value.TIPOMOVIMENTO,
