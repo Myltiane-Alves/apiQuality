@@ -37,7 +37,7 @@ class DevolucaoControllers {
       if (!IDUSUARIO || !IDMOTIVODEVOLUCAO || !DSMOTIVO || STATIVO === undefined) {
         return res.status(400).json({ error: "IDUSUARIO, IDMOTIVODEVOLUCAO, DSMOTIVO and STATIVO are required." });
       }
-      const response = await axios.post(`${url}/api/financeiro/motivo-devolucao.xsjs`, {
+      const response = await axios.put(`${url}/api/financeiro/motivo-devolucao.xsjs`, {
         IDUSUARIO,
         IDMOTIVODEVOLUCAO,
         DSMOTIVO,
