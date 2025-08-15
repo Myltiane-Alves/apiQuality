@@ -118,7 +118,7 @@ class DepositosLojaControllers  {
        
     }
 
-    async cadastroDepositoLoja(req, res) {
+    async postDepositoLoja(req, res) {
         
         try {
             let {error, value} = cadastroDepositoSchema.validate(req.body, {
