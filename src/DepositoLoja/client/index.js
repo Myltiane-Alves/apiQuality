@@ -25,6 +25,22 @@ export class DepositoLojaClient {
         IDUSRCACELAMENTO,
         DSMOTIVOCANCELAMENTO,
     ) {
+        const response = await this.client.post(`${url}/api/deposito-loja/todos.xsjs`, {
+            DTDEPOSITO,
+            DTMOVIMENTOCAIXA,
+            IDEMPRESA,
+            IDUSR,
+            IDCONTABANCO,
+            VRDEPOSITO,
+            DSHISTORIO,
+            NUDOCDEPOSITO,
+            DSPATHDOCDEPOSITO,
+            STATIVO,
+            STCANCELADO,
+            IDUSRCACELAMENTO,
+            DSMOTIVOCANCELAMENTO,
+        });
 
+        return response.data;
     }
 }
