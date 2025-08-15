@@ -1,4 +1,3 @@
-import { console } from "inspector";
 
 export class MotivoDevolucaoService {
     constructor(client) {
