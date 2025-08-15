@@ -136,14 +136,14 @@ class DepositosLojaControllers  {
                 });
             }
 
-            if(!IDEMPRESA) {
+            if(!value.IDEMPRESA) {
                 return res.status(400).json({ error: "IDEMPRESA is required." });
             }
 
-            if(!IDUSR) {
+            if(!value.IDUSR) {
                 return res.status(400).json({ error: "IDUSUARIO is required." });
             }
-            if(!IDCONTABANCO) {
+            if(!value.IDCONTABANCO) {
                 return res.status(400).json({ error: "IDCONTABANCO is required." });
             }
 
@@ -163,7 +163,6 @@ class DepositosLojaControllers  {
                 value.DSMOTIVOCANCELAMENTO,
             );
 
-            console.log(response,  'response.data');
             return res.status(201).json(response);
         } catch (error) {
             console.error("Error creating deposit:", error.message);
