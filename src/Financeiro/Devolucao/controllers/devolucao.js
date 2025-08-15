@@ -48,9 +48,7 @@ class DevolucaoControllers {
           }))
         });
       }
-
-      console.log(value.DSMOTIVO, value.STATIVO, value.IDUSUARIO, value.IDMOTIVODEVOLUCAO);
-
+      
       const response = await deevolucaoService.updateMotivoDevolucao(
         value.DSMOTIVO,
         value.STATIVO,

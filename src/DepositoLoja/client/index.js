@@ -2,7 +2,7 @@ import axios from 'axios';
 import 'dotenv/config';
 const url = process.env.API_URL;
 
-export class DepositoLojaClient {
+export class DepositoClient {
     constructor(baseURL){
         this.client = axios.create({
             baseURL: baseURL || url,

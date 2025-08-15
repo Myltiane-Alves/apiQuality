@@ -4,6 +4,12 @@ import { createDepositoLoja, updateDepositoLoja } from "../repositories/deposito
 import { getDepositosEmpresa } from "../repositories/empresa.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
+import cadastroDepositoSchema from '../schema/cadastroDeposito.js';
+import { DepositoClient } from "../client/index.js";
+import { DepositoService } from "../services/index.js";
+const depositoClient = new DepositoClient(process.env.API_URL);
+const depositoService = new DepositoService(depositoClient);
+
 
 class DepositosLojaControllers  {
 
@@ -115,21 +121,21 @@ class DepositosLojaControllers  {
     async cadastroDepositoLoja(req, res) {
         
         try {
-            let {
-                 DTDEPOSITO,
-                DTMOVIMENTOCAIXA,
-                IDEMPRESA,
-                IDUSR,
-                IDCONTABANCO,
-                VRDEPOSITO,
-                DSHISTORIO,
-                NUDOCDEPOSITO,
-                DSPATHDOCDEPOSITO,
-                STATIVO,
-                STCANCELADO,
-                IDUSRCACELAMENTO,
-                DSMOTIVOCANCELAMENTO,
-            } = req.body;
+            let {error, value} = cadastroDepositoSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+    
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                    field: detail.path.join('.'),
+                    message: detail.message
+                    }))
+                });
+            }
+
             if(!IDEMPRESA) {
                 return res.status(400).json({ error: "IDEMPRESA is required." });
             }
@@ -141,47 +147,24 @@ class DepositosLojaControllers  {
                 return res.status(400).json({ error: "IDCONTABANCO is required." });
             }
 
-            if(!DTDEPOSITO) {
-                return res.status(400).json({ error: "DTDEPOSITO is required." });
-            }
+            const response = await depositoService.createDeposito(
+                value.DTDEPOSITO,
+                value.DTMOVIMENTOCAIXA,
+                value.IDEMPRESA,
+                value.IDUSR,
+                value.IDCONTABANCO,
+                value.VRDEPOSITO,
+                value.DSHISTORIO,
+                value.NUDOCDEPOSITO,
+                value.DSPATHDOCDEPOSITO,
+                value.STATIVO,
+                value.STCANCELADO,
+                value.IDUSRCACELAMENTO,
+                value.DSMOTIVOCANCELAMENTO,
+            );
 
-            if(!DTMOVIMENTOCAIXA) {
-                return res.status(400).json({ error: "DTMOVIMENTOCAIXA is required." });
-            }
-            if(!DSHISTORIO) {
-                return res.status(400).json({ error: "DSHISTORIO is required." });
-            }
-            if(!NUDOCDEPOSITO) {
-                return res.status(400).json({ error: "NUDOCDEPOSITO is required." });
-            }
-            if(!VRDEPOSITO) {
-                return res.status(400).json({ error: "VRDEPOSITO is required." });
-            }
-
-            if(STATIVO === undefined) {
-                return res.status(400).json({ error: "STATIVO is required." }); 
-            }
-            if(STCANCELADO === undefined) {
-                return res.status(400).json({ error: "STCANCELADO is required." }); 
-            }
-            
-
-            const response = await axios.post(`${url}/api/deposito-loja/todos.xsjs`, {
-                DTDEPOSITO,
-                DTMOVIMENTOCAIXA,
-                IDEMPRESA,
-                IDUSR,
-                IDCONTABANCO,
-                VRDEPOSITO,
-                DSHISTORIO,
-                NUDOCDEPOSITO,
-                DSPATHDOCDEPOSITO,
-                STATIVO,
-                STCANCELADO,
-                IDUSRCACELAMENTO,
-                DSMOTIVOCANCELAMENTO,
-            });
-            return res.status(201).json(response.data);
+            console.log(response,  'response.data');
+            return res.status(201).json(response);
         } catch (error) {
             console.error("Error creating deposit:", error.message);
             return res.status(error.response?.status || 500).json({ error: error.message });
