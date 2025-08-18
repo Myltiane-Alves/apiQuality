@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const cadastroDepositoSchema = Joi.object({
+const createDepositoSchema = Joi.object({
     IDEMPRESA: Joi.number().required()
     .messages({
         'number.base': 'O ID da empresa deve ser um número',
@@ -46,4 +46,4 @@ const cadastroDepositoSchema = Joi.object({
 
 })
 
-export default cadastroDepositoSchema;
+export default createDepositoSchema;

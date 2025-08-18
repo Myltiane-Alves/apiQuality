@@ -36,4 +36,40 @@ export class DepositoService {
         )
         return result;
     }
+
+    async updateDeposito(
+        IDDEPOSITOLOJA,
+        DTDEPOSITO,
+        DTMOVIMENTOCAIXA,
+        IDEMPRESA,
+        IDUSR,
+        IDCONTABANCO,
+        VRDEPOSITO,
+        DSHISTORIO,
+        NUDOCDEPOSITO,
+        DSPATHDOCDEPOSITO,
+        STATIVO,
+        STCANCELADO,
+        IDUSRCACELAMENTO,
+        DSMOTIVOCANCELAMENTO,
+    ) {
+
+        const result = await this.client.atualizarDeposito(
+            IDDEPOSITOLOJA,
+            DTDEPOSITO,
+            DTMOVIMENTOCAIXA,
+            IDEMPRESA,
+            IDUSR,
+            IDCONTABANCO,
+            VRDEPOSITO,
+            DSHISTORIO,
+            NUDOCDEPOSITO,
+            DSPATHDOCDEPOSITO,
+            STATIVO,
+            STCANCELADO,
+            IDUSRCACELAMENTO,
+            DSMOTIVOCANCELAMENTO,
+        )
+        return result;
+    }
 }

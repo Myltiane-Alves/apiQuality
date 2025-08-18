@@ -4,7 +4,9 @@ import { createDepositoLoja, updateDepositoLoja } from "../repositories/deposito
 import { getDepositosEmpresa } from "../repositories/empresa.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
-import cadastroDepositoSchema from '../schema/cadastroDeposito.js';
+import createDepositoSchema from '../schema/createDeposito.js';
+import updateDepositoSchema from '../schema/updateDeposito.js';
+
 import { DepositoClient } from "../client/index.js";
 import { DepositoService } from "../services/index.js";
 const depositoClient = new DepositoClient(process.env.API_URL);
@@ -68,9 +70,23 @@ class DepositosLojaControllers  {
     
     async putListaDepositosLoja(req, res) {
         try {
-            const depositos = Array.isArray(req.body) ? req.body : [req.body]; 
+             let {error, value} = updateDepositoSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+    
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                    field: detail.path.join('.'),
+                    message: detail.message
+                    }))
+                });
+            }
+
             const response = await  updateDepositoLoja(depositos);
-            return res.json(response);
+            return res.status(201).json(response);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             return res.status(500).json({ error: error.message });
@@ -121,7 +137,7 @@ class DepositosLojaControllers  {
     async postDepositoLoja(req, res) {
         
         try {
-            let {error, value} = cadastroDepositoSchema.validate(req.body, {
+            let {error, value} = createDepositoSchema.validate(req.body, {
                 abortEarly: false,
                 stripUnknown: true
             });
