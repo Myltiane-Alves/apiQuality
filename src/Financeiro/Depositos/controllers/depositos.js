@@ -52,7 +52,7 @@ class DepositosControllers {
       
 
       //http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/deposito-loja.xsjs?idDeposito=&idConta=10&idEmpresa=&dataCompInicio=&dataCompFim=&dataMovInicio=&dataMovFim=&dataPesquisaInicio=2024-08-07&dataPesquisaFim=2025-08-07&page=1&pageSize=
-      const apiUrl = `${url}/api/financeiro/deposito-loja.xsjs?idDeposito=${idDeposito}&idConta=${idConta}&idEmpresa=${idEmpresa}&dataCompInicio=${dataCompInicio}&dataCompFim=${dataCompFim}&dataMovInicio=${dataMovInicio}&dataMovFim=${dataMovFim}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`
+      const apiUrl = `${url}/api/financeiro/deposito-loja.xsjs?idDep=${idDeposito}&idConta=${idConta}&idEmpresa=${idEmpresa}&dataCompInicio=${dataCompInicio}&dataCompFim=${dataCompFim}&dataMovInicio=${dataMovInicio}&dataMovFim=${dataMovFim}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
       // const response = await getDepositoLoja(idDeposito, idConta, idEmpresa, dataCompInicio, dataCompFim, dataMovInicio, dataMovFim, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
       // console.log(apiUrl, 'APIuRL')

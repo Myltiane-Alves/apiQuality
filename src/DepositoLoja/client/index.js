@@ -57,7 +57,7 @@ export class DepositoClient {
         STATIVO,
         STCANCELADO
     ) {
-        const response = await this.client.post(`${url}/api/deposito-loja/todos.xsjs`, {
+        const response = await this.client.put(`${url}/api/deposito-loja/todos.xsjs`, {
             IDDEPOSITOLOJA,
             IDEMPRESA,
             IDUSR,

@@ -113,7 +113,7 @@ class DepositosLojaControllers  {
             if(!IDDEPOSITOLOJA) {
                 return res.status(400).json({ error: "IDDEPOSITOLOJA is required." });
             }
-            const response = await axios.post(`${url}/api/deposito-loja/atualizacao-status-conferido.xsjs`, {
+            const response = await axios.put(`${url}/api/deposito-loja/atualizacao-status-conferido.xsjs`, {
                 IDDEPOSITOLOJA,
                 STCONFERIDO,
                 DTCOMPENSACAO
@@ -133,11 +133,10 @@ class DepositosLojaControllers  {
             if(!IDDEPOSITOLOJA) {
                 return res.status(400).json({ error: "IDDEPOSITOLOJA is required." });
             }
-            const response = await axios.post(`${url}/api/deposito-loja/atualizacao-status.xsjs`, {
+            const response = await axios.put(`${url}/api/deposito-loja/atualizacao-status.xsjs`, {
                 IDDEPOSITOLOJA,
                 STCANCELADO
             });
-
             return res.status(201).json(response.data);
         } catch (error) {
             console.error("Erro no servidor:", error);
