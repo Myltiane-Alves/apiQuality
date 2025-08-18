@@ -39,36 +39,30 @@ export class DepositoService {
 
     async updateDeposito(
         IDDEPOSITOLOJA,
-        DTDEPOSITO,
-        DTMOVIMENTOCAIXA,
         IDEMPRESA,
         IDUSR,
         IDCONTABANCO,
-        VRDEPOSITO,
+        DTDEPOSITO,
+        DTMOVIMENTOCAIXA,
         DSHISTORIO,
         NUDOCDEPOSITO,
-        DSPATHDOCDEPOSITO,
+        VRDEPOSITO,
         STATIVO,
-        STCANCELADO,
-        IDUSRCACELAMENTO,
-        DSMOTIVOCANCELAMENTO,
+        STCANCELADO
     ) {
 
         const result = await this.client.atualizarDeposito(
             IDDEPOSITOLOJA,
-            DTDEPOSITO,
-            DTMOVIMENTOCAIXA,
             IDEMPRESA,
             IDUSR,
             IDCONTABANCO,
-            VRDEPOSITO,
+            DTDEPOSITO,
+            DTMOVIMENTOCAIXA,
             DSHISTORIO,
             NUDOCDEPOSITO,
-            DSPATHDOCDEPOSITO,
+            VRDEPOSITO,
             STATIVO,
-            STCANCELADO,
-            IDUSRCACELAMENTO,
-            DSMOTIVOCANCELAMENTO,
+            STCANCELADO
         )
         return result;
     }

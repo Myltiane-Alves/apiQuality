@@ -85,7 +85,19 @@ class DepositosLojaControllers  {
                 });
             }
 
-            const response = await  updateDepositoLoja(depositos);
+            const response = await depositoService.updateDeposito(
+                value.IDDEPOSITOLOJA,
+                value.IDEMPRESA,
+                value.IDUSR,
+                value.IDCONTABANCO,
+                value.DTDEPOSITO,
+                value.DTMOVIMENTOCAIXA,
+                value.DSHISTORIO,
+                value.NUDOCDEPOSITO,
+                value.VRDEPOSITO,
+                value.STATIVO,
+                value.STCANCELADO,
+            )
             return res.status(201).json(response);
         } catch (error) {
             console.error("Unable to connect to the database:", error);

@@ -43,4 +43,34 @@ export class DepositoClient {
 
         return response.data;
     }
+
+    async atualizarDeposito(
+        IDDEPOSITOLOJA,
+        IDEMPRESA,
+        IDUSR,
+        IDCONTABANCO,
+        DTDEPOSITO,
+        DTMOVIMENTOCAIXA,
+        DSHISTORIO,
+        NUDOCDEPOSITO,
+        VRDEPOSITO,
+        STATIVO,
+        STCANCELADO
+    ) {
+        const response = await this.client.post(`${url}/api/deposito-loja/todos.xsjs`, {
+            IDDEPOSITOLOJA,
+            IDEMPRESA,
+            IDUSR,
+            IDCONTABANCO,
+            DTDEPOSITO,
+            DTMOVIMENTOCAIXA,
+            DSHISTORIO,
+            NUDOCDEPOSITO,
+            VRDEPOSITO,
+            STATIVO,
+            STCANCELADO
+        });
+
+        return response.data;
+    }
 }
