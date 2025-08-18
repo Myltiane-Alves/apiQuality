@@ -642,7 +642,7 @@ routes.get('/depositosLoja', DepositosLojaControllers.getListaDepositosLojaEmpre
 routes.get('/deposito-loja-empresa', DepositosLojaControllers.getListaDepositosLojaEmpresa)
 
 routes.post('/cadastrar-deposito-loja', DepositosLojaControllers.postDepositoLoja)
-routes.put('/atualizar-deposito-loja', DepositosLojaControllers.putListaDepositosLoja)
+routes.put('/deposito-loja/:id', DepositosLojaControllers.putListaDepositosLoja)
 routes.put('/atualizacao-status-conferido/:id', DepositosLojaControllers.putAtualizarStatusConferido)
 routes.put('/deposito-loja-atualizacao-status/:id', DepositosLojaControllers.putAtualizarStatusDepositoLoja)
 
