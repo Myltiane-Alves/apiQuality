@@ -69,7 +69,7 @@ class AdmBalancoControllers {
         try {
             
             // const response = await getColetorBalanco(idEmpresa, idResumo, descricaoProduto, page, pageSize)
-            const apiUrl = `${url}/api/administrativo/coletor-balanco.xsjs?idresumo=${idResumo}&idempresa=${idEmpresa}`
+            const apiUrl = `${url}/api/administrativo/coletor-balanco.xsjs?idresumo=${idResumo}&idempresa=${idEmpresa}&descProduto=${descricaoProduto}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
             return res.json(response.data); 
         } catch (error) {
