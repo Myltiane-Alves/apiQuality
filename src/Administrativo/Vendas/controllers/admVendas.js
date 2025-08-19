@@ -30,7 +30,7 @@ class AdmVendasControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-           
+
             const apiUrl = `${url}/api/administrativo/venda-total-forma-pag.xsjs?pageSize=${pageSize}&page=${page}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFunc=${idFuncionario}&dSFormaPag=${dsFormaPagamento}&dSParc=${dsParcela}&idEmpGrupo=${idMarca}`;
             const response = await axios.get(apiUrl)
             // const response = await getVendaTotalFormaPagamento(idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, idFuncionario, dsFormaPagamento, dsParcela, page, pageSize);
@@ -69,7 +69,7 @@ class AdmVendasControllers {
 
 
     async getVendaVendedorAction(req, res) {
-        let { idEmpresa, idGrupo, dataPesquisaInicio, dataPesquisaFim, page, pageSize, byId } = req.query;
+        let { idEmpresa, idGrupo, dataPesquisaInicio, dataPesquisaFim, page, pageSize, uf, byId } = req.query;
 
         idEmpresa = idEmpresa ? Number(idEmpresa) : '';
         idGrupo = idGrupo ? Number(idGrupo) : '';
@@ -78,9 +78,10 @@ class AdmVendasControllers {
         byId = byId ? byId : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
+        uf = uf ? uf : '';
 
         try {
-            const apiUrl = `${url}/api/administrativo/venda-vendedor.xsjs?idGrupo=${idGrupo}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}`
+            const apiUrl = `${url}/api/administrativo/venda-vendedor.xsjs?idGrupo=${idGrupo}&idEmpresa=${idEmpresa}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&uf=${uf}`
             const response = await axios.get(apiUrl)
             // const response = await getVendaVendedor(idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize);
 

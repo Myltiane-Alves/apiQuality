@@ -7,15 +7,17 @@ import { getRecebimento } from "../repositories/recebimento.js";
 class AdmRecebimentosControllers {
  
     async getListaFuncionarioRecebimento(req, res) {
-        let { idEmpresa, page, pageSize} = req.query; 
+        let { idEmpresa} = req.query; 
         try {
-            const response = await getFuncionarioRecebimento(idEmpresa, page, pageSize)
+
+            const apiUrl = `${url}/api/administrativo/funcionarioreceb.xsjs?idEmpresa=${idEmpresa}`;
+            const response = await axios.get(apiUrl)
         
-            return res.json(response); 
+            return res.json(response.data); // Retorna
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;
-        }  
+        } 
     }
 
     async getListaPagamentoVenda(req, res) {

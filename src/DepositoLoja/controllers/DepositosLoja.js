@@ -30,20 +30,7 @@ class DepositosLojaControllers  {
                 throw error;
         }
     }
-    // async getListaDepositosLojaEmpresa(req,res) {
-    //     let {idEmpresa, dataPesquisaInicio, dataPesquisaFim,  pageSize, page   } = req.query;
-    //         idEmpresa = idEmpresa ? idEmpresa : '';
-    //         dataPesquisaInicio = dataPesquisaInicio ? dataPesquisaInicio : '';
-    //         dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';
-    //     try {
-    //         const response = await getDepositosEmpresa(idEmpresa, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
-    //         return res.json(response); 
-    //     } catch(error) {
-    //         console.error("Unable to connect to the database:", error);
-    //             throw error;
-    //     }
-    // }
-
+    
     async getListaProdutosLojaSap(req, res) {
         let { descricaoProduto, idEmpresa, idListaEmpresa, pageNumber } = req.query;
     

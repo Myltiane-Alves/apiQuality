@@ -192,7 +192,7 @@ routes.post('/alterar-venda-pagamento', AdmVendasControllers.postAlterarVendasPa
 
 // Desconto
 // routes.get('/vendaConvenio', AdministrativoControllers.getVendaConvenio)
-routes.get('/vendaConvenio', AdmDescontoControllers.getListaDescontoMotivoVendas)
+routes.get('/desconto-motivo-vendas-adm', AdmDescontoControllers.getListaDescontoMotivoVendas)
 
 
 //  Recebimentos

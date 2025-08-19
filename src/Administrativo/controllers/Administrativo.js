@@ -836,7 +836,7 @@ class AdministrativoControllers {
         let { idEmpresa} = req.query; 
         try {
 
-            const apiUrl = `${url}/api/administrativo/funcionarioreceb.xsjs?page=1&idEmpresa=${idEmpresa}`;
+            const apiUrl = `${url}/api/administrativo/funcionarioreceb.xsjs?idEmpresa=${idEmpresa}`;
             const response = await axios.get(apiUrl)
         
             return res.json(response.data); // Retorna
