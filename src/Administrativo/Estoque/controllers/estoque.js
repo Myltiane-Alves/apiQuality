@@ -23,10 +23,10 @@ class EstoqueControllers {
             
  
             try {
+
                 const apiUrl = `${url}/api/administrativo/inventariomovimento.xsjs?idEmpresa=${idEmpresa}&idgrupo=${idGrupo}&idsubgrupo=${idSubGrupo}&idmarca=${idMarca}&idfornecedor=${idFornecedor}&descproduto=${descricaoProduto}&dtinicial=${dataPesquisaInicio}&dtfinal=${dataPesquisaFim}&stativo=${stAtivo}&page=${page}&pageSize=${pageSize}`;
                 const response = await axios.get(apiUrl)
                 // const response = await getInventarioMovimento(idEmpresa, idGrupo, idSubGrupo, idMarca, idFornecedor, descricaoProduto, stAtivo, dataPesquisaInicio, dataPesquisaFim, page, pageSize);
-         
                 return res.json(response.data);
             } catch (error) {
                 console.error("Erro no EstoqueControllers.getListaEstoqueAtual:", error);
