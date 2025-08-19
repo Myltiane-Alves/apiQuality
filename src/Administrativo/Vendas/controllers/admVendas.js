@@ -116,8 +116,7 @@ class AdmVendasControllers {
         //   http://164.152.245.77:8000/quality/concentrador/api/administrativo/venda-ativa.xsjs?&idMarca=1&idEmpresa=0&ufVenda=&dataFechamento=2024-05-19&dataFechamentoFim=2025-07-19&statusContingencia=True&status=False&page=1
             const apiUrl = `${url}/api/administrativo/venda-ativa.xsjs?cpfCliente=${cpfCliente}&ufVenda=${ufVenda}&idMarca=${idGrupo}&idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisaInicio}&dataFechamentoFim=${dataPesquisaFim}&statusContingencia=${statusContingencia}&status=${statusCancelado}&stCanceladoWeb=${statusCanceladoWeb}&stCanceladoPDVEmitida=${stCanceladoPDVEmitida}&stCanceladoApos30Min=${statusCanceladoDepois30Minutos}&stCanceladoPDVEmTela=${stCanceladoPDVEmTela}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl) 
-           console.log(req.query)
-           console.log(apiUrl)
+
             // const response = await getVendaAtiva(statusCancelado, statusContingencia, statusCanceladoWeb, stCanceladoPDVEmitida, stCanceladoPDVEmTela, statusCanceladoDepois30Minutos, cpfCliente, idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
             return res.json(response.data); 
         } catch (error) {
