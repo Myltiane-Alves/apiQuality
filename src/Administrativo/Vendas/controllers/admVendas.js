@@ -95,7 +95,7 @@ class AdmVendasControllers {
 
     async getListaVendaAtiva(req, res) {
 
-        let { statusCancelado, statusContingencia, statusCanceladoWeb, stCanceladoPDVEmitida, stCanceladoPDVEmTela, statusCanceladoDepois30Minutos, cpfCliente, idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize } = req.query;
+        let { statusCancelado, statusContingencia, statusCanceladoWeb, stCanceladoPDVEmitida, stCanceladoPDVEmTela, statusCanceladoDepois30Minutos, cpfCliente, ufVenda, idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize } = req.query;
         statusCancelado = statusCancelado ? statusCancelado : '';
         statusCanceladoWeb = statusCanceladoWeb ? statusCanceladoWeb : '';
         stCanceladoPDVEmitida = stCanceladoPDVEmitida ? stCanceladoPDVEmitida : '';
@@ -103,19 +103,21 @@ class AdmVendasControllers {
         statusCanceladoDepois30Minutos = statusCanceladoDepois30Minutos ? statusCanceladoDepois30Minutos : '';
         statusContingencia = statusContingencia ? statusContingencia : '';
         cpfCliente = cpfCliente ? cpfCliente : '';
-        idGrupo = Number(idGrupo) ? Number(idGrupo) : '';
-        idEmpresa = Number(idEmpresa) ? Number(idEmpresa) : '';
+        ufVenda = ufVenda ? ufVenda : '';
+        idGrupo = idGrupo ? idGrupo : '';
+        idEmpresa = idEmpresa ? idEmpresa : '';
         dataPesquisaInicio = dataPesquisaInicio ? dataPesquisaInicio : '';
         dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
 
         try {
-
-          
-            const apiUrl = `${url}/api/administrativo/venda-ativa.xsjs?cpfCliente=${cpfCliente}&idMarca=${idGrupo}&idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisaInicio}&dataFechamentoFim=${dataPesquisaFim}&status=${statusCancelado}&stCanceladoWeb=${statusCanceladoWeb}&stCanceladoPDVEmitida=${stCanceladoPDVEmitida}&stCanceladoApos30Min=${statusCanceladoDepois30Minutos}&stCanceladoPDVEmTela=${stCanceladoPDVEmTela}&page=${page}&pageSize=${pageSize}`;
+        //   http://164.152.245.77:8000/quality/concentrador_node/api/administrativo/venda-ativa.xsjs?cpfCliente=&idMarca=1&idEmpresa=&dataFechamento=2024-05-19&dataFechamentoFim=2025-07-19&statusContingencia=True&status=False&stCanceladoWeb=&stCanceladoPDVEmitida=&stCanceladoApos30Min=&stCanceladoPDVEmTela=&page=1&pageSize= 
+        //   http://164.152.245.77:8000/quality/concentrador/api/administrativo/venda-ativa.xsjs?&idMarca=1&idEmpresa=0&ufVenda=&dataFechamento=2024-05-19&dataFechamentoFim=2025-07-19&statusContingencia=True&status=False&page=1
+            const apiUrl = `${url}/api/administrativo/venda-ativa.xsjs?cpfCliente=${cpfCliente}&ufVenda=${ufVenda}&idMarca=${idGrupo}&idEmpresa=${idEmpresa}&dataFechamento=${dataPesquisaInicio}&dataFechamentoFim=${dataPesquisaFim}&statusContingencia=${statusContingencia}&status=${statusCancelado}&stCanceladoWeb=${statusCanceladoWeb}&stCanceladoPDVEmitida=${stCanceladoPDVEmitida}&stCanceladoApos30Min=${statusCanceladoDepois30Minutos}&stCanceladoPDVEmTela=${stCanceladoPDVEmTela}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl) 
-           
+           console.log(req.query)
+           console.log(apiUrl)
             // const response = await getVendaAtiva(statusCancelado, statusContingencia, statusCanceladoWeb, stCanceladoPDVEmitida, stCanceladoPDVEmTela, statusCanceladoDepois30Minutos, cpfCliente, idGrupo, idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
             return res.json(response.data); 
         } catch (error) {
