@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import authMiddleware  from './middlewares/authMiddleware.js';
+import authMiddleware from './middlewares/authMiddleware.js';
 
 import FuncionariosControllers from "./Funcionarios/controllers/index.js";
 import EmpresaControllers from "./Empresas/controllers/Empresas.js"
@@ -91,7 +91,7 @@ routes.post('/gerar-danfe', DanfeControllers.gerarDanfeLocal);
 
 routes.get('/autorizarVoucher', FuncionariosControllers.getAutorizacaoVoucherFuncionarios)
 // routes.get('/listaFuncionariosEmpresa', FuncionariosControllers.getListaFuncionariosEmpresa)
-routes.get('/funcionario-ativo-por-empresa', FuncionariosControllers. getListaFuncionariosAtivos)
+routes.get('/funcionario-ativo-por-empresa', FuncionariosControllers.getListaFuncionariosAtivos)
 routes.get('/todos-funcionario', FuncionariosControllers.getListaTodosFuncionarios)
 
 routes.get('/empresas', EmpresaControllers.getAllEmpresas);
@@ -171,7 +171,7 @@ routes.put('/alterarVendaVendedor', AdministrativoControllers.updateAlterarVenda
 
 // routes.get('/estoqueAtual', AdministrativoControllers.getEstoqueAtual)
 routes.get('/ultimaPosicaoEstoque', EstoqueControllers.getListaEstoqueUltimaPosicao)
-routes.get('/inventariomovimento', EstoqueControllers. getListaEstoqueAtual)
+routes.get('/inventariomovimento', EstoqueControllers.getListaEstoqueAtual)
 
 
 
@@ -317,8 +317,8 @@ routes.get('/venda-total-fatura-pix-empresa', FaturasControllers.getListaVendaFa
 routes.get('/venda-total-fatura-pix-empresa-compensada', FaturasControllers.getListaVendaFaturaPixPeriodoCompensacao)
 
 routes.put('/atualizar-status-fatura-pix', FaturasControllers.putListaFaturaVendaPixStatusConferido)
-routes.put('/atualizar-recompra', FaturasControllers.putListaAtualizarRecompra) 
-routes.put('/fatura-loja-atualizar', FaturasControllers.putListaAtualizarFatura) 
+routes.put('/atualizar-recompra', FaturasControllers.putListaAtualizarRecompra)
+routes.put('/fatura-loja-atualizar', FaturasControllers.putListaAtualizarFatura)
 
 
 //  Estabelecimento
@@ -390,8 +390,8 @@ routes.get('/adiantamento-funcionarios', DashBoardAdiantamentoSalarialController
 routes.get('/adiantamentos-salarial', DashBoardAdiantamentoSalarialControllers.getListaAdiantamentosSalarialDashBoard)
 
 routes.put('/atualizacao-adiantamento-status', DashBoardAdiantamentoSalarialControllers.updateAdiantamentoStatus)
-routes.post('/adiantamento-salarial', DashBoardAdiantamentoSalarialControllers .postAdiantamentoSalarial)
-routes.put('/adiantamento-salarial/:id', DashBoardAdiantamentoSalarialControllers .putAdiantamentoSalarial)
+routes.post('/adiantamento-salarial', DashBoardAdiantamentoSalarialControllers.postAdiantamentoSalarial)
+routes.put('/adiantamento-salarial/:id', DashBoardAdiantamentoSalarialControllers.putAdiantamentoSalarial)
 
 // routes.get('/resumoVendaConvenioDescontoFN', DashBoardControllers.getRetornoListaVendasConvenioDescontoFuncionario)
 routes.get('/resumo-venda-convenio-desconto', DashBoardVendasControllers.getVendasConvenioDescontoFuncionario)
@@ -497,7 +497,8 @@ routes.get('/resumoDetalheVoucher', ResumoVoucherControllers.getResumoDetalheVou
 routes.get('/detalhe-voucher', ResumoVoucherControllers.getListaVoucherGerencia)
 routes.get('/empresasVoucher', ResumoVoucherControllers.getListaEmpresasVoucher)
 routes.get('/cliente-todos', ResumoVoucherControllers.getListaTodosClientes)
-routes.put('/todos-web', ResumoVoucherControllers.putResumoVoucher)
+routes.put('/todos-web/:id', ResumoVoucherControllers.putResumoVoucher)
+routes.post('/todos-web', ResumoVoucherControllers.postResumoVoucher)
 
 routes.put('/todos-cliente/:id', ResumoVoucherControllers.putCliente)
 routes.post('/criar-cliente', ResumoVoucherControllers.postCliente)
@@ -605,7 +606,7 @@ routes.get('/listaProdutoCriadoPedidoCompra', CadastroControllers.getListaProdut
 routes.get('/categoriasProdutos', CadastroControllers.getListaCategoriasProduto)
 routes.get('/tipoProduto', CadastroControllers.getListaTipoProdutos)
 routes.get('/tipoFiscalProduto', CadastroControllers.getListaTipoFiscalProdutos)
-routes.get('/consultaProdutos', CadastroControllers. getConsultaProdutos)
+routes.get('/consultaProdutos', CadastroControllers.getConsultaProdutos)
 routes.get('/nfPedido', CadastroControllers.getListaNFPedido)
 
 
@@ -666,10 +667,10 @@ routes.get('/categoriaReceitaDespesaFinanceira', CategoriaReceitaDespesasControl
 routes.get('/detalheFaturaGerencia', DetalheFaturasControllers.getDetalheFatura)
 
 routes.get('/detalhe-Fatura-id', DetalheFaturasControllers.getDetalheFaturaById)
-routes.put('/atualizar-fatura', DetalheFaturasControllers.updateFatura) 
+routes.put('/atualizar-fatura', DetalheFaturasControllers.updateFatura)
 
-routes.put('/atualizar-detalhe-fatura-loja', DetalheFaturasControllers.putDetalheFaturaLoja) 
-routes.post('/criar-detalhe-fatura', DetalheFaturasControllers.postDetalheFaturaLoja) 
+routes.put('/atualizar-detalhe-fatura-loja', DetalheFaturasControllers.putDetalheFaturaLoja)
+routes.post('/criar-detalhe-fatura', DetalheFaturasControllers.postDetalheFaturaLoja)
 
 
 // Marketing
@@ -737,7 +738,6 @@ routes.post('/deposito-integracao', ServiceLayerControllers.postDepositoIntegrar
 routes.post('/log-web', LogsControllers.createLogsUsuario)
 
 
- 
+
 export default routes;
 
-    

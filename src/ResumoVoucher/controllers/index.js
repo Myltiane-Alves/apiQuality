@@ -499,19 +499,19 @@ class ResumoVoucherControllers {
    
             // const response = await updateResumoVoucher(dados);
 
-            if(!IDVOUCHER) {
-                return res.status(400).json({ error: 'IDVOUCHER é obrigatório.' });
-            }
+            // if(!IDVOUCHER) {
+            //     return res.status(400).json({ error: 'IDVOUCHER é obrigatório.' });
+            // }
 
-            if(!IDEMPRESALOGADA) {
-                return res.status(400).json({ error: 'IDEMPRESALOGADA é obrigatório.' });
-            }
+            // if(!IDEMPRESALOGADA) {
+            //     return res.status(400).json({ error: 'IDEMPRESALOGADA é obrigatório.' });
+            // }
 
-            if(!IDFUNCIONARIO) {
-                return res.status(400).json({ error: 'IDFUNCIONARIO é obrigatório.' });
-            }
+            // if(!IDFUNCIONARIO) {
+            //     return res.status(400).json({ error: 'IDFUNCIONARIO é obrigatório.' });
+            // }
 
-            const response = await axios.post(`${url}/api/resumo-voucher/todos-web.xsjs`, {
+            const response = await axios.put(`${url}/api/resumo-voucher/todos-web.xsjs`, {
                 STATIVO,
                 STCANCELADO,
                 DSMOTIVOTROCASTATUS,
@@ -523,7 +523,7 @@ class ResumoVoucherControllers {
                 IDGRUPOEMPRESARIAL
             })
 
-            return res.status(200).json({ message: 'Voucher atualizado com sucesso!' });
+            return res.status(200).json(response.data);
         } catch (error) {
             console.error("Erro no ResumoVoucherControllers.putResumoVoucher:", error);
             return res.status(400).json({ error: error.message });
