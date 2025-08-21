@@ -240,12 +240,18 @@ class ResumoVoucherControllers {
 
     async postAuthFuncionarioCreateVoucher(req, res) {
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body];   
-            const response = await createAuthFuncionarioCreateVoucher(dados)
-            
-            return res.json(response);
+             let {MATRICULA, SENHA, IDEMPRESALOGADA, IDGRUPOEMPRESARIAL, IDVENDA} = req.body;  
+            const response = await axios.post(`${url}/api/resumo-voucher/auth-funcionario-create-voucher.xsjs`, {
+                MATRICULA,
+                SENHA,
+                IDEMPRESALOGADA,
+                IDGRUPOEMPRESARIAL,
+                IDVENDA
+            })
+
+            return res.json(response.data);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("Error no ResumoVoucherControllers.postAuthFuncionarioCreateVoucher:", error);
             throw error;
         }
     }
