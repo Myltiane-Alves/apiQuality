@@ -240,13 +240,14 @@ class ResumoVoucherControllers {
 
     async postAuthFuncionarioCreateVoucher(req, res) {
         try {
-             let {MATRICULA, SENHA, IDEMPRESALOGADA, IDGRUPOEMPRESARIAL, IDVENDA} = req.body;  
+             let {MATRICULA, SENHA, IDEMPRESALOGADA, IDGRUPOEMPRESARIAL, IDVENDA, STTIPOTROCA} = req.body;  
             const response = await axios.post(`${url}/api/resumo-voucher/auth-funcionario-create-voucher.xsjs`, {
                 MATRICULA,
                 SENHA,
                 IDEMPRESALOGADA,
                 IDGRUPOEMPRESARIAL,
-                IDVENDA
+                IDVENDA,
+                STTIPOTROCA
             })
 
             return res.json(response.data);
