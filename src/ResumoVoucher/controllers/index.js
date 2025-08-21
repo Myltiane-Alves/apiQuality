@@ -412,7 +412,7 @@ class ResumoVoucherControllers {
             if(!NUCPFCNPJ) {
                 return res.status(400).json({ error: 'NUCPFCNPJ é obrigatório.' });
             }
-            console.log(req.body, 'body')
+
             const response = await axios.post(`${url}/api/gerencia/cliente.xsjs`, {
                 IDEMPRESA,
                 DSNOMERAZAOSOCIAL,
@@ -447,43 +447,54 @@ class ResumoVoucherControllers {
     async postResumoVoucher(req, res) {
         try {
             let { 
-                IDVOUCHER,
+                IDGRUPOEMPRESARIAL,
                 IDEMPRESAORIGEM,
                 IDCAIXAORIGEM,
                 IDNFEDEVOLUCAO,
-                DTINVOUCHER,
                 IDUSRINVOUCHER,
                 IDVENDEDOR,
                 IDCLIENTE,
+                NUCPF,
                 VRVOUCHER,
-                NUVOUCHER,
-                STATIVO,
-                STCANCELADO,
                 IDRESUMOVENDAWEB,
-                STSTATUS,
                 STTIPOTROCA,
                 MOTIVOTROCA,
                 IDUSRLIBERACAOCRIACAO
-             } = req.body;
+                
+            } = req.body;
 
             const response = await axios.post(`${url}/api/resumo-voucher/todos-web.xsjs`, {
-               IDVOUCHER,
+                IDGRUPOEMPRESARIAL,
                 IDEMPRESAORIGEM,
                 IDCAIXAORIGEM,
                 IDNFEDEVOLUCAO,
-                DTINVOUCHER,
                 IDUSRINVOUCHER,
                 IDVENDEDOR,
                 IDCLIENTE,
+                NUCPF,
                 VRVOUCHER,
-                NUVOUCHER,
-                STATIVO,
-                STCANCELADO,
                 IDRESUMOVENDAWEB,
-                STSTATUS,
                 STTIPOTROCA,
                 MOTIVOTROCA,
-                IDUSRLIBERACAOCRIACAO
+                IDUSRLIBERACAOCRIACAO,
+                detVoucher: {
+                    IDPRODUTO,
+                    QTD,
+                    VRUNIT,
+                    VRTOTALBRUTO,
+                    VRDESCONTO,
+                    VRTOTALLIQUIDO,
+                    STATIVO,
+                    STCANCELADO,
+                },
+                produtosVoucher: {
+                    IDVENDADETALHE,
+                    STTROCA,
+                    QTD,
+                    VRTOTALBRUTO,
+                    VDESC,
+                    VRTOTALLIQUIDO,
+                }
             });
 
             return res.status(200).json({ message: 'Voucher criado com sucesso!' });
