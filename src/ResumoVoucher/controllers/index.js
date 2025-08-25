@@ -203,16 +203,11 @@ class ResumoVoucherControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-
-            const response = await getTodosClientes(
-                idCliente,
-                numeroCpfCnpj,
-                page,
-                pageSize
-            );
+            const apiUrl = `${url}/api/gerencia/cliente.xsjs?id=${idCliente}&numeroCpfCnpj=${numeroCpfCnpj}&page=${page}&pageSize=${pageSize}`
+            const response = await axios.get(apiUrl);
 
 
-            return res.json(response);
+            return res.json(response.data);
         } catch (error) {
             console.error("erro no ResumoVoucherControllers getListaTodosClientes:", error);
             throw error;
@@ -412,9 +407,9 @@ class ResumoVoucherControllers {
             //     return res.status(400).json({ error: 'IDCLIENTE é obrigatório.' });
             // }   
 
-            if(!IDFUNCIONARIO) {
-                return res.status(400).json({ error: 'IDFUNCIONARIO é obrigatório.' });
-            }
+            // if(!IDFUNCIONARIO) {
+            //     return res.status(400).json({ error: 'IDFUNCIONARIO é obrigatório.' });
+            // }
 
             if(!NUCPFCNPJ) {
                 return res.status(400).json({ error: 'NUCPFCNPJ é obrigatório.' });
@@ -445,7 +440,7 @@ class ResumoVoucherControllers {
                 IDFUNCIONARIO 
             });
     
-            return res.status(200).json({ message: 'Cliente atualizado com sucesso!' });
+            return res.status(200).json(response.data);
         } catch (error) {
             console.error("Erro no ResumoVoucherControllers.postCliente:", error);
             return res.status(400).json({ error: error.message });
@@ -466,10 +461,12 @@ class ResumoVoucherControllers {
                 IDRESUMOVENDAWEB,
                 STTIPOTROCA,
                 MOTIVOTROCA,
-                IDUSRLIBERACAOCRIACAO
-                
+                IDUSRLIBERACAOCRIACAO,
+                detVoucher,
+                produtosVoucher
             } = req.body;
 
+      
             const response = await axios.post(`${url}/api/resumo-voucher/todos-web.xsjs`, {
                 IDGRUPOEMPRESARIAL,
                 IDEMPRESAORIGEM,
@@ -484,27 +481,11 @@ class ResumoVoucherControllers {
                 STTIPOTROCA,
                 MOTIVOTROCA,
                 IDUSRLIBERACAOCRIACAO,
-                detVoucher: {
-                    IDPRODUTO,
-                    QTD,
-                    VRUNIT,
-                    VRTOTALBRUTO,
-                    VRDESCONTO,
-                    VRTOTALLIQUIDO,
-                    STATIVO,
-                    STCANCELADO,
-                },
-                produtosVoucher: {
-                    IDVENDADETALHE,
-                    STTROCA,
-                    QTD,
-                    VRTOTALBRUTO,
-                    VDESC,
-                    VRTOTALLIQUIDO,
-                }
+                detVoucher,
+                produtosVoucher
             });
-
-            return res.status(200).json({ message: 'Voucher criado com sucesso!' });
+            console.log(response.data);
+            return res.status(200).json(response.data);
         } catch (error) {
             console.error("Erro no ResumoVoucherControllers.postResumoVoucher:", error);
             return res.status(400).json({ error: error.message });
