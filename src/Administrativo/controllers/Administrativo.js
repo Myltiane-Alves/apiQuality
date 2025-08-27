@@ -930,11 +930,35 @@ class AdministrativoControllers {
                 const response = await axios.put(apiUrl,  {
                     IDVENDADETALHE: dataIdVendaDetalhe,
                     IDVENDEDOR: IDVENDEDOR,
-    
                 })
-
          
-                return res.json(response.data); // Retorna
+                return res.json(response.data);
+            }
+          
+
+        } catch (error) {
+            console.error("Unable to connect to the database:", error);
+            return res.status(500).json({ error: "Erro ao conectar ao servidor" });
+        }
+        
+    }
+
+    async putEditarVoucher(req, res) {
+        
+        try {
+            let {IDVENDADETALHE,IDVENDEDOR } = req.body;         
+            
+            let dataIdVendaDetalhe = [1];
+            if (isNaN(IDVENDADETALHE > 0 )) {
+
+                const apiUrl = `${url}/api/administrativo/venda-vendedor.xsjs`
+             
+                const response = await axios.put(apiUrl,  {
+                    IDVENDADETALHE: dataIdVendaDetalhe,
+                    IDVENDEDOR: IDVENDEDOR,
+                })
+         
+                return res.json(response.data);
             }
           
 
