@@ -956,7 +956,7 @@ class AdministrativoControllers {
                 IDUSRULTALTERACAO, 
                 IDEMPRESALOGADA, 
                 IDGRUPOEMPRESARIAL, 
-                IDVOUCHER, 
+                IDVOUCHER 
             } = req.body;            
 
             const apiUrl = `${url}/api/administrativo/editar-voucher.xsjs`
@@ -971,7 +971,7 @@ class AdministrativoControllers {
                 IDUSRULTALTERACAO, 
                 IDEMPRESALOGADA, 
                 IDGRUPOEMPRESARIAL, 
-                IDVOUCHER,
+                IDVOUCHER
             })
         
             return res.json(response.data);
