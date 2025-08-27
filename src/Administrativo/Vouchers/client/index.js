@@ -10,18 +10,26 @@ export class VouchersClient {
     }
 
     async atualizarVendaPagamento(
-        STCANCELADO,
-        DTULTIMAALTERACAO,
-        IDFUNCIONARIOCANCELA,
-        TXTMOTIVOCANCELA,
-        IDVENDA
-    ) {
+        STATIVO, 
+        STCANCELADO, 
+        DSMOTIVOTROCASTATUS,  
+        STSTATUS, 
+        STTIPOTROCA,
+        IDFUNCIONARIO, 
+        IDEMPRESALOGADA, 
+        IDGRUPOEMPRESARIAL, 
+        IDVOUCHER 
+) {
         const response = await this.api.put(`${url}/api/administrativo/altera-venda-pagamento.xsjs`, [{
-            STCANCELADO,
-            DTULTIMAALTERACAO,
-            IDFUNCIONARIOCANCELA,
-            TXTMOTIVOCANCELA,
-            IDVENDA
+            STATIVO, 
+            STCANCELADO, 
+            DSMOTIVOTROCASTATUS,  
+            STSTATUS, 
+            STTIPOTROCA,
+            IDFUNCIONARIO, 
+            IDEMPRESALOGADA, 
+            IDGRUPOEMPRESARIAL, 
+            IDVOUCHER 
         }]);
         return response.data;
     }
