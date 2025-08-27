@@ -9,7 +9,7 @@ export class VouchersClient {
         });
     }
 
-    async atualizarVendaPagamento(
+    async atualizarVoucher(
         STATIVO, 
         STCANCELADO, 
         DSMOTIVOTROCASTATUS,  
@@ -20,7 +20,7 @@ export class VouchersClient {
         IDGRUPOEMPRESARIAL, 
         IDVOUCHER 
 ) {
-        const response = await this.api.put(`${url}/api/administrativo/altera-venda-pagamento.xsjs`, [{
+        const response = await this.api.put(`${url}/api/administrativo/editar-voucher.xsjs`, [{
             STATIVO, 
             STCANCELADO, 
             DSMOTIVOTROCASTATUS,  
