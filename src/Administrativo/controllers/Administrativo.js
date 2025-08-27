@@ -959,11 +959,19 @@ class AdministrativoControllers {
                 IDVOUCHER, 
             } = req.body;            
 
-            const apiUrl = `${url}/api/administrativo/venda-vendedor.xsjs`
+            const apiUrl = `${url}/api/administrativo/editar-voucher.xsjs`
             
             const response = await axios.put(apiUrl,  {
-                IDVENDADETALHE: dataIdVendaDetalhe,
-                IDVENDEDOR: IDVENDEDOR,
+                STATIVO, 
+                STCANCELADO, 
+                DSMOTIVOCANCELAMENTO, 
+                IDUSRCANCELAMENTO, 
+                STSTATUS, 
+                STTIPOTROCA,
+                IDUSRULTALTERACAO, 
+                IDEMPRESALOGADA, 
+                IDGRUPOEMPRESARIAL, 
+                IDVOUCHER,
             })
         
             return res.json(response.data);
