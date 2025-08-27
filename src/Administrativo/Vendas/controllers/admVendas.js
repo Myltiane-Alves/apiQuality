@@ -152,9 +152,10 @@ class AdmVendasControllers {
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
             
-        if(idVenda == '') {
-            return res.status(400).json({ error: "idVenda is required" });
-        }
+        // if(idVenda == '') {
+        //     return res.status(400).json({ error: "idVenda is required" });
+        // }
+
         try {
             const apiUrl = `${url}/api/venda/lista-venda.xsjs?nnf=${nnf}&serie=${serie}&idEmpresa=${idEmpresa}&id=${idVenda}&pageSize=${pageSize}&page=${page}`;
             const response = await axios.get(apiUrl)
