@@ -949,11 +949,10 @@ class AdministrativoControllers {
             let {
                 STATIVO, 
                 STCANCELADO, 
-                DSMOTIVOCANCELAMENTO, 
-                IDUSRCANCELAMENTO, 
+                DSMOTIVOTROCASTATUS,  
                 STSTATUS, 
                 STTIPOTROCA,
-                IDUSRULTALTERACAO, 
+                IDFUNCIONARIO, 
                 IDEMPRESALOGADA, 
                 IDGRUPOEMPRESARIAL, 
                 IDVOUCHER 
@@ -964,11 +963,10 @@ class AdministrativoControllers {
             const response = await axios.put(apiUrl,  {
                 STATIVO, 
                 STCANCELADO, 
-                DSMOTIVOCANCELAMENTO, 
-                IDUSRCANCELAMENTO, 
+                DSMOTIVOTROCASTATUS,  
                 STSTATUS, 
                 STTIPOTROCA,
-                IDUSRULTALTERACAO, 
+                IDFUNCIONARIO, 
                 IDEMPRESALOGADA, 
                 IDGRUPOEMPRESARIAL, 
                 IDVOUCHER
