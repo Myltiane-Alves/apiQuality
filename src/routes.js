@@ -168,6 +168,7 @@ routes.put('/criar-detalhe-balanco-avulso', AdmBalancoControllers.postDetalheBal
 routes.get('/despesasLojaADM', AdministrativoControllers.getListaDespesasLojaADM)
 
 routes.put('/alterarVendaVendedor', AdministrativoControllers.updateAlterarVendaVendedor)
+routes.put('/editar-voucher/:id', AdministrativoControllers.putEditarVoucher)
 
 // routes.get('/estoqueAtual', AdministrativoControllers.getEstoqueAtual)
 routes.get('/ultimaPosicaoEstoque', EstoqueControllers.getListaEstoqueUltimaPosicao)
