@@ -1,46 +1,52 @@
-import axios from "axios"; 
+import axios from "axios";
 import 'dotenv/config';
 const url = process.env.API_URL;
-
+import updateVoucherSchema from '../schema/useUpdateVoucher.js'
+import { VouchersClient } from '../client/index.js'
+import { VoucherServices } from '../services/index.js'
+const updateVoucherClient = new VouchersClient(process.env.API_URL);
+const updateVoucherService = new VoucherServices(updateVoucherClient);
 
 class AdmVouchersControllers {
-     async putEditarVoucher(req, res) {
-        
-        try {
-            let {
-                STATIVO, 
-                STCANCELADO, 
-                DSMOTIVOTROCASTATUS,  
-                STSTATUS, 
-                STTIPOTROCA,
-                IDFUNCIONARIO, 
-                IDEMPRESALOGADA, 
-                IDGRUPOEMPRESARIAL, 
-                IDVOUCHER 
-            } = req.body;            
+    async putEditarVoucher(req, res) {
 
-            const apiUrl = `${url}/api/administrativo/editar-voucher.xsjs`
-            
-            const response = await axios.put(apiUrl,  {
-                STATIVO, 
-                STCANCELADO, 
-                DSMOTIVOTROCASTATUS,  
-                STSTATUS, 
-                STTIPOTROCA,
-                IDFUNCIONARIO, 
-                IDEMPRESALOGADA, 
-                IDGRUPOEMPRESARIAL, 
-                IDVOUCHER
+        try {
+
+            const { error, value } = updateVoucherSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
             })
-        
-            return res.json(response.data);
-        
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+            const response = await updateVoucherService.updateVoucher(
+                value.STATIVO,
+                value.STCANCELADO,
+                value.DSMOTIVOTROCASTATUS,
+                value.STSTATUS,
+                value.STTIPOTROCA,
+                value.IDFUNCIONARIO,
+                value.IDEMPRESALOGADA,
+                value.IDGRUPOEMPRESARIAL,
+                value.IDVOUCHER
+            )
+
+            return res.status(200).json(response);
+
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("Erro no AdministativoControllers.putEditarVoucher:", error);
             return res.status(500).json({ error: "Erro ao conectar ao servidor" });
         }
-        
+
     }
+
 }
 
 export default new AdmVouchersControllers();
