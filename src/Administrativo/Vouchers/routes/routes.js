@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import AdmVendasControllers from '../controllers/admVendas.js';
+import AdmVouchersControllers from '../controllers/index.js';
 
 
 const admVouchersRoutes = new Router();
 
 // admVendasRoutes.get('/lista-venda-cliente', AdmVendasControllers.getListaVendaCliente);
 
-// admVendasRoutes.post('/alterar-venda-pagamento', AdmVouchersControllers.postAlterarVendasPagamento);
+admVouchersRoutes.post('/editar-voucher/:id', AdmVouchersControllers.putEditarVoucher);
 
 export default admVouchersRoutes;

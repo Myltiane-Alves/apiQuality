@@ -4,6 +4,11 @@ import { getDetalheVendas } from "../Vendas/repositories/detalheVenda.js";
 import { getDetalheVoucherDados } from "../Vouchers/repositories/detalheVoucherDados.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
+import updateVoucherSchema from '../Vouchers/schema/useUpdateVoucher.js'
+import { VouchersClient} from '../Vouchers/client/index.js'
+import { VoucherServices} from '../Vouchers/services/index.js'
+const updateVoucherClient = new VouchersClient(process.env.API_URL);
+const updateVoucherService = new VoucherServices(updateVoucherClient);
 
 class AdministrativoControllers {
 
