@@ -3,31 +3,31 @@ export class VoucherServices {
         this.client = client;
     }
 
-    async updateVendaPagamento( 
-         STATIVO, 
-            STCANCELADO, 
-            DSMOTIVOTROCASTATUS,  
-            STSTATUS, 
-            STTIPOTROCA,
-            IDFUNCIONARIO, 
-            IDEMPRESALOGADA, 
-            IDGRUPOEMPRESARIAL, 
-            IDVOUCHER 
+    async updateVoucher(
+        STATIVO,
+        STCANCELADO,
+        DSMOTIVOTROCASTATUS,
+        STSTATUS,
+        STTIPOTROCA,
+        IDFUNCIONARIO,
+        IDEMPRESALOGADA,
+        IDGRUPOEMPRESARIAL,
+        IDVOUCHER
     ) {
-        if(!IDVOUCHER) {
+        if (!IDVOUCHER) {
             throw new Error('ID do voucher é obrigatório.');
         }
 
-        const result = await this.client.atualizarVendaPagamento(
-            STATIVO, 
-            STCANCELADO, 
-            DSMOTIVOTROCASTATUS,  
-            STSTATUS, 
+        const result = await this.client.atualizarVoucher(
+            STATIVO,
+            STCANCELADO,
+            DSMOTIVOTROCASTATUS,
+            STSTATUS,
             STTIPOTROCA,
-            IDFUNCIONARIO, 
-            IDEMPRESALOGADA, 
-            IDGRUPOEMPRESARIAL, 
-            IDVOUCHER 
+            IDFUNCIONARIO,
+            IDEMPRESALOGADA,
+            IDGRUPOEMPRESARIAL,
+            IDVOUCHER
         );
 
         return result;
