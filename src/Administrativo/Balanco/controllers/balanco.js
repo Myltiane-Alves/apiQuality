@@ -309,7 +309,7 @@ class AdmBalancoControllers {
                 return res.status(400).json({ error: "idResumo is required." });
             }
 
-            const apiUrl = `${url}/api/administrativo/coletor-balanco.xsjs`;
+            const apiUrl = `${url}/api/administrativo/confirmar-consolidar-balanco.xsjs`;
             const response = await axios.put(apiUrl, {
                 IDRESUMOBALANCO,
                 OBSCONTAGEM,
