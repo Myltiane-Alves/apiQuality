@@ -123,9 +123,10 @@ class AdmBalancoControllers {
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
         try {
-            
-            const response = await getConsolidarBalanco(idResumo, page, pageSize)
-            return res.json(response); 
+
+            const apiUrl = `${url}/api/administrativo/consolidar-balanco.xsjs?id=${idResumo}&page=${page}&pageSize=${pageSize}`
+            const response = await axios.get(apiUrl)
+            return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;
