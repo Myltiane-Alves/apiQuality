@@ -157,6 +157,7 @@ routes.get('/balanco-loja', AdmBalancoControllers.getListaBalancoLoja)
 routes.get('/detalhe-balanco', AdmBalancoControllers.getListaDetalheBalancoLoja)
 routes.get('/preparar-primeiro-balanco-loja', AdmBalancoControllers.getListaPrepararPrimeiroBalancoLoja)
 routes.get('/prestacao-contas-balanco', AdmBalancoControllers.getListaPrestacaoContasBalanco)
+routes.get('/consolidar-balanco', AdmBalancoControllers.getListaConsolidarBalanco)
 
 routes.put('/coletor-balanco/:id', AdmBalancoControllers.putColetorBalanco)
 routes.put('/consolidar-balanco/:id', AdmBalancoControllers.putConsolidarBalanco)
