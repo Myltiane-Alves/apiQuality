@@ -220,7 +220,7 @@ class AdmBalancoControllers {
                 return res.status(400).json({ error: "IDEMPRESA is required." });
             }
 
-            const apiUrl = `${url}/api/administrativo/preparar-primeiro-balanco-loja.xsjs`
+            const apiUrl = `${url}/api/administrativo/prepara-primeiro-balanco-loja.xsjs`
             
             const response = await axios.put(apiUrl, {
                 IDEMPRESA
@@ -236,15 +236,21 @@ class AdmBalancoControllers {
 
     async putListaDetalheBalanco(req, res) {
         try {
-            const detalhes = Array.isArray(req.body) ? req.body : [req.body];   
-            const response = await putDetalheBalanco(detalhes)
-        
-            return res.json(response);
+            let {IDDETALHEBALANCO, TOTALCONTAGEMGERAL} = req.body;   
+           
+            const apiUrl = `${url}/api/administrativo/detalhe-balanco.xsjs`;
+            const response = await axios.put(apiUrl, {
+                IDDETALHEBALANCO: Number(IDDETALHEBALANCO),
+                TOTALCONTAGEMGERAL: Number(TOTALCONTAGEMGERAL)
+            });
+         
+            return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;
         }
     }
+
     async putListaDetalheBalancoAvulso(req, res) {
         try {
             let { TOTALCONTAGEMGERAL, IDEMPRESA, NUMEROCOLETOR, IDPRODUTO, DSCOLETOR, CODIGODEBARRAS, DSPRODUTO, PRECOCUSTO, PRECOVENDA, STCANCELADO, INSBALANCO } = req.body;
