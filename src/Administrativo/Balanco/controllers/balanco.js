@@ -11,8 +11,11 @@ import { getNovoPreviaBalanco } from "../repositories/novoPreviaBalanco.js";
 import { createDetalheBalancoAvulso, getDetalheBalancoAvulso, putDetalheBalancoAvulso } from "../repositories/detalheBalancoAvulso.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
-
-
+import updateBalancoConsolidadoSchema from '../schema/confirmarConsolidarBalanco.js';
+import { BalancoClient} from '../client/index.js'
+import { BalancoServices } from '../services/index.js'
+const confirmarBalancoCliente = new BalancoClient(process.env.API_URL);
+const confirmarBalancoService = new BalancoServices(confirmarBalancoCliente);
 
 class AdmBalancoControllers {
     async getListaBalancoLoja(req, res) {
@@ -304,20 +307,30 @@ class AdmBalancoControllers {
     }
     async putConfirmarConsolidarBalanco(req, res) {
         try {
-            let { IDRESUMOBALANCO,  OBSCONTAGEM, OBSDIVERGENCIACONTAGEM, OBSDIVERGENCIAGERENTE} = req.body;
-            if (!IDRESUMOBALANCO) {
-                return res.status(400).json({ error: "idResumo is required." });
+
+             const { error, value } = updateBalancoConsolidadoSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
             }
 
-            const apiUrl = `${url}/api/administrativo/confirmar-consolidar-balanco.xsjs`;
-            const response = await axios.put(apiUrl, {
-                IDRESUMOBALANCO,
-                OBSCONTAGEM,
-                OBSDIVERGENCIACONTAGEM,
-                OBSDIVERGENCIAGERENTE
-            });
+            const response = await confirmarBalancoService.updateConfirmarBalancoConsolidado(
+                value.IDRESUMOBALANCO,
+                value.OBSCONTAGEM,
+                value.OBSDIVERGENCIACONTAGEM,
+                value.OBSDIVERGENCIAGERENTE
+            );
 
-            return res.json(response.data);
+            return res.status(200).json(response);
         } catch (error) {
             console.error("Erro no ADM Balanco Controllers putConfirmarConsolidarBalanco:", error);
             return res.status(500).json({ error: error.message });
