@@ -305,6 +305,27 @@ class AdmBalancoControllers {
             return res.status(500).json({ error: error.message });
         }
     }
+
+    async putConfirmarPrestacaoContas(req, res) {
+        try {
+            let { IDRESUMOBALANCO} = req.body;
+            if (!IDRESUMOBALANCO) {
+                return res.status(400).json({ error: "idResumo is required." });
+            }
+
+            const apiUrl = `${url}/api/administrativo/prestacao-contas-balanco.xsjs`;
+            const response = await axios.put(apiUrl, {
+                IDRESUMOBALANCO,
+            });
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("Erro no ADM Balanco Controllers putConfirmarPrestacaoContas:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    }
+
+
     async putConfirmarConsolidarBalanco(req, res) {
         try {
 
