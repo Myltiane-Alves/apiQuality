@@ -261,7 +261,13 @@ class AdmBalancoControllers {
             // const detalhes = Array.isArray(req.body) ? req.body : [req.body];   
             // const response = await putDetalheBalancoAvulso(detalhes)
             const apiUrl = `${url}/api/administrativo/detalhe-balanco-avulso.xsjs`;
-            const response = await axios.put(apiUrl, req.body);
+            const response = await axios.put(apiUrl,{
+                IDEMPRESA,
+                NUMEROCOLETOR,
+                DSCOLETOR,
+                IDPRODUTO,
+                TOTALCONTAGEMGERAL
+            });
 
             return res.json(response.data);
         } catch (error) {
