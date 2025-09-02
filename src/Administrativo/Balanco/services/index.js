@@ -19,4 +19,23 @@ export class BalancoServices {
 
         return result;
     }
+
+    async updateDetalheBalancoAvulso(
+        IDEMPRESA,
+        NUMEROCOLETOR,
+        DSCOLETOR,
+        IDPRODUTO,
+        TOTALCONTAGEMGERAL
+    ) {
+
+        const result = await this.client.ConfirmarConsolidarBalanco(
+            IDEMPRESA,
+            NUMEROCOLETOR,
+            DSCOLETOR,
+            IDPRODUTO,
+            TOTALCONTAGEMGERAL
+        );
+
+        return result;
+    }
 }
