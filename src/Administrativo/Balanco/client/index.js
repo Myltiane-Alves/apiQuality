@@ -69,7 +69,7 @@ export class BalancoClient {
         TXTOBSERVACAO,
         det
     ) {
-        const response = await this.api.post(`${url}/api/administrativo/confirmar-balanco.xsjs`, {
+        const response = await this.api.post(`${url}/api/administrativo/detalhe-balanco-avulso.xsjs`, {
             DSRESUMOBALANCO,
             DTABERTURA,
             DTFECHAMENTO,

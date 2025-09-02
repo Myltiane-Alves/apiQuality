@@ -303,27 +303,40 @@ class AdmBalancoControllers {
 
     async postDetalheBalancoAvulso(req, res) {
         try {
-        // const { error, value } = confirmarBalancoSchema.validate(req.body, {
-        //         abortEarly: false,
-        //         stripUnknown: true
-        //     })
+            // const { error, value } = confirmarBalancoSchema.validate(req.body, {
+            //     abortEarly: false,
+            //     stripUnknown: true
+            // })
 
-        //     if (error) {
-        //         return res.status(400).json({
-        //             message: 'Dados inválidos',
-        //             errors: error.details.map(detail => ({
-        //                 field: detail.path.join('.'),
-        //                 message: detail.message
-        //             }))
-        //         });
-        //     }
+            // if (error) {
+            //     return res.status(400).json({
+            //         message: 'Dados inválidos',
+            //         errors: error.details.map(detail => ({
+            //             field: detail.path.join('.'),
+            //             message: detail.message
+            //         }))
+            //     });
+            // }
 
-            // let {} =  req.body;   
+            let {} =  req.body;   
             // const response = await createDetalheBalancoAvulso(detalhes)
 
             const apiUrl = `${url}/api/administrativo/detalhe-balanco-avulso.xsjs`;
             
             const response = await axios.post(apiUrl, req.body);
+            // const response = await confirmarBalancoService.createConfirmarBalanco(
+            //     value.DSRESUMOBALANCO,
+            //     value.DTABERTURA,
+            //     value.DTFECHAMENTO,
+            //     value.IDEMPRESA,
+            //     value.INSBALANCO,
+            //     value.QTDTOTALFALTA,
+            //     value.QTDTOTALITENS,
+            //     value.QTDTOTALSOBRA,
+            //     value.STATIVO,
+            //     value.TXTOBSERVACAO,
+            //     value.det
+            // )
         
             return res.json(response.data);
         } catch (error) {

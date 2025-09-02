@@ -10,7 +10,7 @@ const confirmarBalancoSchema = Joi.object({
     QTDTOTALITENS: Joi.number().required(),
     QTDTOTALSOBRA: Joi.number().required(),
     STATIVO: Joi.string().valid('True', 'False').required(),
-    TXTOBSERVACAO: Joi.string().max(255),
+    TXTOBSERVACAO: Joi.string().max(255).allow(''),
     det: Joi.array().items(
         Joi.object({
             CODIGODEBARRAS: Joi.string().required(),
