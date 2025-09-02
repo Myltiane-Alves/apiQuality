@@ -31,16 +31,39 @@ export class BalancoClient {
         NUMEROCOLETOR,
         DSCOLETOR,
         IDPRODUTO,
-        TOTALCONTAGEMGERAL
+        CODIGODEBARRAS,
+        DSPRODUTO,
+        TOTALCONTAGEMGERAL,
+        PRECOCUSTO,
+        PRECOVENDA,
+        STCANCELADO,
+        INSBALANCO
     ) {
-       
-        const response = await this.api.put(`${url}/api/administrativo/detalhe-balanco-avulso.xsjs`,[{
+    //    return  console.log(IDEMPRESA,
+    //     NUMEROCOLETOR,
+    //     DSCOLETOR,
+    //     IDPRODUTO,
+    //     CODIGODEBARRAS,
+    //     DSPRODUTO,
+    //     TOTALCONTAGEMGERAL,
+    //     PRECOCUSTO,
+    //     PRECOVENDA,
+    //     STCANCELADO,
+    //     INSBALANCO)
+
+        const response = await this.api.put(`${url}/api/administrativo/detalhe-balanco-avulso.xsjs`,{
             IDEMPRESA,
             NUMEROCOLETOR,
             DSCOLETOR,
             IDPRODUTO,
-            TOTALCONTAGEMGERAL
-        }]);
+            CODIGODEBARRAS,
+            DSPRODUTO,
+            TOTALCONTAGEMGERAL,
+            PRECOCUSTO,
+            PRECOVENDA,
+            STCANCELADO,
+            INSBALANCO
+        });
 
         return response.data;
     }

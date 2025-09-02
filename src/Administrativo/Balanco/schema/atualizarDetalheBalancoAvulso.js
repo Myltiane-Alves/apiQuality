@@ -60,3 +60,16 @@ const updateDetalheBalancoAvulsoSchema = Joi.object({
 })
 
 export default updateDetalheBalancoAvulsoSchema;    
+
+// [{
+//    "IDEMPRESA":1,
+//    "NUMEROCOLETOR":30514,
+//    "IDPRODUTO":"0000563110",
+//    "CODIGODEBARRAS":"1223990000518",
+//    "DSPRODUTO":"Casaco 3487 Visc Mg Lurex Pto Agua Viva 10",
+//    "TOTALCONTAGEMGERAL":2,
+//    "PRECOCUSTO":20.94,
+//    "PRECOVENDA":14.99,
+//    "STCANCELADO":"False",
+//    "INSBALANCO":0
+// }]

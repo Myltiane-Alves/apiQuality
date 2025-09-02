@@ -276,6 +276,7 @@ class AdmBalancoControllers {
                 });
             }
 
+
             const response = await atualizarDetalheBalancoAvulsoService.updateDetalheBalancoAvulso(
                 value.IDEMPRESA,
                 value.NUMEROCOLETOR,
