@@ -195,9 +195,9 @@ class ExpedicaoControllers {
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
         try {
-            // const response = await axios.get(`${url}/api/expedicao/rotina-movimentacao.xsjs`)
-            const response = await getRotinaMovimentacao(idRotina,  pageSize, page)
-            return res.json(response); 
+            const response = await axios.get(`${url}/api/expedicao/rotina-movimentacao.xsjs`)
+            // const response = await getRotinaMovimentacao(idRotina,  pageSize, page)
+            return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error; 
