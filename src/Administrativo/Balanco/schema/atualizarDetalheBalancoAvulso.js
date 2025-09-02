@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 const updateDetalheBalancoAvulsoSchema = Joi.object({
-     IDEMPRESA: Joi.number().integer.required()
+     IDEMPRESA: Joi.number().integer().required()
      .messages({
         'number.base': 'O campo IDEMPRESA deve ser um número',
         'number.integer': 'O campo IDEMPRESA deve ser um número inteiro',

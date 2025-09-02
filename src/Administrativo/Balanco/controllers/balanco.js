@@ -12,10 +12,13 @@ import { createDetalheBalancoAvulso, getDetalheBalancoAvulso, putDetalheBalancoA
 import 'dotenv/config';
 const url = process.env.API_URL;
 import updateBalancoConsolidadoSchema from '../schema/confirmarConsolidarBalanco.js';
+import updateDetalheBalancoAvulsoSchema from '../schema/atualizarDetalheBalancoAvulso.js';
 import { BalancoClient} from '../client/index.js'
 import { BalancoServices } from '../services/index.js'
 const confirmarBalancoCliente = new BalancoClient(process.env.API_URL);
 const confirmarBalancoService = new BalancoServices(confirmarBalancoCliente);
+const atualizarDetalheBalancoAvulsoCliente = new BalancoClient(process.env.API_URL);
+const atualizarDetalheBalancoAvulsoService = new BalancoServices(atualizarDetalheBalancoAvulsoCliente);
 
 class AdmBalancoControllers {
     async getListaBalancoLoja(req, res) {
@@ -257,19 +260,31 @@ class AdmBalancoControllers {
 
     async putListaDetalheBalancoAvulso(req, res) {
         try {
-            let { TOTALCONTAGEMGERAL, IDEMPRESA, NUMEROCOLETOR, IDPRODUTO, DSCOLETOR, CODIGODEBARRAS, DSPRODUTO, PRECOCUSTO, PRECOVENDA, STCANCELADO, INSBALANCO } = req.body;
-            // const detalhes = Array.isArray(req.body) ? req.body : [req.body];   
-            // const response = await putDetalheBalancoAvulso(detalhes)
-            const apiUrl = `${url}/api/administrativo/detalhe-balanco-avulso.xsjs`;
-            const response = await axios.put(apiUrl,{
-                IDEMPRESA,
-                NUMEROCOLETOR,
-                DSCOLETOR,
-                IDPRODUTO,
-                TOTALCONTAGEMGERAL
-            });
 
-            return res.json(response.data);
+            const { error, value } = updateDetalheBalancoAvulsoSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            })
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+            const response = await atualizarDetalheBalancoAvulsoService.updateDetalheBalancoAvulso(
+                value.IDEMPRESA,
+                value.NUMEROCOLETOR,
+                value.DSCOLETOR,
+                value.IDPRODUTO,
+                value.TOTALCONTAGEMGERAL
+            );
+
+            return res.json(response);
         } catch (error) {
             console.error("Erro no ADM Balanco Controllers putListaDetalheBalancoAvulso:", error);
             return res.status(500).json({ error: error.message });
@@ -335,7 +350,7 @@ class AdmBalancoControllers {
     async putConfirmarConsolidarBalanco(req, res) {
         try {
 
-             const { error, value } = updateBalancoConsolidadoSchema.validate(req.body, {
+            const { error, value } = updateBalancoConsolidadoSchema.validate(req.body, {
                 abortEarly: false,
                 stripUnknown: true
             })
