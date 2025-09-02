@@ -25,4 +25,23 @@ export class BalancoClient {
 
         return response.data;
     }
+
+    async atualizarDetalheBalancoAvulso(
+        IDEMPRESA,
+        NUMEROCOLETOR,
+        DSCOLETOR,
+        IDPRODUTO,
+        TOTALCONTAGEMGERAL
+    ) {
+       
+        const response = await this.api.put(`${url}/api/administrativo/detalhe-balanco-avulso.xsjs`,[{
+            IDEMPRESA,
+            NUMEROCOLETOR,
+            DSCOLETOR,
+            IDPRODUTO,
+            TOTALCONTAGEMGERAL
+        }]);
+
+        return response.data;
+    }
 }
