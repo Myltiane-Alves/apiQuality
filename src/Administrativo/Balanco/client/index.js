@@ -10,7 +10,7 @@ export class BalancoClient {
        }); 
     }
 
-    async ConfirmarConsolidarBalanco(
+    async confirmarConsolidarBalanco(
         IDRESUMOBALANCO,
         OBSCONTAGEM,
         OBSDIVERGENCIACONTAGEM,

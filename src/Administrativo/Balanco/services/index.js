@@ -10,7 +10,7 @@ export class BalancoServices {
         OBSDIVERGENCIAGERENTE
     ) {
 
-        const result = await this.client.ConfirmarConsolidarBalanco(
+        const result = await this.client.confirmarConsolidarBalanco(
             IDRESUMOBALANCO,
             OBSCONTAGEM,
             OBSDIVERGENCIACONTAGEM,
@@ -28,7 +28,7 @@ export class BalancoServices {
         TOTALCONTAGEMGERAL
     ) {
 
-        const result = await this.client.ConfirmarConsolidarBalanco(
+        const result = await this.client.atualizarDetalheBalancoAvulso(
             IDEMPRESA,
             NUMEROCOLETOR,
             DSCOLETOR,

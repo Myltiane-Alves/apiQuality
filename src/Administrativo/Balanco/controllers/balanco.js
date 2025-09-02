@@ -281,7 +281,13 @@ class AdmBalancoControllers {
                 value.NUMEROCOLETOR,
                 value.DSCOLETOR,
                 value.IDPRODUTO,
-                value.TOTALCONTAGEMGERAL
+                value.CODIGODEBARRAS,
+                value.DSPRODUTO,
+                value.TOTALCONTAGEMGERAL,
+                value.PRECOCUSTO,
+                value.PRECOVENDA,
+                value.STCANCELADO,
+                value.INSBALANCO
             );
 
             return res.json(response);
