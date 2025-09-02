@@ -36,7 +36,17 @@ const updateDetalheBalancoAvulsoSchema = Joi.object({
      .messages({
         'number.base': 'O campo TOTALCONTAGEMGERAL deve ser um número',
         'any.required': 'O campo TOTALCONTAGEMGERAL é obrigatório'
-     })
+     }),
+     PRECOCUSTO: Joi.number().required()
+     .messages({
+        'number.base': 'O campo PRECOCUSTO deve ser um número',
+        'any.required': 'O campo PRECOCUSTO é obrigatório'
+     }),
+       PRECOVENDA: Joi.number().required()
+       .messages({
+           'number.base': 'O campo PRECOVENDA deve ser um número',
+           'any.required': 'O campo PRECOVENDA é obrigatório'
+       })
 })
 
 export default updateDetalheBalancoAvulsoSchema;    
