@@ -25,7 +25,13 @@ export class BalancoServices {
         NUMEROCOLETOR,
         DSCOLETOR,
         IDPRODUTO,
-        TOTALCONTAGEMGERAL
+        CODIGODEBARRAS,
+        DSPRODUTO,
+        TOTALCONTAGEMGERAL,
+        PRECOCUSTO,
+        PRECOVENDA,
+        STCANCELADO,
+        INSBALANCO
     ) {
 
         const result = await this.client.atualizarDetalheBalancoAvulso(
@@ -33,7 +39,13 @@ export class BalancoServices {
             NUMEROCOLETOR,
             DSCOLETOR,
             IDPRODUTO,
-            TOTALCONTAGEMGERAL
+            CODIGODEBARRAS,
+            DSPRODUTO,
+            TOTALCONTAGEMGERAL,
+            PRECOCUSTO,
+            PRECOVENDA,
+            STCANCELADO,
+            INSBALANCO
         );
 
         return result;

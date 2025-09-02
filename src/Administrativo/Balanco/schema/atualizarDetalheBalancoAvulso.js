@@ -47,9 +47,9 @@ const updateDetalheBalancoAvulsoSchema = Joi.object({
          'number.base': 'O campo PRECOVENDA deve ser um número',
          'any.required': 'O campo PRECOVENDA é obrigatório'
       }),
-   STCANCELADO: Joi.number().required()
+   STCANCELADO: Joi.string().required()
       .messages({
-         'number.base': 'O campo STCANCELADO deve ser um número',
+         'string.base': 'O campo STCANCELADO deve ser uma string',
          'any.required': 'O campo STCANCELADO é obrigatório'
       }),
    INSBALANCO: Joi.number().required()
