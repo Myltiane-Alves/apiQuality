@@ -55,4 +55,9 @@ export class BalancoClient {
 
         return response.data;
     }
+
+    async criarConfirmarBalanco(data) {
+        const response = await this.api.post(`${url}/api/administrativo/confirmar-balanco.xsjs`, data);
+        return response.data;
+    }
 }

@@ -50,4 +50,9 @@ export class BalancoServices {
 
         return result;
     }
+
+    async createConfirmarBalanco(data) {
+        const result = await this.client.confirmarBalanco(data);
+        return result;
+    }
 }
