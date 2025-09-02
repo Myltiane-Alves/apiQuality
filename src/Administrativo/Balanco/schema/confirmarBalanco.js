@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 const confirmarBalancoSchema = Joi.object({
     DSRESUMOBALANCO: Joi.string().required(),
-    DTABERTURA: Joi.date().required(),
-    DTFECHAMENTO: Joi.date().required(),
+    DTABERTURA: Joi.string().allow(''),
+    DTFECHAMENTO: Joi.string().allow(''),
     IDEMPRESA: Joi.number().required(),
     INSBALANCO: Joi.number().required(),
     QTDTOTALFALTA: Joi.number().required(),
@@ -13,16 +13,16 @@ const confirmarBalancoSchema = Joi.object({
     TXTOBSERVACAO: Joi.string().max(255),
     det: Joi.array().items(
         Joi.object({
+            CODIGODEBARRAS: Joi.string().required(),
+            DSCOLETOR: Joi.string().required(),
+            DSPRODUTO: Joi.string().required(),
+            IDPRODUTO: Joi.string().required(),
             NUMEROCOLETOR: Joi.number().required(),
-            IDPRODUTO: Joi.number().required(),
-            CODIGODEBARRAS: Joi.string().max(255).required(),
-            DSPRODUTO: Joi.string().max(255).required(),
-            TOTALCONTAGEMATUAL: Joi.number().required(),
-            TOTALCONTAGEMGERAL: Joi.number().required(),
             PRECOCUSTO: Joi.number().required(),
             PRECOVENDA: Joi.number().required(),
             STCANCELADO: Joi.string().valid('True', 'False').required(),
-            DSCOLETOR: Joi.string().max(255).required()
+            TOTALCONTAGEMATUAL: Joi.number().required(),
+            TOTALCONTAGEMGERAL: Joi.number().required(),
         })
     )
 });
