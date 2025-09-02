@@ -13,12 +13,15 @@ import 'dotenv/config';
 const url = process.env.API_URL;
 import updateBalancoConsolidadoSchema from '../schema/confirmarConsolidarBalanco.js';
 import updateDetalheBalancoAvulsoSchema from '../schema/atualizarDetalheBalancoAvulso.js';
+import confirmarBalancoSchema from '../schema/confirmarBalanco.js';
 import { BalancoClient} from '../client/index.js'
 import { BalancoServices } from '../services/index.js'
-const confirmarBalancoCliente = new BalancoClient(process.env.API_URL);
-const confirmarBalancoService = new BalancoServices(confirmarBalancoCliente);
+const confirmarBalancoConsolidadoCliente = new BalancoClient(process.env.API_URL);
+const confirmarBalancoConsolidadoService = new BalancoServices(confirmarBalancoConsolidadoCliente);
 const atualizarDetalheBalancoAvulsoCliente = new BalancoClient(process.env.API_URL);
 const atualizarDetalheBalancoAvulsoService = new BalancoServices(atualizarDetalheBalancoAvulsoCliente);
+const confirmarBalancoCliente = new BalancoClient(process.env.API_URL);
+const confirmarBalancoService = new BalancoServices(confirmarBalancoCliente);
 
 class AdmBalancoControllers {
     async getListaBalancoLoja(req, res) {
@@ -300,10 +303,26 @@ class AdmBalancoControllers {
 
     async postDetalheBalancoAvulso(req, res) {
         try {
-            let {} =  req.body;   
+        // const { error, value } = confirmarBalancoSchema.validate(req.body, {
+        //         abortEarly: false,
+        //         stripUnknown: true
+        //     })
+
+        //     if (error) {
+        //         return res.status(400).json({
+        //             message: 'Dados inválidos',
+        //             errors: error.details.map(detail => ({
+        //                 field: detail.path.join('.'),
+        //                 message: detail.message
+        //             }))
+        //         });
+        //     }
+
+            // let {} =  req.body;   
             // const response = await createDetalheBalancoAvulso(detalhes)
 
             const apiUrl = `${url}/api/administrativo/detalhe-balanco-avulso.xsjs`;
+            
             const response = await axios.post(apiUrl, req.body);
         
             return res.json(response.data);
@@ -372,7 +391,7 @@ class AdmBalancoControllers {
                 });
             }
 
-            const response = await confirmarBalancoService.updateConfirmarBalancoConsolidado(
+            const response = await confirmarBalancoConsolidadoService.updateConfirmarBalancoConsolidado(
                 value.IDRESUMOBALANCO,
                 value.OBSCONTAGEM,
                 value.OBSDIVERGENCIACONTAGEM,

@@ -51,8 +51,32 @@ export class BalancoServices {
         return result;
     }
 
-    async createConfirmarBalanco(data) {
-        const result = await this.client.confirmarBalanco(data);
+    async createConfirmarBalanco( 
+            DSRESUMOBALANCO,
+            DTABERTURA,
+            DTFECHAMENTO,
+            IDEMPRESA,
+            INSBALANCO,
+            QTDTOTALFALTA,
+            QTDTOTALITENS,
+            QTDTOTALSOBRA,
+            STATIVO,
+            TXTOBSERVACAO,
+            det
+        ) {
+        const result = await this.client.criarConfirmarBalanco(
+            DSRESUMOBALANCO,
+            DTABERTURA,
+            DTFECHAMENTO,
+            IDEMPRESA,
+            INSBALANCO,
+            QTDTOTALFALTA,
+            QTDTOTALITENS,
+            QTDTOTALSOBRA,
+            STATIVO,
+            TXTOBSERVACAO,
+            det
+        );
         return result;
     }
 }

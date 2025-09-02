@@ -66,7 +66,8 @@ export class BalancoClient {
         QTDTOTALITENS,
         QTDTOTALSOBRA,
         STATIVO,
-        TXTOBSERVACAO
+        TXTOBSERVACAO,
+        det
     ) {
         const response = await this.api.post(`${url}/api/administrativo/confirmar-balanco.xsjs`, {
             DSRESUMOBALANCO,
@@ -78,7 +79,8 @@ export class BalancoClient {
             QTDTOTALITENS,
             QTDTOTALSOBRA,
             STATIVO,
-            TXTOBSERVACAO
+            TXTOBSERVACAO,
+            det
         });
         return response.data;
     }
