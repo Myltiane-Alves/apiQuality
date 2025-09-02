@@ -39,18 +39,6 @@ export class BalancoClient {
         STCANCELADO,
         INSBALANCO
     ) {
-    //    return  console.log(IDEMPRESA,
-    //     NUMEROCOLETOR,
-    //     DSCOLETOR,
-    //     IDPRODUTO,
-    //     CODIGODEBARRAS,
-    //     DSPRODUTO,
-    //     TOTALCONTAGEMGERAL,
-    //     PRECOCUSTO,
-    //     PRECOVENDA,
-    //     STCANCELADO,
-    //     INSBALANCO)
-
         const response = await this.api.put(`${url}/api/administrativo/detalhe-balanco-avulso.xsjs`,{
             IDEMPRESA,
             NUMEROCOLETOR,
