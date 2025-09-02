@@ -56,8 +56,30 @@ export class BalancoClient {
         return response.data;
     }
 
-    async criarConfirmarBalanco(data) {
-        const response = await this.api.post(`${url}/api/administrativo/confirmar-balanco.xsjs`, data);
+    async criarConfirmarBalanco(
+        DSRESUMOBALANCO,
+        DTABERTURA,
+        DTFECHAMENTO,
+        IDEMPRESA,
+        INSBALANCO,
+        QTDTOTALFALTA,
+        QTDTOTALITENS,
+        QTDTOTALSOBRA,
+        STATIVO,
+        TXTOBSERVACAO
+    ) {
+        const response = await this.api.post(`${url}/api/administrativo/confirmar-balanco.xsjs`, {
+            DSRESUMOBALANCO,
+            DTABERTURA,
+            DTFECHAMENTO,
+            IDEMPRESA,
+            INSBALANCO,
+            QTDTOTALFALTA,
+            QTDTOTALITENS,
+            QTDTOTALSOBRA,
+            STATIVO,
+            TXTOBSERVACAO
+        });
         return response.data;
     }
 }
