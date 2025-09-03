@@ -142,14 +142,14 @@ class GerenciaControllers {
     async postMalotesPorLoja(req, res) {      
         try {
             const { IDEMPRESA, DATAMOVIMENTOCAIXA } = req.body;
-            const dataFormatada = formatarDataMalote(req.body.DATAMOVIMENTOCAIXA)
-            if (!IDEMPRESA || !dataFormatada) {
+            // const dataFormatada = formatarDataMalote(req.body.DATAMOVIMENTOCAIXA)
+            if (!IDEMPRESA || !DATAMOVIMENTOCAIXA) {
                 return res.status(400).json({error: "Parâmetros inválidos. É necessário informar 'IDEMPRESA'."    });
             }  
             const payload = [{
                 ...req.body,
                 IDEMPRESA: req.body.IDEMPRESA,
-                DATAMOVIMENTOCAIXA: dataFormatada,
+                DATAMOVIMENTOCAIXA: req.body.DATAMOVIMENTOCAIXA,
                 VRDINHEIRO: req.body.VRDINHEIRO,
                 VRCARTAO: req.body.VRCARTAO,
                 VRPOS: req.body.VRPOS,
