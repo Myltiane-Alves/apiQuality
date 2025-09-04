@@ -241,11 +241,11 @@ class ProdutoControllers  {
         pageSize = pageSize ? pageSize : '';
         
         try {
-
+                           
             const apiUrl = `${url}/api/produtos/lista-produtos-etiqueta-SAP.xsjs?idLista=${idLista}&id=${idProduto}&descProd=${descricao}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
-
-            return res.json(response.data); // Retorna
+            console.log(apiUrl, 'url')
+            return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;
