@@ -7,7 +7,7 @@ class AuthentiCationController {
     
     try {
       const loginResponse = await axios.post(
-        "http://164.152.245.77:8000/quality/concentrador_homologacao/api/login-tst.xsjs",
+        "http://164.152.245.77:8000/quality/concentrador_node/api/login-tst.xsjs",
         {
           timeout: 10000,
           usuario: usuario,
