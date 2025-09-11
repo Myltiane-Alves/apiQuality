@@ -1,5 +1,5 @@
 import { get } from "http";
-import conn from "../../config/dbConnection.js";
+// import conn from "../../config/dbConnection.js";
 import 'dotenv/config';
 const databaseSchema = process.env.HANA_DATABASE;
 
