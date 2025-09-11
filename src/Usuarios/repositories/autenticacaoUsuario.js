@@ -1,5 +1,5 @@
 
-import conn from "../../config/dbConnection.js";
+// import conn from "../../config/dbConnection.js";
 import { v4 as uuidv4 } from 'uuid'; 
 import 'dotenv/config';
 const databaseSchema = process.env.HANA_DATABASE;

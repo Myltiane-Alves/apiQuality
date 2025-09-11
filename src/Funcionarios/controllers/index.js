@@ -1,6 +1,6 @@
 import axios from "axios";
-import { getFuncionarios  } from "../repositories/funcionario.js";
-import { getTodosFuncionarios } from "../repositories/todos.js";
+// import { getFuncionarios  } from "../repositories/funcionario.js";
+// import { getTodosFuncionarios } from "../repositories/todos.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
 
@@ -10,7 +10,7 @@ class FuncionariosControllers {
     async buscarTodosFuncionario(req, res) {
         try {
           const { byId, cpf, empresa, matricula, senha } = req.body; 
-          const result = await getFuncionarios();
+        //   const result = await getFuncionarios();
           
           return res.json(result);
         } catch (err) {
