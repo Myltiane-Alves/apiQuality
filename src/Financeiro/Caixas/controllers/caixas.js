@@ -1,9 +1,9 @@
 
 import axios from "axios";
-import { getListaPCJById } from "../repositories/listaCaixaMovimentos.js";
-import { getCaixaStatus } from "../repositories/listaCaixaStatus.js";
-import { getCaixaZerados } from "../repositories/listaCaixaZerados.js";
-import { putFecharCaixaZerados } from "../repositories/fechaCaixaZerados.js";
+// import { getListaPCJById } from "../repositories/listaCaixaMovimentos.js";
+// import { getCaixaStatus } from "../repositories/listaCaixaStatus.js";
+// import { getCaixaZerados } from "../repositories/listaCaixaZerados.js";
+// import { putFecharCaixaZerados } from "../repositories/fechaCaixaZerados.js";
 import { dataFormatada } from "../../../utils/dataFormatada.js";
 import 'dotenv/config';
 const url = process.env.API_URL|| 'localhost:6001'

@@ -1,4 +1,4 @@
-import conn from "../../config/dbConnection.js";
+// import conn from "../../config/dbConnection.js";
 
 export const getLogsUsuarios = async (byId, dataPesquisaInicio, dataPesquisaFim, page, pageSize) => {
     try {

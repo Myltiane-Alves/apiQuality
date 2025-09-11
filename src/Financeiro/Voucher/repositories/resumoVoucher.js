@@ -1,4 +1,4 @@
-import conn from "../../../config/dbConnection.js";
+// import conn from "../../../config/dbConnection.js";
 
 
 export const getResumoVoucher = async (idEmpresa, dataPesquisaInicio, dataPesquisaFim, pageSize, page) => {
