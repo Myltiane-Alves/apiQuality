@@ -1,4 +1,4 @@
-import conn from "../../config/dbConnection.js";
+// import conn from "../../config/dbConnection.js";
 
 export const getGrupoEmpresa = async () => {
   try {
