@@ -1,4 +1,4 @@
-import conn from "../../config/dbConnection.js";
+// import conn from "../../config/dbConnection.js";
 const databaseSchema = process.env.HANA_DATABASE;
 
 export const getVendaXML = async (idVenda, idMarca,idEmpresa, stCancelado, stContigencia, dataPesquisaInicio, dataPesquisaFim, page, pageSize) => {
