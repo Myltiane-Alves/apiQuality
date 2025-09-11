@@ -2,10 +2,11 @@
 
 
 // export const connParams = {
-//     serverNode: '10.117.165.43:30015',
-//     uid: 'GTO_DEV',
-//     pwd: 'Gto@1234',
-//     dbname: 'QUALITY_CONC_HML',
+//     // serverNode: '10.117.165.43:30015',
+//     serverNode: '',
+//     uid: '',
+//     pwd: '',
+//     dbname: '',
 //     encrypt: false
 // };
 //  const conn = hana.createConnection();
