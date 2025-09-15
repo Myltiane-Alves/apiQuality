@@ -2,7 +2,11 @@ import axios from "axios";
 import { dataFormatada } from "../../utils/dataFormatada.js";
 // import { getEmpresasLista, updateEmpresa } from "../repositories/empresas.js";
 import 'dotenv/config';
+import { EmpresaServices } from "../services/index.js";
+import { EmpresaClient } from "../client/index.js";
 const url = process.env.API_URL|| 'localhost:6001'
+const updateServiceEmpresa = new EmpresaServices(process.env.API_URL);
+const updateClientEmpresa = new EmpresaClient(updateServiceEmpresa)
 
 class EmpresaControllers {
 
