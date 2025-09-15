@@ -26,6 +26,7 @@ class AdmVouchersControllers {
                     }))
                 });
             }
+            
             const response = await updateVoucherService.updateVoucher(
                 value.STATIVO,
                 value.STCANCELADO,
