@@ -150,9 +150,6 @@ const updateEmpresaSchema = Joi.object({
 
 })
 
-
-
-
 // DTULTATUALIZACAO,
 // STATIVO,
 // ALIQPIS,
