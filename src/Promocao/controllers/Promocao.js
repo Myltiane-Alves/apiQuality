@@ -1,5 +1,5 @@
 import { createPromocao, getPromocaoAtiva, updatePromocao } from "../repositories/promocaoAtiva.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_node`;
+let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
 // let url = `http://164.152.245.77:8000/quality/concentrador`;
 import axios from "axios";
 // import 'dotenv/config';
@@ -15,7 +15,8 @@ class PromocaoControllers  {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/select-mecanica.xsjs`
+            // const apiUrl = `${url}/api/promocoes-ativas/select-mecanica.xsjs`
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/select-mecanica.xsjs`
             const response = await axios.get(apiUrl)
             return res.json(response.data);
         } catch(error) {
@@ -33,8 +34,8 @@ class PromocaoControllers  {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
-            // const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/promocao-ativa.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idResumoPromocao=${idResumoPromocao}&status=${status}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             // const response = await getPromocaoAtiva(idResumoPromocao, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
 
@@ -50,7 +51,8 @@ class PromocaoControllers  {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/detalhe-promocao-ativa.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/detalhe-promocao-ativa.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/detalhe-promocao-ativa.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             // const response = await getPromocaoAtiva(idResumoPromocao, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
             return res.json(response.data);
@@ -70,7 +72,8 @@ class PromocaoControllers  {
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-ativa.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-ativa.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/produto-promocao-ativa.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
           
             return res.json(response.data); // Retorna
@@ -89,7 +92,8 @@ class PromocaoControllers  {
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/produto-promocao-destino.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch(error) {
@@ -107,7 +111,8 @@ class PromocaoControllers  {
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/produto-promocao-origem.xsjs?idProduto=${idProduto}&dsProduto=${dsProduto}&codeBars=${codBarras}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch(error) {
@@ -124,7 +129,8 @@ class PromocaoControllers  {
         pageSize = pageSize ? pageSize : '';
     
         try {   
-            const apiUrl = `${url}/api/promocoes-ativas/empresa-promocao.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
+            // const apiUrl = `${url}/api/promocoes-ativas/empresa-promocao.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/empresa-promocao.xsjs?idResumoPromocao=${idResumoPromocao}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
    
             return res.json(response.data); // Retorna
@@ -172,7 +178,8 @@ class PromocaoControllers  {
                 return res.status(400).json({ error: "IDRESUMOPROMOCAOMARKETING é obrigatório." });
             }
             
-            const response = await axios.put(`${url}/api/promocoes-ativas/promocao-ativa.xsjs`, [{
+            // const response = await axios.put(`${url}/api/promocoes-ativas/promocao-ativa.xsjs`, [{
+            const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/promocao-ativa.xsjs`, [{
                 DSPROMOCAOMARKETING,
                 DTHORAINICIO,
                 DTHORAFIM,
@@ -229,7 +236,8 @@ class PromocaoControllers  {
             }
             
                                                         
-            const response = await axios.put(`${url}/api/promocoes-ativas/desativar-pruduto-promocao-destino.xsjs`, [{
+            // const response = await axios.put(`${url}/api/promocoes-ativas/desativar-pruduto-promocao-destino.xsjs`, [{
+            const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/desativar-pruduto-promocao-destino.xsjs`, [{
                 STATIVO,
                 IDRESUMOPROMOCAOMARKETING,
                 IDPRODUTODESTINO
@@ -257,7 +265,8 @@ class PromocaoControllers  {
             if(!IDRESUMOPROMOCAOMARKETING) {
                 return res.status(400).json({ error: "IDRESUMOPROMOCAOMARKETING é obrigatório." });
             }
-            const response = await axios.put(`${url}/api/promocoes-ativas/desativar-pruduto-promocao-origem.xsjs`, [{
+            // const response = await axios.put(`${url}/api/promocoes-ativas/desativar-pruduto-promocao-origem.xsjs`, [{
+            const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/desativar-pruduto-promocao-origem.xsjs`, [{
                 STATIVO,
                 IDRESUMOPROMOCAOMARKETING,
                 IDPRODUTOORIGEM
@@ -286,7 +295,8 @@ class PromocaoControllers  {
             if(!IDRESUMOPROMOCAOMARKETING) {
                 return res.status(400).json({ error: "IDRESUMOPROMOCAOMARKETING é obrigatório." });
             }
-            const response = await axios.put(`${url}/api/promocoes-ativas/desativar-empresa-promocao.xsjs`, [{
+            // const response = await axios.put(`${url}/api/promocoes-ativas/desativar-empresa-promocao.xsjs`, [{
+            const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/desativar-empresa-promocao.xsjs`, [{
                 STATIVO,
                 IDRESUMOPROMOCAOMARKETING,
                 IDEMPRESA,
@@ -317,7 +327,8 @@ class PromocaoControllers  {
             if(!IDRESUMOPROMOCAOMARKETING) {
                 return res.status(400).json({ error: "IDRESUMOPROMOCAOMARKETING é obrigatório." });
             }
-            const response = await axios.put(`${url}/api/promocoes-ativas/desativar-status-promocao.xsjs`, [{
+            // const response = await axios.put(`${url}/api/promocoes-ativas/desativar-status-promocao.xsjs`, [{
+            const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/desativar-status-promocao.xsjs`, [{
                 STATIVO,
                 IDRESUMOPROMOCAOMARKETING,
                 IDEMPRESA,
@@ -339,8 +350,10 @@ class PromocaoControllers  {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];
                   
-            const response = await axios.post(`${url}/api/promocoes-ativas/promocao-ativa.xsjs`, dados);
+            // const response = await axios.post(`${url}/api/promocoes-ativas/promocao-ativa.xsjs`, dados);
+            const response = await axios.post(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/promocao-ativa.xsjs`, dados);
 
+            
             return res.status(200).json({
                 message: "Promoção(s) criada(s) com sucesso",
                 data: response.data
@@ -360,7 +373,8 @@ class PromocaoControllers  {
             // }
 
             // const response = `${url}/api/select-mecanica.xsjs`
-            const response = await axios.post(`${url}/api/promocoes-ativas/select-mecanica.xsjs`, {
+            // const response = await axios.post(`${url}/api/promocoes-ativas/select-mecanica.xsjs`, {
+            const response = await axios.post(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/promocoes-ativas/select-mecanica.xsjs`, {
                     DESCRICAO,
                     APLICACAODESTINO,
                     MECANICA,
