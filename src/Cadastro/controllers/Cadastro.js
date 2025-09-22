@@ -7,6 +7,7 @@ let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
 
 class CadastroControllers  {
 
+    
     async getListaProdutoCriadoPedidoCompra(req, res) {
         let { 
             NuPedidoPesquisa,
