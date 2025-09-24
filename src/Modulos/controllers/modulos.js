@@ -8,14 +8,15 @@ const url = process.env.API_URL;
 class ModulosControllers  {
      
      async getListaPerfilUsuario(req, res) {
-        let { idUsuario, page, pageSize, idMenuPai } = req.query;
+        let { idUsuario, page, pageSize, idMenuPai, idPerfil } = req.query;
             idUsuario = idUsuario ? idUsuario : '';
             idMenuPai = idMenuPai ? idMenuPai : '';
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
+            idPerfil = idPerfil ? idPerfil : '';
         try {
             // const response = await getPerfilUsuarioMenu(idUsuario)
-            const apiUrl = `${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs?idUsuario=${idUsuario}`;
+            const apiUrl = `${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs?idUsuario=${idUsuario}&idPerfil=${Number(idPerfil)}`;
             const response = await axios.get(apiUrl);
 
             return res.json(response.data); // Retorna

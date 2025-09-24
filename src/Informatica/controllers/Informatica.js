@@ -22,7 +22,7 @@ import { createCaixa, getCaixa, updateCaixa } from "../caixas/caixa.js";
 import { createConfiguracao, getConfiguracoes, updateConfiguracao } from "../configuracao/repositories/configuracao.js";
 import { updateFuncionarioDesconto } from "../Funcionarios/repositories/funcionarioDesconto.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
+const url = process.env.API_URL
 
 class InformaticaControllers {
 
@@ -42,10 +42,14 @@ class InformaticaControllers {
     }
 
     async getListaEmpresasInformatica(req, res) {
-        let {  } = req.query;
+        let { 
+            idEmpresa 
 
+         } = req.query;
+            idEmpresa = idEmpresa ? idEmpresa : '';
         try {
-            const apiUrl = `${url}/api/informatica/empresa.xsjs`
+            // const apiUrl = `${url}/api/informatica/empresa.xsjs?id=${idEmpresa}`
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/informatica/empresa.xsjs?id=${idEmpresa}`
             const response = await axios.get(apiUrl)
         
             return res.json(response.data); // Retorna
