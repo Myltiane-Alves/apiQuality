@@ -108,6 +108,7 @@ routes.get('/menus-usuario', ModulosControllers.getListaPerfilUsuario)
 routes.get('/menus-usuario-excecao', ModulosControllers.getListaMenusPorUsuario)
 // routes.get('/menus-usuario', ModulosControllers.getListaMenusUsuario)
 routes.get('/menus', ModulosControllers.getListaSubMenusUsuario)
+routes.get('/menus-filho-usuario', ModulosControllers.getListaMenusFilhosUsuario)
 
 routes.put('/perfil-permissao/:id', ModulosControllers.putPerfilPermissoes)
 routes.put('/perfil-usuario/:id', ModulosControllers.putPerfilUsuarioMenu)
