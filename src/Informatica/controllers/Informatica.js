@@ -269,7 +269,7 @@ class InformaticaControllers {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
             // http://164.152.245.77:8000/quality/concentrador_homologacao/api/informatica/funcionario-loja.xsjs?pagesize=1000&idEmpresa=&dsNomeFunc=
-            const apiUrl = `${url}/api/informatica/funcionario-loja.xsjs?byId=${byId}&idEmpresa=${idEmpresa}&dsNomeFunc=${noFuncionarioCPF}&nuCPF=${cpf}&page=${page}&pagesize=${pageSize}`;
+            const apiUrl = `${url}/api/informatica/funcionario-loja.xsjs?id=${byId}&idEmpresa=${idEmpresa}&dsNomeFunc=${noFuncionarioCPF}&nuCPF=${cpf}&page=${page}&pagesize=${pageSize}`;
             const response = await axios.get(apiUrl)
            
 
