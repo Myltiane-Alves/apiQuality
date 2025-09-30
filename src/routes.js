@@ -452,7 +452,7 @@ routes.put('/atualiza-empresa-diario/:id', InformaticaControllers.putAtualizaEmp
 routes.put('/atualizar-todos-caixa', InformaticaControllers.putAtualizarTodosCaixas)
 // routes.put('/atualizaStatusCaixa', InformaticaControllers.updateAtualizaSTCaixasInformatica)
 routes.put('/funcionarios-loja/:id', InformaticaControllers.putFuncionarioLoja)
-routes.post('/funcionarios-loja', InformaticaControllers.postFuncionarioLoja)
+routes.post('/criar-funcionarios-loja', InformaticaControllers.postFuncionarioLoja)
 routes.put('/lista-caixas/:id', InformaticaControllers.putCaixaLoja)
 routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDesconto)
 
