@@ -106,7 +106,7 @@ routes.post('/criar-modulos', ModulosControllers.postModulo)
 
 routes.get('/menus-usuario', ModulosControllers.getListaPerfilUsuario)
 routes.get('/menus-usuario-excecao', ModulosControllers.getListaMenusPorUsuario)
-// routes.get('/menus-usuario', ModulosControllers.getListaMenusUsuario)
+routes.get('/menus-filho-usuario', ModulosControllers.getListaMenusFilhosUsuario)
 routes.get('/menus', ModulosControllers.getListaSubMenusUsuario)
 routes.get('/menus-filho-usuario', ModulosControllers.getListaMenusFilhosUsuario)
 
