@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const funcionarioShema = Joi.object({
+const funcionarioSchema = Joi.object({
        IDFUNCIONARIO: Joi.number().integer().required()
         .messages({
             'number.base': 'IDFUNCIONARIO deve ser um número inteiro',
@@ -83,6 +83,6 @@ const funcionarioShema = Joi.object({
         }),
 
 })
-  export default funcionarioShema;    
+  export default funcionarioSchema;    
 
    

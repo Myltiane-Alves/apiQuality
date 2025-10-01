@@ -1,6 +1,6 @@
 import {FuncionarioClient} from '../../Clients/FuncionarioClient.js';
 import {FuncionarioService} from '../../Services/FuncionarioService.js';
-import funcionarioShema from '../schema/index.js';
+import funcionarioSchema from '../schema/index.js';
 
 const funcionarioClient = new FuncionarioClient(process.env.INFORMATICA_API_URL);
 const funcionarioService = new FuncionarioService(funcionarioClient);
