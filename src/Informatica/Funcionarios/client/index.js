@@ -54,4 +54,15 @@ export class FuncionarioClient {
     return response.data;
   }
 
+  async inativarFuncionario(DATAULTIMAALTERACAO, STATIVO, DATA_DEMISSAO, ID) {
+  const response = await this.api.put('/inativar-funcionario', {
+    DATAULTIMAALTERACAO,
+    STATIVO,
+    DATA_DEMISSAO,
+    ID
+  });
+  return response.data;
+}
+
+
 }
