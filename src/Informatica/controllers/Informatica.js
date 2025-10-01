@@ -22,7 +22,7 @@ import { createCaixa, getCaixa, updateCaixa } from "../caixas/caixa.js";
 import { createConfiguracao, getConfiguracoes, updateConfiguracao } from "../configuracao/repositories/configuracao.js";
 import { updateFuncionarioDesconto } from "../Funcionarios/repositories/funcionarioDesconto.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
+const url = process.env.API_URL
 
 class InformaticaControllers {
 
@@ -42,9 +42,15 @@ class InformaticaControllers {
     }
 
     async getListaEmpresasInformatica(req, res) {
-        let {  } = req.query;
+        let { 
+            idEmpresa 
 
+         } = req.query;
+            idEmpresa = idEmpresa ? idEmpresa : '';
         try {
+
+            // const apiUrl = `${url}/api/informatica/empresa.xsjs?id=${idEmpresa}`
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/informatica/empresa.xsjs?id=${idEmpresa}`
             // const apiUrl = `${url}/api/informatica/empresa.xsjs`
             const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/informatica/empresa.xsjs`
             const response = await axios.get(apiUrl)
@@ -266,8 +272,11 @@ class InformaticaControllers {
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
             // http://164.152.245.77:8000/quality/concentrador_homologacao/api/informatica/funcionario-loja.xsjs?pagesize=1000&idEmpresa=&dsNomeFunc=
+
+            const apiUrl = `${url}/api/informatica/funcionario-loja.xsjs?id=${byId}&idEmpresa=${idEmpresa}&dsNomeFunc=${noFuncionarioCPF}&nuCPF=${cpf}&page=${page}&pagesize=${pageSize}`;
             const apiUrl = `${url}/api/informatica/funcionario-loja.xsjs?byId=${byId}&idEmpresa=${idEmpresa}&dsNomeFunc=${noFuncionarioCPF}&nuCPF=${cpf}&page=${page}&pagesize=${pageSize}`;
             const response = await axios.get(apiUrl)
+           
 
             // const response = await getFuncionariosLoja(byId, idEmpresa, cpf, noFuncionarioCPF, page, pageSize)
            
@@ -504,9 +513,14 @@ class InformaticaControllers {
     // Update
     async putInativarFuncionario(req, res) {
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await axios.put(`${url}/api/informatica/funcionario-inativa.xsjs`, dados)
-            // const response = await updateInativarFuncionario(dados);
+            let  {DATAULTIMAALTERACAO,STATIVO,DATA_DEMISSAO,ID} = req.body; 
+            const response = await axios.put(`${url}/api/informatica/funcionario-inativa.xsjs`, { 
+                DATAULTIMAALTERACAO,
+                STATIVO,
+                DATA_DEMISSAO,
+                ID
+            })
+            
             return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -581,9 +595,9 @@ class InformaticaControllers {
     async postFuncionarioLoja(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
-            const response = await createFuncionario(dados)
+            const response = await axios.post(`${url}/api/informatica/funcionario-loja.xsjs`, dados)
         
-            return res.json(response);
+            return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             throw error;

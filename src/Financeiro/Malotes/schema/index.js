@@ -11,6 +11,7 @@ const maloteSchema = Joi.object({
         'string.base': 'STATUS deve ser uma string',
         'string.max': 'STATUS deve ter no máximo 500 caracteres'
     }),
+    
     OBSERVACAOADMINISTRATIVO: Joi.string().allow('').max(500).optional()
     .messages({
         'string.base': 'OBSERVACAOADMINISTRATIVO deve ser uma string',

@@ -8,14 +8,15 @@ const url = process.env.API_URL;
 class ModulosControllers  {
      
      async getListaPerfilUsuario(req, res) {
-        let { idUsuario, page, pageSize, idMenuPai } = req.query;
+        let { idUsuario, page, pageSize, idMenuPai, idPerfil } = req.query;
             idUsuario = idUsuario ? idUsuario : '';
             idMenuPai = idMenuPai ? idMenuPai : '';
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
+            idPerfil = idPerfil ? idPerfil : '';
         try {
             // const response = await getPerfilUsuarioMenu(idUsuario)
-            const apiUrl = `${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs?idUsuario=${idUsuario}`;
+            const apiUrl = `${url}/api/perfilUsuario/perfilUsuarioMenu.xsjs?idUsuario=${idUsuario}&idPerfil=${Number(idPerfil)}`;
             const response = await axios.get(apiUrl);
 
             return res.json(response.data); // Retorna
@@ -75,6 +76,23 @@ class ModulosControllers  {
         }
     }
     
+
+    async getListaMenusFilhosUsuario(req, res) {
+        let { idMenuFilho, idUsuario } = req.query;
+    
+        idMenuFilho = idMenuFilho ? idMenuFilho : '';
+        idUsuario = idUsuario ? idUsuario : '';
+        try {   
+            const response = await axios.get(`${url}/api/perfilUsuario/perfilUsuarioMenuFilho.xsjs?idUsuario=${idUsuario}&idMenuFilho=${idMenuFilho}` )
+
+            // const response = await getMenuUsuario(idMenu, idModulo, dsModulo);
+            return res.json(response.data); // Retorna
+        } catch(error) {
+            console.error("Unable to connect to the database:", error);
+            throw error;
+        } 
+    }
+
     async getListaMenusUsuario(req, res) {
         let { idMenu, idModulo, dsModulo } = req.query;
     
