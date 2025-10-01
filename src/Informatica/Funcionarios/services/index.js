@@ -31,4 +31,19 @@ export class FuncionarioService {
         
         return result;
   }
+
+  async inativarFuncionario(DATAULTIMAALTERACAO, STATIVO, DATA_DEMISSAO, ID) {
+  if (!ID) {
+    throw new Error("ID é obrigatório para inativar funcionário.");
+  }
+
+  return await this.client.inativarFuncionario(
+    DATAULTIMAALTERACAO,
+    STATIVO,
+    DATA_DEMISSAO,
+    ID
+  );
+}
+
+
 }
