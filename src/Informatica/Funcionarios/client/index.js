@@ -9,7 +9,7 @@ export class FuncionarioClient {
             timeout: 80000
         });
     }
-
+        
     async atualizarFuncionario(IDFUNCIONARIO, IDSUBGRUPOEMPRESARIAL, NOFUNCIONARIO, NUCPF, PWSENHA, DSTIPO, DTADMISSAO, IDPERFIL, DSFUNCAO, STCONVENIO, STDESCONTOFOLHA, STLOJA, STATIVO, IDFUNCALTERACAO, MOTIVODESC, ID) {
         const response = await this.api.put(`/api/informatica/funcionario-loja.xsjs`, {
             IDFUNCIONARIO,

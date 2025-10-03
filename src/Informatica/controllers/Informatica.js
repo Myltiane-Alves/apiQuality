@@ -379,12 +379,14 @@ class InformaticaControllers {
     }
 
     async getListaLinkRelatorioBI(req, res) {
-        let { idRelatorio, idEmpresa, page, pageSize} = req.query;
+        let { idRelatorio, idEmpresa, page, pageSize, idLoja} = req.query;
         
         idRelatorio = idRelatorio ? idRelatorio : '';
         idEmpresa = idEmpresa ? idEmpresa : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
+        idLoja = idLoja ? idLoja : '';
+        
         try {
             // ajaxGet('api/informatica/linkrelatoriobi.xsjs?page=' + numPage + '&id=' + idrelatoriobi + '&idfilial=' + idloja)
             const apiUrl = `${url}/api/informatica/linkrelatoriobi.xsjs?id=${idRelatorio}&idfilial=${idLoja}&page=${page}&pageSize=${pageSize}`
