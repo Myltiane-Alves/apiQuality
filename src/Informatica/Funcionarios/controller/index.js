@@ -94,7 +94,7 @@ export class FuncionarioController {
     }
   }
 
- async inativarFuncionario(req, res) {
+ async putInativarFuncionario(req, res) {
   try {
     const { error, value } = inativarFuncionarioSchema.validate(req.body, {
       abortEarly: false,
