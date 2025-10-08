@@ -384,7 +384,7 @@ class InformaticaControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             // ajaxGet('api/informatica/linkrelatoriobi.xsjs?page=' + numPage + '&id=' + idrelatoriobi + '&idfilial=' + idloja)
-            const apiUrl = `${url}/api/informatica/linkrelatoriobi.xsjs?id=${idRelatorio}&idfilial=${idLoja}&page=${page}&pageSize=${pageSize}`
+            const apiUrl = `${url}/api/informatica/linkrelatoriobi.xsjs?id=${idRelatorio}&idfilial=${idEmpresa}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
             // const response = await getLinkRelatorioBI(idRelatorio, idEmpresa, page, pageSize)
         
