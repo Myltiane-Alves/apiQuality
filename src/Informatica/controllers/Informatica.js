@@ -282,15 +282,16 @@ class InformaticaControllers {
     }
 
     async getListaVendasAlloc(req, res) {
-        let { idEmpresa, status, idVenda, dataPesquisaInicio, dataPesquisaFim, page, pageSize} = req.query;
+        let { idEmpresa, status, idVenda, dataPesquisaInicio, dataPesquisaFim, stVendasAlloc , page, pageSize} = req.query;
         idEmpresa = idEmpresa ? idEmpresa : '';
         status = status ? status : '';
         idVenda = idVenda ? idVenda : '';
+        stVendasAlloc = stVendasAlloc ? stVendasAlloc : '';
         dataPesquisaInicio = dataPesquisaInicio ? dataFormatada(dataPesquisaInicio) : '';
         dataPesquisaFim = dataPesquisaFim ? dataFormatada(dataPesquisaFim) : '';
         try {
             // ajaxGet('api/informatica/lista-vendas-alloc.xsjs?idVenda=' + idVenda + '&idEmpresa=' + IDEmpresaLoja + '&dataPesquisaInic=' + datapesqinicio + '&dataPesquisaFim=' + datapesqfim + '&stvendasalloc=' + stvendasalloc)
-            const apiUrl = `${url}/api/informatica/lista-vendas-alloc.xsjs?idVenda=${idVenda}&idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquiaFim}&stvendasalloc=${stVendasAlloc}`
+            const apiUrl = `${url}/api/informatica/lista-vendas-alloc.xsjs?idVenda=${idVenda}&idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&stvendasalloc=${stVendasAlloc}`
             const response = await axios.get(apiUrl)
 
             // const response = await getVendasAlloc(idEmpresa, status, idVenda, dataPesquisaInicio, dataPesquisaFim, page, pageSize)
@@ -362,7 +363,7 @@ class InformaticaControllers {
             pageSize = pageSize ? pageSize : '';
             // ajaxGet('api/informatica/cliente.xsjs?page=' + numPage + '&idmarca=' + idmarca + '&idloja=' + idloja + '&dscliente=' + dscliente + '&idcpfcnpj=' + idcpfcnpj + '&idtipocliente=' + idtipocliente + '&idstatus=' + idstatus)
 
-            const apiUrl = `${url}/api/informatica/cliente.xsjs?idmarca=${idMarca}&idloja=${idEmpresa}&dscliente=${descCliente}&idcpfcnpj=${cpf}&idtipocliente=${tpCliente}&idstatus=${status}`
+            const apiUrl = `${url}/api/informatica/cliente.xsjs?idmarca=${idMarca}&idloja=${idEmpresa}&dscliente=${descCliente}&idcpfcnpj=${cpf}&idtipocliente=${tpCliente}&idstatus=${status}&id=${idCliente}`
             const response = await axios.get(apiUrl)
             // const response = await getCliente(idEmpresa, idCliente, idMarca, cpf, descCliente, tpCliente, status,  page, pageSize)
          
@@ -376,12 +377,14 @@ class InformaticaControllers {
     }
 
     async getListaLinkRelatorioBI(req, res) {
-        let { idRelatorio, idEmpresa, page, pageSize} = req.query;
+        let { idRelatorio, idEmpresa, page, pageSize, idLoja} = req.query;
         
         idRelatorio = idRelatorio ? idRelatorio : '';
         idEmpresa = idEmpresa ? idEmpresa : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
+        idLoja = idLoja ? idLoja : '';
+        
         try {
             // ajaxGet('api/informatica/linkrelatoriobi.xsjs?page=' + numPage + '&id=' + idrelatoriobi + '&idfilial=' + idloja)
             const apiUrl = `${url}/api/informatica/linkrelatoriobi.xsjs?id=${idRelatorio}&idfilial=${idLoja}&page=${page}&pageSize=${pageSize}`
