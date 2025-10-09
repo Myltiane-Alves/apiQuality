@@ -7,7 +7,7 @@ import { getRotinaMovimentacao } from "../repositories/rotinaMovimentacao.js";
 import { getImpressaoEtiquetaOT } from "../repositories/impressaoEtiquetaOT.js";
 import { getNFESaidaTransferencia } from "../../ServiceLayer/repositories/NotasTransferencia/consultaNFESaidaTransferencia.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
+const url = process.env.API_URL;
 
 class ExpedicaoControllers {
 
