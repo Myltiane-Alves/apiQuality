@@ -447,12 +447,14 @@ class ExpedicaoControllers {
             QTDTOTALITENSAJUSTE,
             CONFEREITENS,
             IDROTINA,
-            DATAENTREGA
+            DATAENTREGA,
+            
         } = req.body;
+        
+        // if(!IDRESUMOOT) {
+        //     return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
+        // }
 
-        if(!IDRESUMOOT) {
-            return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
-        }
 
         if(!IDEMPRESADESTINO) {
             return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
