@@ -1,0 +1,6 @@
+pynfe
+beautifulsoup4
+pandas
+chardet
+urllib3
+openpyxl
