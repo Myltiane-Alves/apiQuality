@@ -7,7 +7,7 @@ import { getRotinaMovimentacao } from "../repositories/rotinaMovimentacao.js";
 import { getImpressaoEtiquetaOT } from "../repositories/impressaoEtiquetaOT.js";
 import { getNFESaidaTransferencia } from "../../ServiceLayer/repositories/NotasTransferencia/consultaNFESaidaTransferencia.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
+const url = process.env.API_URL;
 
 class ExpedicaoControllers {
 
@@ -447,12 +447,14 @@ class ExpedicaoControllers {
             QTDTOTALITENSAJUSTE,
             CONFEREITENS,
             IDROTINA,
-            DATAENTREGA
+            DATAENTREGA,
+            
         } = req.body;
+        
+        // if(!IDRESUMOOT) {
+        //     return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
+        // }
 
-        if(!IDRESUMOOT) {
-            return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
-        }
 
         if(!IDEMPRESADESTINO) {
             return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});

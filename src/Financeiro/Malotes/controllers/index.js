@@ -6,6 +6,7 @@ const maloteClient = new MaloteClient(process.env.API_URL);
 const maloteService = new MaloteService(maloteClient);
 
 export class MaloteFinanceiroController {
+  
   async putMalotesLoja(req, res) {
     try {
     
