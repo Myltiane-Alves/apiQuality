@@ -1,0 +1,1 @@
+<retConsSitNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00"><tpAmb>1</tpAmb><verAplic>W-1.5.59</verAplic><cStat>217</cStat><xMotivo>Rejeição: NF-e não consta na base de dados da SEFAZ</xMotivo><cUF>31</cUF><dhRecbto>2025-10-15T16:33:15-03:00</dhRecbto><chNFe>31251036769602012404650030000001812380062037</chNFe></retConsSitNFe>

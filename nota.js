@@ -1,159 +1,184 @@
-import fs from 'fs-extra';
-import XLSX from 'xlsx';
-import inquirer from 'inquirer';
-import cliProgress from 'cli-progress';
-import csvWriter from 'csv-writer';
-import soap from 'soap';
-import path from 'path';
+import fs from "fs";
+import path from "path";
+import xlsx from "xlsx";
+import readline from "readline";
+import { parseStringPromise } from "xml2js";
+import ora from "ora";
+import csvWriter from "csv-writer";
+import chalk from "chalk";
+import axios from "axios";
+import https from "https";
+
 // ===================== CONFIG ===================== //
-const CERTIFICADO = "C:/certificados/GTO COMERCIO 2025-2026.pfx";
+const CERTIFICADO = "./certificado_completo.pem";
+const CHAVE = "./chave.pem";
 const SENHA = "#senhagto2024#";
+
 const ARQ_PLANILHA = "./python_notas/consulta_nfe/dados.xlsx";
 const PASTA_RESULTADOS = "./python_notas/resultados";
-const ARQ_LOG = "./python_notas/consulta_nfe/log/consultas.csv";
-const WSDL_URL = "https://nfe.sefaz.df.gov.br/ws/NFeConsultaProtocolo4"; // Troque pelo WSDL real
+const LOG_DIR = "./python_notas/consulta_nfe/log";
+const LOG_FILE = path.join(LOG_DIR, "consultas.csv");
 
-// ===================== FUNÇÕES ===================== //
+// Cria pastas
+fs.mkdirSync(PASTA_RESULTADOS, { recursive: true });
+fs.mkdirSync(LOG_DIR, { recursive: true });
 
-// Lê a planilha Excel
-function lerPlanilhaExcel(caminho) {
-  const workbook = XLSX.readFile(caminho);
-  const sheetName = workbook.SheetNames[0];
-  return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+// ----------------- Endpoints UF ----------------- //
+const ENDPOINTS = {
+  DF: "https://nfe.fazenda.df.gov.br/NFeConsulta/NFeConsulta2.asmx",
+    GO: "https://nfe.sefaz.go.gov.br/nfe/services/NFeConsultaProtocolo4",
+  MG: "https://nfe.fazenda.mg.gov.br/nfe2/services/NFeConsultaProtocolo4",
+  // Adicione outras UFs se necessário
+};
+
+// ----------------- Helpers ----------------- //
+function askQuestion(query) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(query, ans => { rl.close(); resolve(ans.trim()); }));
 }
 
-// Lê o log CSV existente ou inicializa se não existir
-function lerLogCsv(caminho) {
-  if (!fs.existsSync(caminho)) {
-    // Cria o arquivo com cabeçalho padrão
-    fs.ensureDirSync(path.dirname(caminho));
-    fs.writeFileSync(caminho, "DATA_HORA,CHAVE_NFE,STATUS,ERRO\n", 'utf8');
-    return [];
-  }
-  const dados = fs.readFileSync(caminho, 'utf8');
-  const linhas = dados.split('\n').filter(l => l.trim());
-  if (linhas.length === 0) return [];
-  const cabecalho = linhas[0].split(',');
-  return linhas.slice(1).map(linha => {
-    const valores = linha.split(',');
-    return cabecalho.reduce((obj, col, idx) => {
-      obj[col] = valores[idx];
-      return obj;
-    }, {});
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function registrarLog(linhaLog) {
+  const exists = fs.existsSync(LOG_FILE);
+  const createCsvWriter = csvWriter.createObjectCsvWriter;
+  const writer = createCsvWriter({
+    path: LOG_FILE,
+    header: [
+      { id: "DATA_HORA", title: "DATA_HORA" },
+      { id: "IDVENDA", title: "IDVENDA" },
+      { id: "UF", title: "UF" },
+      { id: "CHAVE", title: "CHAVE" },
+      { id: "CSTAT", title: "CSTAT" },
+      { id: "SUBPASTA", title: "SUBPASTA" },
+      { id: "ARQUIVO", title: "ARQUIVO" },
+    ],
+    append: exists,
   });
+  await writer.writeRecords([linhaLog]);
 }
 
-// Escreve log CSV
-async function escreveLogCsv(caminho, registros) {
-  if (registros.length === 0) return;
-  const cabecalho = Object.keys(registros[0]);
-  const writer = csvWriter.createObjectCsvWriter({
-    path: caminho,
-    header: cabecalho.map(col => ({ id: col, title: col }))
+// ----------------- Consulta NFe ----------------- //
+async function consultarNFe(UF, chave) {
+  const endpoint = ENDPOINTS[UF.toUpperCase()];
+  if (!endpoint) throw new Error(`UF ${UF} não possui endpoint configurado`);
+
+  const xmlEnvelope = `
+  <?xml version="1.0" encoding="utf-8"?>
+  <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+      <nfe:consSitNFe xmlns:nfe="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsulta2" versao="4.00">
+        <tpAmb>1</tpAmb>
+        <xServ>CONSULTAR</xServ>
+        <chNFe>${chave}</chNFe>
+      </nfe:consSitNFe>
+    </soap:Body>
+  </soap:Envelope>
+  `;
+
+  const agent = new https.Agent({
+    cert: fs.readFileSync(CERTIFICADO),
+    key: fs.readFileSync(CHAVE),
+    passphrase: SENHA,
+    secureProtocol: "TLSv1_2_method"
   });
-  await writer.writeRecords(registros);
-}
 
-// Consulta NFE/NFCE na SEFAZ via SOAP usando certificado
-async function consultaNfeSefaz(chaveNfe) {
-  const pfx = fs.readFileSync(CERTIFICADO);
-  const options = {
-    wsdl_options: {
-      pfx: pfx,
-      passphrase: SENHA,
-      rejectUnauthorized: false // para homologação
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    soap.createClient(WSDL_URL, options, (err, client) => {
-      if (err) return reject(err);
-      // Troque 'consultaNota' pelo método correto do WSDL
-      client.consultaNota({ chave: chaveNfe }, (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      });
-    });
+  const response = await axios.post(endpoint, xmlEnvelope, {
+    httpsAgent: agent,
+    headers: {
+      "Content-Type": "application/soap+xml; charset=utf-8",
+      "SOAPAction": "http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsulta2"
+    },
+    timeout: 10000
   });
+
+  return response.data;
 }
 
-// Salva resultado XML
-function salvaResultadoXml(pasta, chaveNfe, xmlString) {
-  fs.ensureDirSync(pasta);
-  fs.writeFileSync(`${pasta}/${chaveNfe}.xml`, xmlString, 'utf8');
-}
-
-// ===================== FLUXO PRINCIPAL ===================== //
-
-async function main() {
-  // 1. Pergunta se continua ou recomeça
-  const { continuar } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'continuar',
-      message: 'Deseja continuar do último log?',
-      default: true
-    }
-  ]);
-
-  // 2. Lê planilha Excel
-  const tarefas = lerPlanilhaExcel(ARQ_PLANILHA);
-
-  // 3. Lê log CSV
-  let log = continuar ? lerLogCsv(ARQ_LOG) : [];
-  console.log(`Log atual tem ${log.length} registros.`);
-  // 4. Monta lista de tarefas pendentes
-  const chavesProcessadas = new Set(log.map(r => r.CHAVE_NFE));
-  const tarefasPendentes = tarefas.filter(t => !chavesProcessadas.has(t.CHAVE_NFE));
-
-  // 5. Barra de progresso
-  const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-  bar.start(tarefasPendentes.length, 0);
-
-  // 6. Processa cada tarefa
-  for (let i = 0; i < tarefasPendentes.length; i++) {
-    const tarefa = tarefasPendentes[i];
+async function consultarComRetry(UF, CHAVE, tentativas = 3) {
+  for (let i = 1; i <= tentativas; i++) {
     try {
-      // Consulta SEFAZ
-      const resultado = await consultaNfeSefaz(tarefa.CHAVE_NFE);
-    //   console.log(`Resultado da chave ${tarefa.CHAVE_NFE}:`, resultado);
-
-      // Extrai XML do resultado (ajuste conforme resposta real)
-      const xmlString = resultado.xml || resultado.XML || '';
-      if (!xmlString) {
-        console.log(`Nenhum XML retornado para chave ${tarefa.CHAVE_NFE}`);
-      }
-      salvaResultadoXml(PASTA_RESULTADOS, tarefa.CHAVE_NFE, xmlString);
-
-      // Atualiza log
-      log.push({
-        DATA_HORA: new Date().toISOString(),
-        CHAVE_NFE: tarefa.CHAVE_NFE,
-        STATUS: xmlString ? 'OK' : 'SEM_XML',
-        ERRO: xmlString ? '' : 'Sem XML retornado'
-      });
-      await escreveLogCsv(ARQ_LOG, log);
-
-      bar.update(i + 1);
+      return await consultarNFe(UF, CHAVE);
     } catch (err) {
-      log.push({
-        DATA_HORA: new Date().toISOString(),
-        CHAVE_NFE: tarefa.CHAVE_NFE,
-        STATUS: 'ERRO',
-        ERRO: err.message
-      });
-      await escreveLogCsv(ARQ_LOG, log);
-      bar.update(i + 1);
-      console.error(`Erro na chave ${tarefa.CHAVE_NFE}:`, err.message);
+      if (i === tentativas) throw err;
+      console.log(chalk.yellow(`Tentativa ${i} falhou para ${CHAVE}, retry em 1s...`));
+      await delay(1000);
+    }
+  }
+}
+
+// ----------------- Execução principal ----------------- //
+(async () => {
+  console.clear();
+  console.log(chalk.cyan.bold("=== Consulta NF-e SEFAZ – Node.js ===\n"));
+
+  const continuar = (await askQuestion("Deseja continuar o script anterior? (s/n): ")).toLowerCase() === "s";
+
+  if (!continuar && fs.existsSync(PASTA_RESULTADOS)) {
+    fs.rmSync(PASTA_RESULTADOS, { recursive: true, force: true });
+  }
+  fs.mkdirSync(PASTA_RESULTADOS, { recursive: true });
+
+  if (!continuar && fs.existsSync(LOG_FILE)) fs.unlinkSync(LOG_FILE);
+
+  // Lê Excel
+  const workbook = xlsx.readFile(ARQ_PLANILHA);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const dados = xlsx.utils.sheet_to_json(sheet);
+
+  // Lê chaves já consultadas
+  let chavesConsultadas = new Set();
+  if (fs.existsSync(LOG_FILE)) {
+    const linhas = fs.readFileSync(LOG_FILE, "utf8").split("\n").slice(1);
+    for (const l of linhas) {
+      const parts = l.split(",");
+      if (parts[3]) chavesConsultadas.add(parts[3].trim());
     }
   }
 
-  // Teste de escrita de arquivo
-  fs.ensureDirSync(PASTA_RESULTADOS);
-  fs.writeFileSync(`${PASTA_RESULTADOS}/teste.txt`, 'teste', 'utf8');
+  const tarefas = dados.filter(row => !chavesConsultadas.has(row["CHAVE"]?.trim()));
 
-  bar.stop();
-  console.log('Processo finalizado!');
-}
+  const total = tarefas.length;
+  let processados = 0;
+  const spinner = ora("Consultando notas...").start();
 
-main();
+  for (const row of tarefas) {
+    const IDVENDA = String(row["IDVENDA"]);
+    const UF = String(row["NFE_INFNFE_EMIT_ENDEREMIT_UF"]).trim();
+    const CHAVE = String(row["CHAVE"]).trim();
+
+    try {
+      const resposta = await consultarComRetry(UF, CHAVE, 3);
+      const parsed = await parseStringPromise(resposta);
+      const cstat = parsed?.["soap:Envelope"] ? "200" : "ERRO";
+
+      const subpasta = path.join(PASTA_RESULTADOS, `${cstat}-${UF}`);
+      fs.mkdirSync(subpasta, { recursive: true });
+      const arquivoSaida = path.join(subpasta, `${IDVENDA}.xml`);
+      fs.writeFileSync(arquivoSaida, resposta, "utf8");
+
+      await registrarLog({
+        DATA_HORA: new Date().toISOString().replace("T", " ").split(".")[0],
+        IDVENDA,
+        UF,
+        CHAVE,
+        CSTAT: cstat,
+        SUBPASTA: subpasta,
+        ARQUIVO: arquivoSaida,
+      });
+
+      processados++;
+      spinner.text = `Processados ${processados}/${total}`;
+      await delay(500);
+
+    } catch (err) {
+      console.error(chalk.red(`Erro na consulta da chave ${CHAVE}: ${err.message}`));
+    }
+  }
+
+  spinner.succeed("Consulta concluída!");
+})();

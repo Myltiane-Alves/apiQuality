@@ -1,42 +1,54 @@
-// consultaNfe.js
 import fs from "fs";
 import path from "path";
 import https from "https";
-import { parseStringPromise } from "xml2js";
 import xlsx from "xlsx";
 import readline from "readline";
-import chalk from "chalk";
+import { parseStringPromise } from "xml2js";
 import ora from "ora";
 import csvWriter from "csv-writer";
-import { strict } from "assert";
+import chalk from "chalk";
 
 // ===================== CONFIG ===================== //
-const CERTIFICADO = "./GTO COMERCIO 2025-2026.pfx";
-const SENHA = "#senhagto2024#";
+const CERTIFICADO = "./cert.pem";
+const CHAVE = "./chave.pem";
 
 const ARQ_PLANILHA = "./python_notas/consulta_nfe/dados.xlsx";
 const PASTA_RESULTADOS = "./python_notas/resultados";
 const LOG_DIR = "./python_notas/consulta_nfe/log";
 const LOG_FILE = path.join(LOG_DIR, "consultas.csv");
-// ================================================== //
+const SENHA = "#senhagto2024#";
 
-// cria pastas se necessário
+// Cria pastas
 fs.mkdirSync(PASTA_RESULTADOS, { recursive: true });
 fs.mkdirSync(LOG_DIR, { recursive: true });
 
-// função auxiliar para perguntar no terminal
+// ----------------- Endpoints UF ----------------- //
+const ENDPOINTS = {
+  DF: "https://nfe.fazenda.df.gov.br/NFeConsulta/NFeConsulta2.asmx",
+  GO: "https://nfe.sefaz.go.gov.br/nfe/services/NFeConsultaProtocolo4",
+  MG: "https://nfe.fazenda.mg.gov.br/nfe2/services/NFeConsultaProtocolo4",
+  RS: "https://nfe.sefaz.rs.gov.br/ws/nfeconsulta/NfeConsulta.asmx?WSDL",
+  SP: "https://nfe.fazenda.sp.gov.br/ws/NfeConsultaProtocolo4.asmx"
+};
+
+
+// ----------------- Helpers ----------------- //
 function askQuestion(query) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
-  return new Promise(resolve => rl.question(query, ans => {
+  return new Promise((resolve) => rl.question(query, (ans) => {
     rl.close();
     resolve(ans.trim());
   }));
 }
 
-// função para registrar no CSV
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Registrar log CSV
 async function registrarLog(linhaLog) {
   const exists = fs.existsSync(LOG_FILE);
   const createCsvWriter = csvWriter.createObjectCsvWriter;
@@ -56,89 +68,56 @@ async function registrarLog(linhaLog) {
   await writer.writeRecords([linhaLog]);
 }
 
-const ENDPOINTS = {
-  AC: "https://nfe.sefazvirtual.rs.gov.br/ws/NfeConsultaProtocolo4.asmx",
-  AL: "https://nfe.sefaz.al.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  AM: "https://nfe.sefaz.am.gov.br/services2/services/NFeConsultaProtocolo4",
-  AP: "https://nfe.sefaz.ap.gov.br/nfe/services/NFeConsultaProtocolo4",
-  BA: "https://nfe.sefaz.ba.gov.br/webservices/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx",
-  CE: "https://nfe.sefaz.ce.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  DF: "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx",
-  ES: "https://nfe.sefaz.es.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  GO: "https://nfe.sefaz.go.gov.br/nfe/services/NFeConsultaProtocolo4",
-  MA: "https://nfe.sefaz.ma.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  MG: "https://nfe.fazenda.mg.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  MS: "https://nfe.sefaz.ms.gov.br/ws/NFeConsultaProtocolo4",
-  MT: "https://nfe.sefaz.mt.gov.br/nfews/v2/services/NFeConsultaProtocolo4",
-  PA: "https://nfe.sefa.pa.gov.br/nfews/NFeConsultaProtocolo4",
-  PB: "https://nfe.sefaz.pb.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  PE: "https://nfe.sefaz.pe.gov.br/nfe-service/services/NFeConsultaProtocolo4",
-  PI: "https://nfe.sefaz.pi.gov.br/nfeweb/services/NFeConsultaProtocolo4",
-  PR: "https://nfe.sefa.pr.gov.br/nfe/NFeConsultaProtocolo4",
-  RJ: "https://nfe.fazenda.rj.gov.br/nfe/services/NFeConsultaProtocolo4",
-  RN: "https://nfe.set.rn.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  RO: "https://nfe.sefin.ro.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  RR: "https://nfe.sefaz.rr.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  RS: "https://nfe.sefazrs.rs.gov.br/ws/NfeConsultaProtocolo4.asmx",
-  SC: "https://nfe.sef.sc.gov.br/nfe/services/NFeConsultaProtocolo4",
-  SE: "https://nfe.sefaz.se.gov.br/nfe2/services/NFeConsultaProtocolo4",
-  SP: "https://nfe.fazenda.sp.gov.br/ws/NfeConsultaProtocolo4.asmx",
-  TO: "https://nfe.sefaz.to.gov.br/nfe/services/NFeConsultaProtocolo4",
-  SVRS: "https://nfe.sefazvirtual.rs.gov.br/ws/NfeConsultaProtocolo4.asmx",
-  SVAN: "https://www.sefazvirtual.fazenda.gov.br/NFeConsultaProtocolo4/NFeConsultaProtocolo4.asmx"
-};
 
-// função para consultar na SEFAZ
-async function consultarNFe(uf, chave) {
-  const endpoint = ENDPOINTS[uf.toUpperCase()];
-  if (!endpoint) throw new Error(`UF ${uf} não possui endpoint configurado`);
+// ----------------- Consulta NFe ----------------- //
+async function consultarNFe(UF, chave) {
+  const endpoint = ENDPOINTS[UF.toUpperCase()];
+  if (!endpoint) throw new Error(`UF ${UF} não possui endpoint configurado`);
 
-  const xmlEnvelope = `<?xml version="1.0" encoding="UTF-8"?>
-<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"
-                 xmlns:nfe="http://www.portalfiscal.inf.br/nfe">
-  <soap12:Body>
-    <nfe:consSitNFe versao="4.00">
+  const xmlEnvelope = `
+  <?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soap:Body>
+    <nfe:consSitNFe xmlns:nfe="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4" versao="4.00">
       <tpAmb>1</tpAmb>
       <xServ>CONSULTAR</xServ>
-      <chNFe>53251036769602004495650050000021411383333471</chNFe>
+      <chNFe>${chave}</chNFe>
     </nfe:consSitNFe>
-  </soap12:Body>
-</soap12:Envelope>`;
+  </soap:Body>
+</soap:Envelope>
+`;
 
 
-//   const xmlEnvelope = `<?xml version="1.0" encoding="UTF-8"?>
-//   <soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"
-//                    xmlns:nfe="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4">
-//     <soap12:Header/>
-//     <soap12:Body>
-//       <nfe:consultaNFe>
-//         <nfe:consSitNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
-//           <tpAmb>1</tpAmb>
-//           <xServ>CONSULTAR</xServ>
-//           <chNFe>${chave}</chNFe>
-//         </nfe:consSitNFe>
-//       </nfe:consultaNFe>
-//     </soap12:Body>
-//   </soap12:Envelope>`;
+ const options = {
+  key: fs.readFileSync("chave.pem"),
+  cert: fs.readFileSync("cert.pem"),
+  passphrase: SENHA,
+  method: "POST",
+  secureProtocol: "TLSv1_2_method",
+  headers: {
+    "Content-Type": "application/soap+xml; charset=utf-8",
+    "SOAPAction": "https://www.portalfiscal.inf.br/nfe/wsdl/NFeConsulta/NFeConsulta2"
 
-  const options = {
-    forever: true,
-    strictSSL: false,
-    method: "POST",
-    pfx: fs.readFileSync(CERTIFICADO),
-    passphrase: SENHA,
-    headers: {
-      "Content-Type": "application/soap+xml; charset=utf-8; action=\"http://www.portalfiscal.inf.br/nfe/wsdl/NfeConsulta2/nfeConsultaNF2\"",
-      "Content-Length": Buffer.byteLength(xmlEnvelope),
-      "SOAPAction": "http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4/consultaNFe"
-    },
-    rejectUnauthorized: false,
-  };
+  }
+};
+
+
+const req = https.request("https://www.portalfiscal.inf.br/nfe/wsdl/NFeConsulta/NFeConsulta2", options, (res) => {
+  let data = "";
+  res.on("data", chunk => data += chunk);
+  res.on("end", () => console.log(data));
+});
+
+req.on("error", console.error);
+req.write("<XML_ENVELOPE_DA_CONSULTA>");
+req.end();
 
   return new Promise((resolve, reject) => {
     const req = https.request(endpoint, options, res => {
       let data = "";
-      res.on("data", chunk => (data += chunk));
+      res.on("data", chunk => data += chunk);
       res.on("end", () => resolve(data));
     });
     req.on("error", reject);
@@ -147,13 +126,26 @@ async function consultarNFe(uf, chave) {
   });
 }
 
+// Retry automático
+async function consultarComRetry(UF, CHAVE, tentativas = 3) {
+  for (let i = 1; i <= tentativas; i++) {
+    try {
+      return await consultarNFe(UF, CHAVE);
+    } catch (err) {
+      if (i === tentativas) throw err;
+      console.log(chalk.yellow(`Tentativa ${i} falhou para ${CHAVE}, retry em 1s...`));
+      await delay(1000);
+    }
+  }
+}
 
-// ===================== EXECUÇÃO PRINCIPAL ===================== //
+// ----------------- Execução principal ----------------- //
 (async () => {
   console.clear();
   console.log(chalk.cyan.bold("=== Consulta NF-e SEFAZ – Node.js ===\n"));
 
-  const continuar = (await askQuestion("Deseja continuar o script anterior? (s/n): ")).toLowerCase() === "s";
+  const continuar = (await askQuestion("Deseja continuar o script anterior? (s/n): "))
+    .toLowerCase() === "s";
 
   if (!continuar && fs.existsSync(PASTA_RESULTADOS)) {
     fs.rmSync(PASTA_RESULTADOS, { recursive: true, force: true });
@@ -189,9 +181,9 @@ async function consultarNFe(uf, chave) {
     const CHAVE = String(row["CHAVE"]).trim();
 
     try {
-      const resposta = await consultarNFe(UF, CHAVE);
+      const resposta = await consultarComRetry(UF, CHAVE, 3);
       const parsed = await parseStringPromise(resposta);
-      const cstat = parsed?.["soap:Envelope"] ? "200" : "ERRO"; // exemplo simplificado
+      const cstat = parsed?.["soap:Envelope"] ? "200" : "ERRO";
 
       const subpasta = path.join(PASTA_RESULTADOS, `${cstat}-${UF}`);
       fs.mkdirSync(subpasta, { recursive: true });
@@ -210,6 +202,8 @@ async function consultarNFe(uf, chave) {
 
       processados++;
       spinner.text = `Processados ${processados}/${total}`;
+      await delay(500); // pequena pausa entre requisições
+
     } catch (err) {
       console.error(chalk.red(`Erro na consulta da chave ${CHAVE}: ${err.message}`));
     }

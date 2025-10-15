@@ -29,7 +29,7 @@ import ConferenciaCegaControllers from './ConferenciaCega/controllers/Conferenci
 import ListaPrecoControllers from './controllers/ListaPreco.js';
 import LogsControllers from './LogsUsuario/controllers/log.js';
 import PromocaoControllers from './Promocao/controllers/Promocao.js'
-
+import ConsultaNfeController from './Informatica/ConsultaNFCE/controllers/index.js'
 
 // Financeiro Início
 import AdiantamentosControllers from './Financeiro/Adiantamentos/controllers/adiantamentos.js'
@@ -71,6 +71,10 @@ import ComercialProdutoControllers from './Comercial/Produto/controllers/index.j
 
 import ModulosControllers from './Modulos/controllers/modulos.js';
 import DanfeControllers from './Danfe/controllers/danfe.js';
+
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' });
+
 const routes = new Router();
 // routes.use(authMiddleware)
 
@@ -455,6 +459,8 @@ routes.put('/funcionarios-loja/:id', InformaticaControllers.putFuncionarioLoja)
 routes.post('/criar-funcionarios-loja', InformaticaControllers.postFuncionarioLoja)
 routes.put('/lista-caixas/:id', InformaticaControllers.putCaixaLoja)
 routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDesconto)
+// routes.post('/consulta-nfec', ConsultaNfeController.consultar)
+routes.post('/consultar-nfe', upload.single('planilha'), ConsultaNfeController.consultar);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática

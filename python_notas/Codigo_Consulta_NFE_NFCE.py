@@ -14,12 +14,12 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ===================== CONFIG ===================== #
-CERTIFICADO = r"C:\certificados\GTO COMERCIO 2025-2026.pfx"
+CERTIFICADO = r"C:\quality\react_node\homologacao\apiQuality\GTO COMERCIO 2025-2026.pfx"
 SENHA = '#senhagto2024#'
 
-ARQ_PLANILHA = r"C:\desenvolvimento_gto_testes\python_notas\consulta_nfe\dados.xlsx"
-PASTA_RESULTADOS = r"C:\desenvolvimento_gto_testes\python_notas\resultados"
-LOG_DIR = r"C:\desenvolvimento_gto_testes\python_notas\consulta_nfe\log"
+ARQ_PLANILHA = r"C:\quality\react_node\homologacao\apiQuality\python_notas\consulta_nfe\dados.xlsx"
+PASTA_RESULTADOS = r"C:\quality\react_node\homologacao\apiQuality\python_notas\resultados"
+LOG_DIR = r"C:\quality\react_node\homologacao\apiQuality\python_notas\consulta_nfe\log"
 LOG_FILE = os.path.join(LOG_DIR, 'consultas.csv')
 # ================================================== #
 
