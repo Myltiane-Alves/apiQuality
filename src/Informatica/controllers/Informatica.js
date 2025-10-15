@@ -408,7 +408,7 @@ class InformaticaControllers {
             status = status ? status : '';
             page = page ? page : '';
             pageSize = pageSize ? pageSize : '';
-            const apiUrl = `${url}/api/informatica/relatoriobi.xsjs?`
+            const apiUrl = `${url}/api/informatica/relatoriobi.xsjs?id=${idRelatorio}&status=${status}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
             // const response = await getRelatorioBI(idRelatorio, status, page, pageSize)
           
