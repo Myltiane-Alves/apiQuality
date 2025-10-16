@@ -115,11 +115,12 @@ class ConsultaNfeController {
 
   async putValidarVendaContigencia(req, res) {
     try {
-      let  {IDVENDA} = req.body; 
+      let  {IDVENDA, STVALIDACONTINGENCIA} = req.body; 
+      console.log(req.body, 'IDVENDA')
       const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`, { 
-          IDVENDA
+          IDVENDA,
+          STVALIDACONTINGENCIA
       })
-      
       return res.json(response.data);
     } catch (error) {
       console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
