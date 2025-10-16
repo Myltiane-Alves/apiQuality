@@ -116,15 +116,85 @@ class ConsultaNfeController {
   async putValidarVendaContigencia(req, res) {
     try {
       let  {IDVENDA, STVALIDACONTINGENCIA} = req.body; 
-      console.log(req.body, 'IDVENDA')
+    
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
+
+
+
       const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`, { 
-          IDVENDA,
-          STVALIDACONTINGENCIA
+        IDVENDA
       })
       return res.json(response.data);
     } catch (error) {
       console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
       return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async validarConsultar(req, res) {
+    try {
+      const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
+      const SENHA = '#senhagto2024#';
+
+      // Pega vendas do body.vendas ou busca na API se não informado
+      let vendas = req.body?.vendas;
+      if (!vendas) {
+        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
+        const response = await axios.get(apiUrl);
+        vendas = response.data;
+      }
+
+      if (!Array.isArray(vendas) || vendas.length === 0) {
+        return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
+      }
+
+      const certificadoBuffer = fs.readFileSync(CERTIFICADO);
+      let processados = 0;
+      const resultados = [];
+
+      for (const row of vendas) {
+        const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
+        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
+        const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
+
+        if (!CHAVE) {
+          resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
+          continue;
+        }
+
+        try {
+          const myTools = new Tools({
+            mod: '55',
+            tpAmb: 1,
+            UF: UF,
+            versao: '4.00',
+            xmllint: '../libxml/bin/xmllint.exe',
+          }, {
+            pfx: certificadoBuffer,
+            senha: SENHA,
+          });
+
+          const resposta = await myTools.consultarNFe(CHAVE);
+          const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
+          const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
+
+          resultados.push({
+            IDVENDA,
+            UF,
+            CHAVE,
+            cstat,
+            xml: xmlContent,
+          });
+
+          processados++;
+        } catch (innerErr) {
+          resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
+        }
+      }
+
+      return res.json({ processados, resultados });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
   }
 }
