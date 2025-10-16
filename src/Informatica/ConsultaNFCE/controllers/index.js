@@ -104,7 +104,7 @@ class ConsultaNfeController {
     try {
         const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
         const response = await axios.get(apiUrl)
-    
+        console.log(response.data.length, 'aqui')
         return res.json(response.data); // Retorna
     } catch (error) {
         console.error("Unable to connect to the database:", error);
