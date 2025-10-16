@@ -3,6 +3,7 @@ import fs from 'fs';
 import xlsx from 'xlsx';
 import path from 'path';
 import archiver from 'archiver';
+import axios from 'axios';
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
@@ -96,6 +97,35 @@ class ConsultaNfeController {
       return res.status(500).json({ error: err.message });
     }
   }
+
+  async getListaVendasContigenciaValidas(req, res) {
+    let {  } = req.query;
+
+    try {
+        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
+        const response = await axios.get(apiUrl)
+    
+        return res.json(response.data); // Retorna
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+        throw error;
+    }
+    
+  }
+
+  async putValidarVendaContigencia(req, res) {
+    try {
+      let  {IDVENDA} = req.body; 
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`, { 
+          IDVENDA
+      })
+      
+      return res.json(response.data);
+    } catch (error) {
+      console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
-export default ConsultaNfeController;
+export default new ConsultaNfeController();
