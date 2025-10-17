@@ -57,6 +57,8 @@ class ConsultaNfeController {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
+      // tenta garantir certificado a partir da variável de ambiente (se configurada)
+      const { path: envCertPath, buffer: envCertBuffer } = await ensureCertificateFromEnv();
       const ARQ_PLANILHA = req.file?.path || req.body?.planilhaPath;
       const PASTA_RESULTADOS = path.resolve('python_notas/resultados');
       const LOG_DIR = path.resolve('python_notas/consulta_nfe/log');
@@ -89,8 +91,8 @@ class ConsultaNfeController {
         const IDVENDA = String(row['IDVENDA']);
         const UF = String(row['NFE_INFNFE_EMIT_ENDEREMIT_UF']).trim();
         const CHAVE = String(row['CHAVE']).trim();
-
-        let certificadoBuffer = fs.readFileSync(CERTIFICADO);
+        // usa buffer carregado da env se disponível, caso contrário lê do arquivo local
+        const certificadoBuffer = envCertBuffer || fs.readFileSync(CERTIFICADO);
         const myTools = new Tools({
           mod: '55',
           tpAmb: 1,
@@ -179,6 +181,8 @@ class ConsultaNfeController {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
+      // tenta garantir certificado a partir da variável de ambiente (se configurada)
+      const { path: envCertPath, buffer: envCertBuffer } = await ensureCertificateFromEnv();
 
       let vendas = req.body?.vendas;
       if (!vendas) {
@@ -206,7 +210,8 @@ class ConsultaNfeController {
         return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
       }
 
-      const certificadoBuffer = fs.readFileSync(CERTIFICADO);
+  // usa buffer carregado da env se disponível, caso contrário lê do arquivo local
+  const certificadoBuffer = envCertBuffer || fs.readFileSync(CERTIFICADO);
       let processados = 0;
       const resultados = [];
 
