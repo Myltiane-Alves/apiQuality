@@ -314,7 +314,7 @@ class ConsultaNfeController {
         }
       }
 
-      return res.json(resp.data);
+      return res.json(resp);
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
