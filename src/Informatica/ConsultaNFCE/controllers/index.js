@@ -300,6 +300,8 @@ class ConsultaNfeController {
       const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
       let putCount = 0;
 
+      const putResponses = [];
+
       for (const r of resultados) {
         if (r.error) continue;
         if (!r.cstat) continue;
@@ -308,14 +310,16 @@ class ConsultaNfeController {
         try {
           const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
           r.putResult = { status: 'ok', data: resp.data };
+          putResponses.push(resp.data);
           console.log(resp.data);
           putCount++;
         } catch (putErr) {
           r.putResult = { status: 'error', message: putErr.message };
+          putResponses.push({ error: putErr.message });
         }
       }
 
-      return res.json({ processados, putCount, resultados });
+      return res.json({ putResponses });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
