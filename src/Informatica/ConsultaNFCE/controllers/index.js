@@ -64,7 +64,6 @@ class ConsultaNfeController {
         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
 
-        // Logar a venda quando o cstat NÃO for "sem" (ex.: SEM_CSTAT)
         if (!String(cstat).toUpperCase().includes('SEM')) {
           console.log(`Venda com cstat diferente de SEM: IDVENDA=${IDVENDA}, CHAVE=${CHAVE}, UF=${UF}, cstat=${cstat}`);
         }
@@ -76,7 +75,6 @@ class ConsultaNfeController {
         processados++;
       }
 
-      // Compacta a pasta de resultados
       const zipPath = path.join(PASTA_RESULTADOS, 'resultados.zip');
       const output = fs.createWriteStream(zipPath);
       const archive = archiver('zip', { zlib: { level: 9 } });
@@ -86,8 +84,6 @@ class ConsultaNfeController {
           if (err) {
             return res.status(500).json({ error: 'Erro ao enviar o arquivo zip.' });
           }
-          // Opcional: remover o zip após download
-          // fs.unlinkSync(zipPath);
         });
       });
 
