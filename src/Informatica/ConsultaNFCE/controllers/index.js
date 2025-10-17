@@ -104,7 +104,7 @@ class ConsultaNfeController {
     let {  } = req.query;
 
     try {
-        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
+        const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`
         const response = await axios.get(apiUrl)
         
         return res.json(response.data); // Retorna
@@ -119,11 +119,11 @@ class ConsultaNfeController {
     try {
       let  {IDVENDA, STVALIDACONTINGENCIA} = req.body; 
     
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`
 
 
 
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`, { 
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`, { 
         IDVENDA
       })
       return res.json(response.data);
@@ -140,7 +140,7 @@ class ConsultaNfeController {
 
       let vendas = req.body?.vendas;
       if (!vendas) {
-        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
+        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
         const response = await axios.get(apiUrl);
         vendas = response.data;
       }
@@ -208,7 +208,7 @@ class ConsultaNfeController {
         }
       }
 
-      const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
+      const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
       let putCount = 0;
 
       for (const r of resultados) {
