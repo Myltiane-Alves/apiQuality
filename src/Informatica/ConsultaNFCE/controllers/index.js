@@ -307,9 +307,10 @@ class ConsultaNfeController {
 
         try {
           const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
-          putResponses.push(resp.data);
+          // guarda retorno completo
+          putResponses.push({ IDVENDA: r.IDVENDA, status: resp.status, headers: resp.headers, data: resp.data });
         } catch (putErr) {
-          putResponses.push({ IDVENDA: r.IDVENDA, error: putErr.message });
+          putResponses.push({ IDVENDA: r.IDVENDA, error: putErr?.message || String(putErr), code: putErr?.code });
         }
       }
 
