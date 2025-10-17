@@ -314,15 +314,8 @@ class ConsultaNfeController {
         }
       }
 
-      // Extrai todos os IDVENDA de resultados (trim e não vazios) e deixa únicos
-      const idVendas = Array.from(new Set(
-        resultados
-          .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
-          .filter(v => v !== '')
-      ));
 
-      console.log('IDVENDAS:', idVendas);
-      return res.json({ processados, putCount, resultados });
+      return res.json(resultados);
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
