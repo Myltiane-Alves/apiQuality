@@ -4,6 +4,48 @@ import xlsx from 'xlsx';
 import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
+import os from 'os';
+
+/**
+ * Utilitário: garante que o certificado PFX esteja disponível no runtime.
+ * - Se a variável de ambiente CERT_PFX_BASE64 existir, decodifica e grava o PFX.
+ * - Tenta gravar no caminho relativo esperado (./GTO COMERCIO 2025-2026.pfx).
+ * - Se não for possível gravar no diretório do projeto, grava em um path temporário e retorna esse path.
+ *
+ * Uso: chame `await ensureCertificateFromEnv()` na inicialização do servidor ou antes de usar as funções que dependem do PFX.
+ * Retorna: { path: string, buffer: Buffer }
+ */
+export async function ensureCertificateFromEnv(options = {}) {
+  const envName = options.envName || 'CERT_PFX_BASE64';
+  const fallbackName = options.fallbackFilename || 'GTO COMERCIO 2025-2026.pfx';
+  const base64 = process.env[envName];
+
+  if (!base64) {
+    // nenhuma variável definida
+    return { path: null, buffer: null };
+  }
+
+  const buf = Buffer.from(base64, 'base64');
+
+  // tenta gravar no caminho relativo do projeto (o mesmo que o código atual usa)
+  const relativePath = `./${fallbackName}`;
+  try {
+    fs.writeFileSync(relativePath, buf, { flag: 'w' });
+    return { path: relativePath, buffer: buf };
+  } catch (err) {
+    // se falhar (por exemplo ambientes serverless read-only), grava em /tmp
+    try {
+      const tmpDir = os.tmpdir();
+      const tmpPath = path.join(tmpDir, fallbackName.replace(/[^a-zA-Z0-9.-]/g, '_'));
+      fs.writeFileSync(tmpPath, buf, { flag: 'w' });
+      return { path: tmpPath, buffer: buf };
+    } catch (err2) {
+      // não foi possível gravar em nenhum lugar
+      console.error('ensureCertificateFromEnv: não foi possível gravar o certificado PFX:', err, err2);
+      return { path: null, buffer: buf };
+    }
+  }
+}
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
