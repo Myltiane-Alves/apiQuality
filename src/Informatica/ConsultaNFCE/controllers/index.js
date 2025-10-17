@@ -298,10 +298,22 @@ class ConsultaNfeController {
 
       // Fazer PUT nas vendas cujo cstat é diferente de '100'
       const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-      const putResponse = await axios.put(putApiUrl, {
-        resultados: resultados.filter(r => r.cstat && String(r.cstat) !== '100')
-      });
+      // enviar apenas os IDVENDA cujo cstat !== '100' (únicos, trim, não vazios)
+      const idVendas = Array.from(new Set(
+        resultados
+          .filter(r => !r.error && r.cstat && String(r.cstat) !== '100')
+          .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
+          .filter(v => v !== '')
+      ));
 
+      let putResponse;
+      if (idVendas.length === 0) {
+        putResponse = { data: { message: 'Nenhum ID para enviar', idVendas } };
+      } else {
+        // envia somente a lista de IDs no body
+        putResponse = await axios.put(putApiUrl, idVendas);
+      }
+ 
       return res.json(putResponse.data); // Retorna
     } catch (err) {
       return res.status(500).json({ error: err.message });
