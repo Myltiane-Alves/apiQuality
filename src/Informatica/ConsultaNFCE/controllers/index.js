@@ -297,8 +297,10 @@ class ConsultaNfeController {
       }
 
       // Fazer PUT nas vendas cujo cstat é diferente de '100'
-      const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-      const response = await axios.put(putApiUrl);
+      const response = await axios.put('http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs', {
+        resultados: resultados.filter(r => r.cstat && String(r.cstat) !== '100')
+      });
+
       return res.json(response.data); // Retorna
     } catch (err) {
       return res.status(500).json({ error: err.message });
