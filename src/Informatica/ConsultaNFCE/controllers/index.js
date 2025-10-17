@@ -308,6 +308,7 @@ class ConsultaNfeController {
         try {
           const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
           r.putResult = { status: 'ok', data: resp.data };
+          console.log(resp.data);
           putCount++;
         } catch (putErr) {
           r.putResult = { status: 'error', message: putErr.message };
