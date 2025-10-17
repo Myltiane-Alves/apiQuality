@@ -6,55 +6,90 @@ import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
 
-/**
- * Utilitário: garante que o certificado PFX esteja disponível no runtime.
- * - Se a variável de ambiente CERT_PFX_BASE64 existir, decodifica e grava o PFX.
- * - Tenta gravar no caminho relativo esperado (./GTO COMERCIO 2025-2026.pfx).
- * - Se não for possível gravar no diretório do projeto, grava em um path temporário e retorna esse path.
- *
- * Uso: chame `await ensureCertificateFromEnv()` na inicialização do servidor ou antes de usar as funções que dependem do PFX.
- * Retorna: { path: string, buffer: Buffer }
- */
-export async function ensureCertificateFromEnv(options = {}) {
-  const envName = options.envName || 'CERT_PFX_BASE64';
-  const fallbackName = options.fallbackFilename || 'GTO COMERCIO 2025-2026.pfx';
-  const base64 = process.env[envName];
-
-  if (!base64) {
-    // nenhuma variável definida
-    return { path: null, buffer: null };
-  }
-
-  const buf = Buffer.from(base64, 'base64');
-
-  // tenta gravar no caminho relativo do projeto (o mesmo que o código atual usa)
-  const relativePath = `./${fallbackName}`;
-  try {
-    fs.writeFileSync(relativePath, buf, { flag: 'w' });
-    // expõe o caminho gravado para outras partes do runtime que possam esperar um arquivo físico
-    process.env.CERT_PFX_PATH = relativePath;
-    return { path: relativePath, buffer: buf };
-  } catch (err) {
-    // se falhar (por exemplo ambientes serverless read-only), grava em /tmp
-    try {
-      const tmpDir = os.tmpdir();
-      const tmpPath = path.join(tmpDir, fallbackName.replace(/[^a-zA-Z0-9.-]/g, '_'));
-      fs.writeFileSync(tmpPath, buf, { flag: 'w' });
-      process.env.CERT_PFX_PATH = tmpPath;
-      return { path: tmpPath, buffer: buf };
-    } catch (err2) {
-      // não foi possível gravar em nenhum lugar
-      console.error('ensureCertificateFromEnv: não foi possível gravar o certificado PFX:', err?.message || err, err2?.message || err2);
-      // ainda assim colocamos no env para sinalizar que há um buffer disponível, mesmo sem um arquivo gravado
-      process.env.CERT_PFX_PATH = '';
-      return { path: null, buffer: buf };
-    }
-  }
-}
-
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
   return match ? match[1] : 'SEM_CSTAT';
+}
+
+/**
+ * Carrega opções de certificado para passar ao constructor de Tools.
+ * Suporta, na ordem de preferência:
+ *  - PFX via variável de ambiente CERT_PFX_BASE64
+ *  - PFX arquivo local './GTO COMERCIO 2025-2026.pfx'
+ *  - PEM via variáveis CERT_PEM_CERT_BASE64 / CERT_PEM_KEY_BASE64
+ *  - PEM via caminhos process.env.CERT_PEM_CERT_PATH / process.env.CERT_PEM_KEY_PATH
+ * Retorna um objeto que pode ser passado como 2º argumento do Tools, por exemplo { pfx: Buffer, senha } ou { cert: Buffer, key: Buffer }
+ */
+async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
+  // 1) PFX via env base64
+  const pfxBase64 = process.env.CERT_PFX_BASE64;
+  if (pfxBase64) {
+    try {
+      const pfxBuf = Buffer.from(pfxBase64, 'base64');
+      // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
+      try {
+        const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+        fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
+        process.env.CERT_PFX_PATH = tmpPath;
+      } catch (e) {
+        // se não gravar, não é crítico — ainda temos o buffer
+        console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
+      }
+      return { pfx: pfxBuf, senha };
+    } catch (e) {
+      console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
+    }
+  }
+
+  // 2) PFX arquivo local
+  if (fs.existsSync(fallbackPfxPath)) {
+    try {
+      const pfxBuf = fs.readFileSync(fallbackPfxPath);
+      process.env.CERT_PFX_PATH = fallbackPfxPath;
+      return { pfx: pfxBuf, senha };
+    } catch (e) {
+      console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
+    }
+  }
+
+  // 3) PEM via envs base64
+  const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
+  const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
+  if (pemCertBase64 && pemKeyBase64) {
+    try {
+      const certBuf = Buffer.from(pemCertBase64, 'base64');
+      const keyBuf = Buffer.from(pemKeyBase64, 'base64');
+      try {
+        const certPath = path.join(os.tmpdir(), 'cert.pem');
+        const keyPath = path.join(os.tmpdir(), 'key.pem');
+        fs.writeFileSync(certPath, certBuf, { flag: 'w' });
+        fs.writeFileSync(keyPath, keyBuf, { flag: 'w' });
+        process.env.CERT_PEM_CERT_PATH = certPath;
+        process.env.CERT_PEM_KEY_PATH = keyPath;
+      } catch (e) {
+        console.warn('getCertOptions: não foi possível gravar PEMs em tmp:', e?.message || e);
+      }
+      return { cert: certBuf, key: keyBuf };
+    } catch (e) {
+      console.error('getCertOptions: falha ao decodificar CERT_PEM_*_BASE64:', e?.message || e);
+    }
+  }
+
+  // 4) PEM via caminhos já apontados no ambiente
+  const certPathEnv = process.env.CERT_PEM_CERT_PATH;
+  const keyPathEnv = process.env.CERT_PEM_KEY_PATH;
+  if (certPathEnv && keyPathEnv && fs.existsSync(certPathEnv) && fs.existsSync(keyPathEnv)) {
+    try {
+      const certBuf = fs.readFileSync(certPathEnv);
+      const keyBuf = fs.readFileSync(keyPathEnv);
+      return { cert: certBuf, key: keyBuf };
+    } catch (e) {
+      console.warn('getCertOptions: falha ao ler PEMs dos caminhos apontados:', e?.message || e);
+    }
+  }
+
+  // nada encontrado
+  return null;
 }
 
 class ConsultaNfeController {
@@ -62,8 +97,6 @@ class ConsultaNfeController {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
-      // tenta garantir certificado a partir da variável de ambiente (se configurada)
-      const { path: envCertPath, buffer: envCertBuffer } = await ensureCertificateFromEnv();
       const ARQ_PLANILHA = req.file?.path || req.body?.planilhaPath;
       const PASTA_RESULTADOS = path.resolve('python_notas/resultados');
       const LOG_DIR = path.resolve('python_notas/consulta_nfe/log');
@@ -96,23 +129,23 @@ class ConsultaNfeController {
         const IDVENDA = String(row['IDVENDA']);
         const UF = String(row['NFE_INFNFE_EMIT_ENDEREMIT_UF']).trim();
         const CHAVE = String(row['CHAVE']).trim();
-        // usa buffer carregado da env se disponível, caso contrário lê do arquivo local
-        const certificadoBuffer = envCertBuffer || fs.readFileSync(CERTIFICADO);
-        const myTools = new Tools({
+
+        // carrega opções de certificado (PFX ou PEM)
+        const certOptions = await getCertOptions(SENHA, CERTIFICADO);
+        const toolsOpts = Object.assign({
           mod: '55',
           tpAmb: 1,
           UF: UF,
           versao: '4.00',
           xmllint: '../libxml/bin/xmllint.exe',
-        }, {
-          pfx: certificadoBuffer,
-          senha: SENHA,
-        });
+        }, {});
+        const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
 
         const resposta = await myTools.consultarNFe(CHAVE);
         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
 
+        // Logar a venda quando o cstat NÃO for "sem" (ex.: SEM_CSTAT)
         if (!String(cstat).toUpperCase().includes('SEM')) {
           console.log(`Venda com cstat diferente de SEM: IDVENDA=${IDVENDA}, CHAVE=${CHAVE}, UF=${UF}, cstat=${cstat}`);
         }
@@ -124,6 +157,7 @@ class ConsultaNfeController {
         processados++;
       }
 
+      // Compacta a pasta de resultados
       const zipPath = path.join(PASTA_RESULTADOS, 'resultados.zip');
       const output = fs.createWriteStream(zipPath);
       const archive = archiver('zip', { zlib: { level: 9 } });
@@ -133,6 +167,8 @@ class ConsultaNfeController {
           if (err) {
             return res.status(500).json({ error: 'Erro ao enviar o arquivo zip.' });
           }
+          // Opcional: remover o zip após download
+          // fs.unlinkSync(zipPath);
         });
       });
 
@@ -186,16 +222,17 @@ class ConsultaNfeController {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
-      // tenta garantir certificado a partir da variável de ambiente (se configurada)
-      const { path: envCertPath, buffer: envCertBuffer } = await ensureCertificateFromEnv();
 
+      // Pega vendas do body.vendas ou busca na API se não informado
       let vendas = req.body?.vendas;
       if (!vendas) {
         const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
         const response = await axios.get(apiUrl);
         vendas = response.data;
+        // console.log('Vendas buscadas da API (raw):', vendas);
       }
 
+      // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
       if (vendas && !Array.isArray(vendas)) {
         if (Array.isArray(vendas.data)) {
           vendas = vendas.data;
@@ -204,19 +241,20 @@ class ConsultaNfeController {
         } else if (vendas.data && Array.isArray(vendas.data.rows)) {
           vendas = vendas.data.rows;
         } else {
+          // tenta encontrar a primeira propriedade que é array
           const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
           if (Array.isArray(possibleArray)) {
             vendas = possibleArray;
           }
         }
+        console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
       }
 
       if (!Array.isArray(vendas) || vendas.length === 0) {
         return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
       }
 
-  // usa buffer carregado da env se disponível, caso contrário lê do arquivo local
-  const certificadoBuffer = envCertBuffer || fs.readFileSync(CERTIFICADO);
+  const certOptions = await getCertOptions(SENHA, CERTIFICADO);
       let processados = 0;
       const resultados = [];
 
@@ -231,16 +269,14 @@ class ConsultaNfeController {
         }
 
         try {
-          const myTools = new Tools({
+          const toolsOpts = {
             mod: '55',
             tpAmb: 1,
             UF: UF,
             versao: '4.00',
             xmllint: '../libxml/bin/xmllint.exe',
-          }, {
-            pfx: certificadoBuffer,
-            senha: SENHA,
-          });
+          };
+          const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
 
           const resposta = await myTools.consultarNFe(CHAVE);
           const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
@@ -260,6 +296,7 @@ class ConsultaNfeController {
         }
       }
 
+      // Fazer PUT nas vendas cujo cstat é diferente de '100'
       const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
       let putCount = 0;
 
@@ -277,12 +314,14 @@ class ConsultaNfeController {
         }
       }
 
-      // const idVendas = Array.from(new Set(
-      //   resultados
-      //     .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
-      //     .filter(v => v !== '')
-      // ));
+      // Extrai todos os IDVENDA de resultados (trim e não vazios) e deixa únicos
+      const idVendas = Array.from(new Set(
+        resultados
+          .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
+          .filter(v => v !== '')
+      ));
 
+      console.log('IDVENDAS:', idVendas);
       return res.json({ processados, putCount, resultados });
     } catch (err) {
       return res.status(500).json({ error: err.message });
