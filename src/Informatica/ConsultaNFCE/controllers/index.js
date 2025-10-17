@@ -306,7 +306,7 @@ class ConsultaNfeController {
         if (String(r.cstat) === '100') continue;
 
         try {
-          var resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
+          const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
           r.putResult = { status: 'ok', data: resp.data };
           putCount++;
         } catch (putErr) {
@@ -314,7 +314,7 @@ class ConsultaNfeController {
         }
       }
 
-      return res.json(resp);
+      return res.json({ processados, putCount, resultados });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
