@@ -318,6 +318,7 @@ class ConsultaNfeController {
           putResponses.push({ error: putErr.message });
         }
       }
+      
 
       return res.json({ putResponses });
     } catch (err) {
