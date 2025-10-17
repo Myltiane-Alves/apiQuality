@@ -31,6 +31,8 @@ export async function ensureCertificateFromEnv(options = {}) {
   const relativePath = `./${fallbackName}`;
   try {
     fs.writeFileSync(relativePath, buf, { flag: 'w' });
+    // expõe o caminho gravado para outras partes do runtime que possam esperar um arquivo físico
+    process.env.CERT_PFX_PATH = relativePath;
     return { path: relativePath, buffer: buf };
   } catch (err) {
     // se falhar (por exemplo ambientes serverless read-only), grava em /tmp
@@ -38,10 +40,13 @@ export async function ensureCertificateFromEnv(options = {}) {
       const tmpDir = os.tmpdir();
       const tmpPath = path.join(tmpDir, fallbackName.replace(/[^a-zA-Z0-9.-]/g, '_'));
       fs.writeFileSync(tmpPath, buf, { flag: 'w' });
+      process.env.CERT_PFX_PATH = tmpPath;
       return { path: tmpPath, buffer: buf };
     } catch (err2) {
       // não foi possível gravar em nenhum lugar
-      console.error('ensureCertificateFromEnv: não foi possível gravar o certificado PFX:', err, err2);
+      console.error('ensureCertificateFromEnv: não foi possível gravar o certificado PFX:', err?.message || err, err2?.message || err2);
+      // ainda assim colocamos no env para sinalizar que há um buffer disponível, mesmo sem um arquivo gravado
+      process.env.CERT_PFX_PATH = '';
       return { path: null, buffer: buf };
     }
   }
