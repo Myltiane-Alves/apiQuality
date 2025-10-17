@@ -1,1 +1,0 @@
-<retConsSitNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe"><tpAmb>1</tpAmb><verAplic>SVRSnfce2507041618DR</verAplic><cStat>217</cStat><xMotivo>Rejeicao: NF-e nao consta na base de dados da SEFAZ</xMotivo><cUF>53</cUF><dhRecbto>2025-10-15T16:33:12-03:00</dhRecbto><chNFe>53251036769602006277650020000852162918827334</chNFe></retConsSitNFe>

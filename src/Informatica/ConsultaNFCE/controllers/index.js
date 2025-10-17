@@ -11,7 +11,7 @@ function extrairCStat(xml) {
 }
 
 class ConsultaNfeController {
-  static async consultar(req, res) {
+  async consultar(req, res) {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
@@ -63,6 +63,12 @@ class ConsultaNfeController {
         const resposta = await myTools.consultarNFe(CHAVE);
         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
+
+        // Logar a venda quando o cstat NÃO for "sem" (ex.: SEM_CSTAT)
+        if (!String(cstat).toUpperCase().includes('SEM')) {
+          console.log(`Venda com cstat diferente de SEM: IDVENDA=${IDVENDA}, CHAVE=${CHAVE}, UF=${UF}, cstat=${cstat}`);
+        }
+
         const subpasta = path.join(PASTA_RESULTADOS, `${cstat}-${UF}`);
         fs.mkdirSync(subpasta, { recursive: true });
         const arquivoSaida = path.join(subpasta, `${IDVENDA}.txt`);
@@ -136,12 +142,26 @@ class ConsultaNfeController {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
 
-      // Pega vendas do body.vendas ou busca na API se não informado
       let vendas = req.body?.vendas;
       if (!vendas) {
         const apiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
         const response = await axios.get(apiUrl);
         vendas = response.data;
+      }
+
+      if (vendas && !Array.isArray(vendas)) {
+        if (Array.isArray(vendas.data)) {
+          vendas = vendas.data;
+        } else if (Array.isArray(vendas.rows)) {
+          vendas = vendas.rows;
+        } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+          vendas = vendas.data.rows;
+        } else {
+          const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+          if (Array.isArray(possibleArray)) {
+            vendas = possibleArray;
+          }
+        }
       }
 
       if (!Array.isArray(vendas) || vendas.length === 0) {
@@ -192,7 +212,30 @@ class ConsultaNfeController {
         }
       }
 
-      return res.json({ processados, resultados });
+      const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
+      let putCount = 0;
+
+      for (const r of resultados) {
+        if (r.error) continue;
+        if (!r.cstat) continue;
+        if (String(r.cstat) === '100') continue;
+
+        try {
+          const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
+          r.putResult = { status: 'ok', data: resp.data };
+          putCount++;
+        } catch (putErr) {
+          r.putResult = { status: 'error', message: putErr.message };
+        }
+      }
+
+      // const idVendas = Array.from(new Set(
+      //   resultados
+      //     .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
+      //     .filter(v => v !== '')
+      // ));
+
+      return res.json({ processados, putCount, resultados });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
