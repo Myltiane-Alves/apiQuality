@@ -186,29 +186,29 @@ class ConsultaNfeController {
   }
 
   async getListaVendasContigenciaValidas(req, res) {
-    let {  } = req.query;
+    let { } = req.query;
 
     try {
-        const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`
-        const response = await axios.get(apiUrl)
-        
-        return res.json(response.data); // Retorna
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`
+      const response = await axios.get(apiUrl)
+
+      return res.json(response.data); // Retorna
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
-        throw error;
+      console.error("Unable to connect to the database:", error);
+      throw error;
     }
-    
+
   }
 
   async putValidarVendaContigencia(req, res) {
     try {
-      let  {IDVENDA, STVALIDACONTINGENCIA} = req.body; 
-    
+      let { IDVENDA, STVALIDACONTINGENCIA } = req.body;
+
       const apiUrl = `http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`
 
 
 
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`, { 
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`, {
         IDVENDA
       })
       return res.json(response.data);
@@ -254,7 +254,7 @@ class ConsultaNfeController {
         return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
       }
 
-  const certOptions = await getCertOptions(SENHA, CERTIFICADO);
+      const certOptions = await getCertOptions(SENHA, CERTIFICADO);
       let processados = 0;
       const resultados = [];
 
@@ -298,33 +298,123 @@ class ConsultaNfeController {
 
       // Fazer PUT nas vendas cujo cstat é diferente de '100'
       const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-      let putCount = 0;
 
-      const putResponses = [];
-
-      for (const r of resultados) {
-        if (r.error) continue;
-        if (!r.cstat) continue;
-        if (String(r.cstat) === '100') continue;
-
-        try {
-          const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
-          r.putResult = { status: 'ok', data: resp.data };
-          putResponses.push(resp.data);
-          console.log(resp.data);
-          putCount++;
-        } catch (putErr) {
-          r.putResult = { status: 'error', message: putErr.message };
-          putResponses.push({ error: putErr.message });
-        }
-      }
-      
-
-      return res.json({ putResponses });
+      const response = await axios.get(putApiUrl);
+      return res.json(response.data); // Retorna
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
+
+  // async validarConsultar(req, res) {
+  //   try {
+  //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
+  //     const SENHA = '#senhagto2024#';
+
+  //     // Pega vendas do body.vendas ou busca na API se não informado
+  //     let vendas = req.body?.vendas;
+  //     if (!vendas) {
+  //       const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
+  //       const response = await axios.get(apiUrl);
+  //       vendas = response.data;
+  //       // console.log('Vendas buscadas da API (raw):', vendas);
+  //     }
+
+  //     // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+  //     if (vendas && !Array.isArray(vendas)) {
+  //       if (Array.isArray(vendas.data)) {
+  //         vendas = vendas.data;
+  //       } else if (Array.isArray(vendas.rows)) {
+  //         vendas = vendas.rows;
+  //       } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+  //         vendas = vendas.data.rows;
+  //       } else {
+  //         // tenta encontrar a primeira propriedade que é array
+  //         const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+  //         if (Array.isArray(possibleArray)) {
+  //           vendas = possibleArray;
+  //         }
+  //       }
+  //       console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
+  //     }
+
+  //     if (!Array.isArray(vendas) || vendas.length === 0) {
+  //       return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
+  //     }
+
+  //     const certOptions = await getCertOptions(SENHA, CERTIFICADO);
+  //     let processados = 0;
+  //     const resultados = [];
+
+  //     for (const row of vendas) {
+  //       const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
+  //       const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
+  //       const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
+
+  //       if (!CHAVE) {
+  //         resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
+  //         continue;
+  //       }
+
+  //       try {
+  //         const toolsOpts = {
+  //           mod: '55',
+  //           tpAmb: 1,
+  //           UF: UF,
+  //           versao: '4.00',
+  //           xmllint: '../libxml/bin/xmllint.exe',
+  //         };
+  //         const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
+
+  //         const resposta = await myTools.consultarNFe(CHAVE);
+  //         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
+  //         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
+
+  //         resultados.push({
+  //           IDVENDA,
+  //           UF,
+  //           CHAVE,
+  //           cstat,
+  //           xml: xmlContent,
+  //         });
+
+  //         processados++;
+  //       } catch (innerErr) {
+  //         resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
+  //       }
+  //     }
+
+  //     // Fazer PUT nas vendas cujo cstat é diferente de '100'
+  //     const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
+  //     let putCount = 0;
+
+  //     for (const r of resultados) {
+  //       if (r.error) continue;
+  //       if (!r.cstat) continue;
+  //       if (String(r.cstat) === '100') continue;
+
+  //       try {
+  //         const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
+  //         r.putResult = { status: 'ok', data: resp.data };
+  //         putCount++;
+  //       } catch (putErr) {
+  //         r.putResult = { status: 'error', message: putErr.message };
+  //       }
+  //     }
+
+  //     // Extrai todos os IDVENDA de resultados (trim e não vazios) e deixa únicos
+  //     const idVendas = Array.from(new Set(
+  //       resultados
+  //         .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
+  //         .filter(v => v !== '')
+  //     ));
+
+  //     console.log('IDVENDAS:', idVendas);
+  //     return res.json({ processados, putCount, resultados });
+  //   } catch (err) {
+  //     return res.status(500).json({ error: err.message });
+  //   }
+  // }
 }
 
 export default new ConsultaNfeController();
