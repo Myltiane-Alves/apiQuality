@@ -26,6 +26,10 @@ const criarOTSchema = Joi.object({
         "any.required": "O ID do operador de expedição é obrigatório",
         "number.base": "O ID do operador de expedição deve ser um número"
     }),
+    NUTOTALITENS: Joi.number().allow()
+    .messages({
+        "number.base": "O número total de itens deve ser um número"
+    }),
 });
 
 export default criarOTSchema;
