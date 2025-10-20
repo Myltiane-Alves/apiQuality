@@ -29,7 +29,7 @@ import ConferenciaCegaControllers from './ConferenciaCega/controllers/Conferenci
 import ListaPrecoControllers from './controllers/ListaPreco.js';
 import LogsControllers from './LogsUsuario/controllers/log.js';
 import PromocaoControllers from './Promocao/controllers/Promocao.js'
-
+import CaixaControllers from './Informatica/caixas/controllers/controllersCaixas.js'
 
 // Financeiro Início
 import AdiantamentosControllers from './Financeiro/Adiantamentos/controllers/adiantamentos.js'
@@ -443,6 +443,7 @@ routes.post('/createRelatorioInformaticaBI', InformaticaControllers.postRelatori
 routes.post('/criarlinkRelatorioBI', InformaticaControllers.postLinkRelatorioBI)
 routes.post('/configuracao-todos', InformaticaControllers.postCaixaLoja)
 routes.post('/criar-lista-caixas', InformaticaControllers.postConfiguracao)
+routes.post('/criar-caixas', CaixaControllers.postCaixaLojas)
 
 // PUT
 routes.put('/inativar-funcionario', InformaticaControllers.putInativarFuncionario)
@@ -450,6 +451,7 @@ routes.put('/relatorioInformaticaBI/:id', InformaticaControllers.putRelatorioBI)
 routes.put('/linkRelatorioBI/:id', InformaticaControllers.putLinkRelatorioBI)
 routes.put('/atualiza-empresa-diario/:id', InformaticaControllers.putAtualizaEmpresaDiario)
 routes.put('/atualizar-todos-caixa', InformaticaControllers.putAtualizarTodosCaixas)
+routes.put('/lista-caixas/:id', CaixaControllers.putCaixaLoja)
 // routes.put('/atualizaStatusCaixa', InformaticaControllers.updateAtualizaSTCaixasInformatica)
 routes.put('/funcionarios-loja/:id', InformaticaControllers.putFuncionarioLoja)
 routes.post('/criar-funcionarios-loja', InformaticaControllers.postFuncionarioLoja)
