@@ -5,17 +5,26 @@ const url = process.env.API_URL;
 export class OTClient {
     constructor(baseURL) {
         this.api = axios.create({
-            baseURL: baseURL || url
+            baseURL: baseURL || url,
+            timeout: 80000
         });
     }
-    async criarOT() {
+    async criarOT(
+        IDRESUMOOT
+    ) {
         
-        const response = await this.api.post(`api/expedicao/resumo-ordem-transferencia.xsjs`);
+        const response = await this.api.post(`api/expedicao/resumo-ordem-transferencia.xsjs`,{
+            IDRESUMOOT
+        });
         return response.data;
     }
-    async atualizarOT(IDRESUMOOT) {
+    async atualizarOT(
+        IDRESUMOOT
+    ) {
 
-        const response = await this.api.put(`api/expedicao/resumo-ordem-transferencia.xsjs`, IDRESUMOOT);
+        const response = await this.api.put(`api/expedicao/resumo-ordem-transferencia.xsjs`, {
+            IDRESUMOOT
+        });
         return response.data;
     }
 }
