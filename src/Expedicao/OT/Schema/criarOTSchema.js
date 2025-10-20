@@ -1,11 +1,6 @@
 import Joi from "joi";
 
 const criarOTSchema = Joi.object({
-    IDRESUMOOT: Joi.number().required()
-    .messages({
-        "any.required": "O ID do resumo da OT é obrigatório",
-        "number.base": "O ID do resumo da OT deve ser um número"
-    }),
     IDEMPRESAORIGEM: Joi.number().required()
     .messages({
         "any.required": "O ID da empresa de origem é obrigatório",
