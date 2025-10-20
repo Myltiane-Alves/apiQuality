@@ -17,14 +17,76 @@ export class OTService {
     }
 
     async updateOT(
-        IDRESUMOOT
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        IDEMPRESADESTINO,
+        DATAEXPEDICAO,
+        IDOPERADOREXPEDICAO,
+        NUTOTALITENS,
+        QTDTOTALITENS,
+        QTDTOTALITENSRECEPCIONADO,
+        QTDTOTALITENSDIVERGENCIA,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        VRTOTALCUSTO,
+        VRTOTALVENDA,
+        DTRECEPCAO,
+        IDOPERADORRECEPTOR,
+        DSOBSERVACAO,
+        IDUSRCANCELAMENTO,
+        DTULTALTERACAO,
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        STEMISSAONFE,
+        NUMERONFE,
+        STENTRADAINVENTARIO,
+        QTDCONFERENCIA,
+        dadosdetalheot,
+        IDSTATUSOT,
+        IDUSRAJUSTE,
+        DTAJUSTE,
+        QTDTOTALITENSAJUSTE,
+        CONFEREITENS,
+        IDROTINA,
+        DATAENTREGA,
     ) {
         if(!IDRESUMOOT) {
             throw new Error("IDRESUMOOT is required");
         }
 
         const result = await this.client.atualizarOT(
-            IDRESUMOOT
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            IDEMPRESADESTINO,
+            DATAEXPEDICAO,
+            IDOPERADOREXPEDICAO,
+            NUTOTALITENS,
+            QTDTOTALITENS,
+            QTDTOTALITENSRECEPCIONADO,
+            QTDTOTALITENSDIVERGENCIA,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            VRTOTALCUSTO,
+            VRTOTALVENDA,
+            DTRECEPCAO,
+            IDOPERADORRECEPTOR,
+            DSOBSERVACAO,
+            IDUSRCANCELAMENTO,
+            DTULTALTERACAO,
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            STEMISSAONFE,
+            NUMERONFE,
+            STENTRADAINVENTARIO,
+            QTDCONFERENCIA,
+            dadosdetalheot,
+            IDSTATUSOT,
+            IDUSRAJUSTE,
+            DTAJUSTE,
+            QTDTOTALITENSAJUSTE,
+            CONFEREITENS,
+            IDROTINA,
+            DATAENTREGA,
         )
         return result;
     }
