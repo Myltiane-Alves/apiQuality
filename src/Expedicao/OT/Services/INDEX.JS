@@ -15,4 +15,17 @@ export class OTService {
         )
         return result;
     }
+
+    async updateOT(
+        IDRESUMOOT
+    ) {
+        if(!IDRESUMOOT) {
+            throw new Error("IDRESUMOOT is required");
+        }
+
+        const result = await this.client.atualizarOT(
+            IDRESUMOOT
+        )
+        return result;
+    }
 }
