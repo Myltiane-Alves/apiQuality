@@ -30,6 +30,22 @@ const criarOTSchema = Joi.object({
     .messages({
         "number.base": "O número total de itens deve ser um número"
     }),
+    QTDTOTALITENS: Joi.number().allow()
+    .messages({
+        "number.base": "A quantidade total de itens deve ser um número"
+    }),
+    QTDTOTALITENSRECEPCIONADO: Joi.number().allow()
+    .messages({
+        "number.base": "A quantidade total de itens recepcionados deve ser um número"
+    }),
+    QTDTOTALITENSDIVERGENCIA: Joi.number().allow()
+    .messages({
+        "number.base": "A quantidade total de itens com divergência deve ser um número"
+    }),
+    NUTOTALVOLUMES: Joi.number().allow()
+    .messages({
+        "number.base": "O número total de volumes deve ser um número"
+    })
 });
 
 export default criarOTSchema;
