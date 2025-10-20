@@ -8,14 +8,14 @@ export class OTClient {
             baseURL: baseURL || url
         });
     }
-    async criarOT(IDDEPOSITOLOJA) {
+    async criarOT() {
         
-        const response = await this.api.post(`api/expedicao/resumo-ordem-transferencia.xsjs`, IDDEPOSITOLOJA);
+        const response = await this.api.post(`api/expedicao/resumo-ordem-transferencia.xsjs`);
         return response.data;
     }
     async atualizarOT(IDRESUMOOT) {
 
-        const response = await this.api.put(`api/expedicao/resumo-ordem-transferencia.xsjs`, IDDEPOSITOLOJA);
+        const response = await this.api.put(`api/expedicao/resumo-ordem-transferencia.xsjs`, IDRESUMOOT);
         return response.data;
     }
 }
