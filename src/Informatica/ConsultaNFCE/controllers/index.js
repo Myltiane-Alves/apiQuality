@@ -218,7 +218,109 @@ class ConsultaNfeController {
     }
   }
 
-  async validarConsultar(req, res) {
+  // async validarConsultar(req, res) {
+  //   try {
+  //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
+  //     const SENHA = '#senhagto2024#';
+
+  //     // Pega vendas do body.vendas ou busca na API se não informado
+  //     let vendas = req.body?.vendas;
+  //     if (!vendas) {
+  //       const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
+  //       const response = await axios.get(apiUrl);
+  //       vendas = response.data;
+  //       // console.log('Vendas buscadas da API (raw):', vendas);
+  //     }
+
+  //     // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+  //     if (vendas && !Array.isArray(vendas)) {
+  //       if (Array.isArray(vendas.data)) {
+  //         vendas = vendas.data;
+  //       } else if (Array.isArray(vendas.rows)) {
+  //         vendas = vendas.rows;
+  //       } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+  //         vendas = vendas.data.rows;
+  //       } else {
+  //         // tenta encontrar a primeira propriedade que é array
+  //         const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+  //         if (Array.isArray(possibleArray)) {
+  //           vendas = possibleArray;
+  //         }
+  //       }
+  //       console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
+  //     }
+
+  //     if (!Array.isArray(vendas) || vendas.length === 0) {
+  //       return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
+  //     }
+
+  //     const certOptions = await getCertOptions(SENHA, CERTIFICADO);
+  //     let processados = 0;
+  //     const resultados = [];
+
+  //     for (const row of vendas) {
+  //       const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
+  //       const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
+  //       const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
+
+  //       if (!CHAVE) {
+  //         resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
+  //         continue;
+  //       }
+
+  //       try {
+  //         const toolsOpts = {
+  //           mod: '55',
+  //           tpAmb: 1,
+  //           UF: UF,
+  //           versao: '4.00',
+  //           xmllint: '../libxml/bin/xmllint.exe',
+  //         };
+  //         const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
+
+  //         const resposta = await myTools.consultarNFe(CHAVE);
+  //         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
+  //         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
+
+  //         resultados.push({
+  //           IDVENDA,
+  //           UF,
+  //           CHAVE,
+  //           cstat,
+  //           xml: xmlContent,
+  //         });
+
+  //         processados++;
+  //       } catch (innerErr) {
+  //         resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
+  //       }
+  //     }
+
+  //     // Fazer PUT nas vendas cujo cstat é diferente de '100'
+  //     const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
+  //     // enviar apenas os IDVENDA cujo cstat !== '100' (únicos, trim, não vazios)
+  //     const idVendas = Array.from(new Set(
+  //       resultados
+  //         .filter(r => !r.error && r.cstat && String(r.cstat) !== '100')
+  //         .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
+  //         .filter(v => v !== '')
+  //     ));
+
+  //     let putResponse;
+  //     if (idVendas.length === 0) {
+  //       putResponse = { data: { message: 'Nenhum ID para enviar', idVendas } };
+  //     } else {
+  //       // envia somente a lista de IDs no body
+  //       putResponse = await axios.put(putApiUrl, idVendas);
+  //     }
+ 
+  //     return res.json(putResponse.data); // Retorna
+  //   } catch (err) {
+  //     return res.status(500).json({ error: err.message });
+  //   }
+  // }
+
+   async validarConsultar(req, res) {
     try {
       const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
       const SENHA = '#senhagto2024#';
@@ -226,7 +328,7 @@ class ConsultaNfeController {
       // Pega vendas do body.vendas ou busca na API se não informado
       let vendas = req.body?.vendas;
       if (!vendas) {
-        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
+        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
         const response = await axios.get(apiUrl);
         vendas = response.data;
         // console.log('Vendas buscadas da API (raw):', vendas);
@@ -295,31 +397,53 @@ class ConsultaNfeController {
           resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
         }
       }
-
-      // Fazer PUT nas vendas cujo cstat é diferente de '100'
-      const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-      // enviar apenas os IDVENDA cujo cstat !== '100' (únicos, trim, não vazios)
-      const idVendas = Array.from(new Set(
-        resultados
-          .filter(r => !r.error && r.cstat && String(r.cstat) !== '100')
-          .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
-          .filter(v => v !== '')
-      ));
-
-      let putResponse;
-      if (idVendas.length === 0) {
-        putResponse = { data: { message: 'Nenhum ID para enviar', idVendas } };
-      } else {
-        // envia somente a lista de IDs no body
-        putResponse = await axios.put(putApiUrl, idVendas);
-      }
+      
+      // Log detalhado dos resultados para análise
+      // console.log('=== RESULTADOS DETALHADOS ===');
+      // console.log('Total de resultados:', resultados.length);
+      // console.log('Processados:', processados);
+      
+      // resultados.forEach((r, index) => {
+      //   // console.log(`\n[${index + 1}] IDVENDA: ${r.IDVENDA}, UF: ${r.UF}, cStat: ${r.cstat}`);
+      //   if (r.error) {
+      //     console.log(`    ERROR: ${r.error}`);
+      //   } else {
+      //     console.log(`    CHAVE: ${r.CHAVE?.substring(0, 10)}...`);
+      //     console.log(`    XML length: ${r.xml} chars`);
+      //   }
+      // });
+      
+      // Resumo por cStat
+      const statSummary = {};
+      resultados.forEach(r => {
+        const stat = r.error ? 'ERROR' : (r.cstat || 'NO_CSTAT');
+        statSummary[stat] = (statSummary[stat] || 0) + 1;
+      });
+      // console.log('\n=== RESUMO POR STATUS ===');
+      // Object.entries(statSummary).forEach(([stat, count]) => {
+      //   console.log(`${stat}: ${count}`);
+      // });
+      // console.log('========================\n');
+      
+      // Retorna apenas os resultados consultados com CHAVE, IDVENDA, UF, CSTAT e XML
+      const responseData = resultados.map(r => ({
+        CHAVE: r.CHAVE,
+        IDVENDA: r.IDVENDA,
+        UF: r.UF,
+        CSTAT: r.cstat,
+        XML: r.xml,
+        ...(r.error && { ERROR: r.error })
+      }));
  
-      return res.json(putResponse.data); // Retorna
+      return res.json({
+        total: resultados.length,
+        processados,
+        data: responseData
+      });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
-
   // async validarConsultar(req, res) {
   //   try {
   //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
