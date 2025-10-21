@@ -1,14 +1,12 @@
 import axios from "axios";
 import { dataFormatada } from "../../utils/dataFormatada.js";
-import { getResumoOrdemTransferencia } from "../repositories/resumoOrdemTransferencia.js";
-import { getDetalheOrdemTransferencia } from "../repositories/detalheOrdemTransferencia.js";
-import { getProdutos } from "../repositories/produto.js";
-import { getRotinaMovimentacao } from "../repositories/rotinaMovimentacao.js";
-import { getImpressaoEtiquetaOT } from "../repositories/impressaoEtiquetaOT.js";
-import { getNFESaidaTransferencia } from "../../ServiceLayer/repositories/NotasTransferencia/consultaNFESaidaTransferencia.js";
 import 'dotenv/config';
+import { OTClient } from "../OT/Client/index.js";
+import { OTService } from "../OT/Services/index.js";
 // const url = process.env.API_URL;
 const url = 'http://164.152.245.77:8000/quality/concentrador_homologacao';
+const otClient = new OTClient(url);
+const otService = new OTService(otClient);
 
 class ExpedicaoControllers {
 
@@ -24,7 +22,7 @@ class ExpedicaoControllers {
         try {
             const apiUrl = `${url}/api/expedicao/produto.xsjs?idEmpresa=${idEmpresa}&id=${idProduto}&descProduto=${dsProduto}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
-            // const response = await getProdutos(idEmpresa, codBarras, dsProduto, page, pageSize)
+            
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -48,7 +46,7 @@ class ExpedicaoControllers {
            
             const apiUrl = `${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=${Number(idTipoFiltro)}&idEmpresaOrigem=${Number(idEmpresaOrigem)}&idEmpresaDestino=${Number(idEmpresaDestino)}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`
             const response = await axios.get(apiUrl)
-            // const response = await  getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+           
 
             return res.json(response.data); 
         } catch (error) {
@@ -68,7 +66,7 @@ class ExpedicaoControllers {
         dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';    
 
         try {
-            // ajaxGet('api/expedicao/resumo-ordem-transferencia.xsjs?page=' + numPage + '&idtipofiltro=' + 1 + '&idEmpresaOrigem=' + idlojaorigem + '&idEmpresaDestino=' + idlojadestino + '&datapesqinicio=' + datapesqinicio + '&datapesqfim=' + datapesqfim)
+            
 
             const response = await axios.get(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=1&idEmpresaOrigem=${idEmpresaLogin}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`)
 
@@ -90,7 +88,7 @@ class ExpedicaoControllers {
         try {
             // ajaxGet('api/expedicao/detalhe-ordem-transferencia.xsjs?page=' + numPage + '&id=' + id + '&idtipofiltro=' + 1)
             const response = await axios.get(`${url}/api/expedicao/detalhe-ordem-transferencia.xsjs?id=${idResumoOT}`)
-            // const response = await getDetalheOrdemTransferencia(idResumoOT, idTipoFiltro, pageSize, page)
+     
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -110,7 +108,7 @@ class ExpedicaoControllers {
         dataPesquisaFim = dataFormatada(dataPesquisaFim)
 
         try {
-            // ajaxGet('api/expedicao/resumo-ordem-transferencia.xsjs?page=' + numPage + '&idtipofiltro=' + 2 + '&idEmpresaOrigem=' + IDEmpresaLogin + '&idEmpresaDestino=' + idlojadestino + '&datapesqinicio=' + datapesqinicio + '&datapesqfim=' + datapesqfim)
+
             const apiUrl = `${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=2&idEmpresaOrigem=${idEmpresaLogin}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`
             const response = await axios.get(apiUrl)
 
@@ -145,7 +143,7 @@ class ExpedicaoControllers {
         idStatusOt = idStatusOt ? idStatusOt : '';
         try {
             const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/expedicao/resumo-ordem-transferencia.xsjs?page=1&idtipofiltro=1&idEmpresaOrigem=${idLojaOrigem}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}&idstatusot=${idStatusOt}&dtinifat=${dataInicioFatura}&dtfimfat=${dataFimFatura}`)
-            // const response = await getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+           
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -167,7 +165,7 @@ class ExpedicaoControllers {
         page = page ? page : '';
         try {
             const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/expedicao/resumo-ordem-transferencia.xsjs?page=1&idtipofiltro=2&idEmpresaOrigem=${idEmpresaOrigem}&idEmpresaDestino=${idEmpresaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}&idrotina=${idRotina}&dtinient=${dataPesquisaInicio}&dtfiment=${dataPesquisaFim}`)
-            // const response = await getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+            
             
             return res.json(response.data); 
         } catch (error) {
@@ -197,7 +195,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/expedicao/rotina-movimentacao.xsjs`)
-            // const response = await getRotinaMovimentacao(idRotina,  pageSize, page)
+         
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -213,7 +211,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/expedicao/impressao-etiqueta-ot.xsjs?id=${idResumoOT}&stAtivo=${stAtivo}&pageSize=${pageSize}&page=${page}`)
-            // const response = await getImpressaoEtiquetaOT(idResumoOT, stAtivo,  pageSize, page)
+          
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -228,7 +226,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/service-layer/notas-transferencia/consulta-nfe-saida-tranferencia.xsjs?id=${idSapOrigem}&pageSize=${pageSize}&page=${page}`)
-            // const response = await getNFESaidaTransferencia(idSapOrigem,  pageSize, page)
+            
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
