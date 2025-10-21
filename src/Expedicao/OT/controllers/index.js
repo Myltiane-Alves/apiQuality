@@ -103,6 +103,7 @@ class OrdemTransferenciaControllers {
             }
 
             const response = await otService.createOT(
+                    value.IDRESUMOOT,
                     value.IDEMPRESAORIGEM,
                     value.IDEMPRESADESTINO,
                     value.DATAEXPEDICAO,

@@ -6,7 +6,7 @@ import { OTService } from "../OT/Services/index.js";
 import criarOTSchema from '../OT/Schema/criarOTSchema.js';
 import atualizarOTSchema from '../OT/Schema/atualizarOTSchema.js';
 // const url = process.env.API_URL;
-const url = 'http://164.152.245.77:8000/quality/concentrador_homologacao';
+const url = 'http://164.152.245.77:8000/quality/concentrador_node';
 const otClient = new OTClient(url);
 const otService = new OTService(otClient);
 
@@ -407,6 +407,76 @@ class ExpedicaoControllers {
     async postResumoOrdemTransferencia(req, res) {
         
         try {
+        //     let {
+        //         IDEMPRESAORIGEM,
+        //         IDEMPRESADESTINO,
+        //         DATAEXPEDICAO,
+        //         IDOPERADOREXPEDICAO,
+        //         NUTOTALITENS,
+        //         QTDTOTALITENS,
+        //         QTDTOTALITENSRECEPCIONADO,
+        //         QTDTOTALITENSDIVERGENCIA,
+        //         NUTOTALVOLUMES,
+        //         TPVOLUME,
+        //         VRTOTALCUSTO,
+        //         VRTOTALVENDA,
+        //         DTRECEPCAO,
+        //         IDOPERADORRECEPTOR,
+        //         DSOBSERVACAO,
+        //         IDUSRCANCELAMENTO,
+        //         DTULTALTERACAO,
+        //         IDSTDIVERGENCIA,
+        //         OBSDIVERGENCIA,
+        //         STEMISSAONFE,
+        //         NUMERONFE,
+        //         STENTRADAINVENTARIO,
+        //         QTDCONFERENCIA,
+        //         dadosdetalheot,
+        //         IDRESUMOOT,
+        //         IDSTATUSOT,
+        //         IDUSRAJUSTE,
+        //         DTAJUSTE,
+        //         QTDTOTALITENSAJUSTE,
+        //         CONFEREITENS,
+        //         IDROTINA,
+        //         DATAENTREGA
+        //     } = req.body;
+        //     const response = await axios.post(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs`,{
+        //     IDEMPRESAORIGEM,
+        //     IDEMPRESADESTINO,
+        //     DATAEXPEDICAO,
+        //     IDOPERADOREXPEDICAO,
+        //     NUTOTALITENS,
+        //     QTDTOTALITENS,
+        //     QTDTOTALITENSRECEPCIONADO,
+        //     QTDTOTALITENSDIVERGENCIA,
+        //     NUTOTALVOLUMES,
+        //     TPVOLUME,
+        //     VRTOTALCUSTO,
+        //     VRTOTALVENDA,
+        //     DTRECEPCAO,
+        //     IDOPERADORRECEPTOR,
+        //     DSOBSERVACAO,
+        //     IDUSRCANCELAMENTO,
+        //     DTULTALTERACAO,
+        //     IDSTDIVERGENCIA,
+        //     OBSDIVERGENCIA,
+        //     STEMISSAONFE,
+        //     NUMERONFE,
+        //     STENTRADAINVENTARIO,
+        //     QTDCONFERENCIA,
+        //     dadosdetalheot,
+        //     IDRESUMOOT,
+        //     IDSTATUSOT,
+        //     IDUSRAJUSTE,
+        //     DTAJUSTE,
+        //     QTDTOTALITENSAJUSTE,
+        //     CONFEREITENS,
+        //     IDROTINA,
+        //     DATAENTREGA,
+        // });
+      
+        // return res.status(200).json(response.data);
             const {error, value} = criarOTSchema.validate(req.body, {
                 abortEarly: false,
                 stripUnknown: true
@@ -421,11 +491,11 @@ class ExpedicaoControllers {
                     }))
                 });
             }
-
+        
             const response = await otService.createOT(
+                    value.IDRESUMOOT,
                     value.IDEMPRESAORIGEM,
                     value.IDEMPRESADESTINO,
-                    value.DATAEXPEDICAO,
                     value.IDOPERADOREXPEDICAO,
                     value.NUTOTALITENS,
                     value.QTDTOTALITENS,
@@ -439,22 +509,18 @@ class ExpedicaoControllers {
                     value.IDOPERADORRECEPTOR,
                     value.DSOBSERVACAO,
                     value.IDUSRCANCELAMENTO,
-                    value.DTULTALTERACAO,
                     value.IDSTDIVERGENCIA,
                     value.OBSDIVERGENCIA,
                     value.STEMISSAONFE,
                     value.NUMERONFE,
                     value.STENTRADAINVENTARIO,
                     value.QTDCONFERENCIA,
-                    value.dadosdetalheot,
-                    value.IDRESUMOOT,
                     value.IDSTATUSOT,
                     value.IDUSRAJUSTE,
                     value.DTAJUSTE,
                     value.QTDTOTALITENSAJUSTE,
-                    value.CONFEREITENS,
-                    value.IDROTINA,
-                    value.DATAENTREGA
+                    value.dadosdetalheot,
+
     
             );
     
@@ -465,12 +531,12 @@ class ExpedicaoControllers {
             if(!value.IDEMPRESAORIGEM) {
                 return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
             }
-           
+           console.log('response', response);
             return res.status(200).json(response);
         } catch(error) {
-            console.log('Erro ao atualizar ordem de transferência:', error);
-            return res.status(500).json({message: 'Erro ao atualizar ordem de transferência.'});
-            
+            console.log('Erro ao criar ordem de transferência:', error);
+            return res.status(500).json({message: 'Erro ao criar ordem de transferência.'});
+
         }
     }
 }

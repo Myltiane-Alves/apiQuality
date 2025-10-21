@@ -4,9 +4,9 @@ export class OTService {
     }
 
     async createOT(
+        IDRESUMOOT,
         IDEMPRESAORIGEM,
         IDEMPRESADESTINO,
-        DATAEXPEDICAO,
         IDOPERADOREXPEDICAO,
         NUTOTALITENS,
         QTDTOTALITENS,
@@ -20,23 +20,92 @@ export class OTService {
         IDOPERADORRECEPTOR,
         DSOBSERVACAO,
         IDUSRCANCELAMENTO,
-        DTULTALTERACAO,
         IDSTDIVERGENCIA,
         OBSDIVERGENCIA,
         STEMISSAONFE,
         NUMERONFE,
         STENTRADAINVENTARIO,
         QTDCONFERENCIA,
-        dadosdetalheot,
-        IDRESUMOOT,
         IDSTATUSOT,
         IDUSRAJUSTE,
         DTAJUSTE,
         QTDTOTALITENSAJUSTE,
-        CONFEREITENS,
-        IDROTINA,
-        DATAENTREGA
+        dadosdetalheot,
     ){
+        if(!IDEMPRESAORIGEM) {
+            throw new Error("IDEMPRESAORIGEM is required, services");
+        }
+        console.log("IDEMPRESAORIGEM", IDEMPRESAORIGEM)
+
+        if(!IDEMPRESADESTINO) {
+            throw new Error("IDEMPRESADESTINO is required, services");
+        }
+
+        const result = await this.client.criarOT(
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            IDEMPRESADESTINO,
+            IDOPERADOREXPEDICAO,
+            NUTOTALITENS,
+            QTDTOTALITENS,
+            QTDTOTALITENSRECEPCIONADO,
+            QTDTOTALITENSDIVERGENCIA,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            VRTOTALCUSTO,
+            VRTOTALVENDA,
+            DTRECEPCAO,
+            IDOPERADORRECEPTOR,
+            DSOBSERVACAO,
+            IDUSRCANCELAMENTO,
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            STEMISSAONFE,
+            NUMERONFE,
+            STENTRADAINVENTARIO,
+            QTDCONFERENCIA,
+            IDSTATUSOT,
+            IDUSRAJUSTE,
+            DTAJUSTE,
+            QTDTOTALITENSAJUSTE,
+            dadosdetalheot,
+        )
+        return result;
+    }
+
+    async updateOT(
+         IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            IDEMPRESADESTINO,
+            IDOPERADOREXPEDICAO,
+            NUTOTALITENS,
+            QTDTOTALITENS,
+            QTDTOTALITENSRECEPCIONADO,
+            QTDTOTALITENSDIVERGENCIA,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            VRTOTALCUSTO,
+            VRTOTALVENDA,
+            DTRECEPCAO,
+            IDOPERADORRECEPTOR,
+            DSOBSERVACAO,
+            IDUSRCANCELAMENTO,
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            STEMISSAONFE,
+            NUMERONFE,
+            STENTRADAINVENTARIO,
+            QTDCONFERENCIA,
+            IDSTATUSOT,
+            IDUSRAJUSTE,
+            DTAJUSTE,
+            QTDTOTALITENSAJUSTE,
+            dadosdetalheot,
+    ) {
+        if(!IDRESUMOOT) {
+            throw new Error("IDRESUMOOT is required");
+        }
+        
         if(!IDEMPRESAORIGEM) {
             throw new Error("IDEMPRESAORIGEM is required");
         }
@@ -44,87 +113,11 @@ export class OTService {
         if(!IDEMPRESADESTINO) {
             throw new Error("IDEMPRESADESTINO is required");
         }
-
-        const result = await this.client.criarOT(
-            IDEMPRESAORIGEM,
-            IDEMPRESADESTINO,
-            DATAEXPEDICAO,
-            IDOPERADOREXPEDICAO,
-            NUTOTALITENS,
-            QTDTOTALITENS,
-            QTDTOTALITENSRECEPCIONADO,
-            QTDTOTALITENSDIVERGENCIA,
-            NUTOTALVOLUMES,
-            TPVOLUME,
-            VRTOTALCUSTO,
-            VRTOTALVENDA,
-            DTRECEPCAO,
-            IDOPERADORRECEPTOR,
-            DSOBSERVACAO,
-            IDUSRCANCELAMENTO,
-            DTULTALTERACAO,
-            IDSTDIVERGENCIA,
-            OBSDIVERGENCIA,
-            STEMISSAONFE,
-            NUMERONFE,
-            STENTRADAINVENTARIO,
-            QTDCONFERENCIA,
-            dadosdetalheot,
-            IDRESUMOOT,
-            IDSTATUSOT,
-            IDUSRAJUSTE,
-            DTAJUSTE,
-            QTDTOTALITENSAJUSTE,
-            CONFEREITENS,
-            IDROTINA,
-            DATAENTREGA
-        )
-        return result;
-    }
-
-    async updateOT(
-        IDRESUMOOT,
-        IDEMPRESAORIGEM,
-        IDEMPRESADESTINO,
-        DATAEXPEDICAO,
-        IDOPERADOREXPEDICAO,
-        NUTOTALITENS,
-        QTDTOTALITENS,
-        QTDTOTALITENSRECEPCIONADO,
-        QTDTOTALITENSDIVERGENCIA,
-        NUTOTALVOLUMES,
-        TPVOLUME,
-        VRTOTALCUSTO,
-        VRTOTALVENDA,
-        DTRECEPCAO,
-        IDOPERADORRECEPTOR,
-        DSOBSERVACAO,
-        IDUSRCANCELAMENTO,
-        DTULTALTERACAO,
-        IDSTDIVERGENCIA,
-        OBSDIVERGENCIA,
-        STEMISSAONFE,
-        NUMERONFE,
-        STENTRADAINVENTARIO,
-        QTDCONFERENCIA,
-        dadosdetalheot,
-        IDSTATUSOT,
-        IDUSRAJUSTE,
-        DTAJUSTE,
-        QTDTOTALITENSAJUSTE,
-        CONFEREITENS,
-        IDROTINA,
-        DATAENTREGA,
-    ) {
-        if(!IDRESUMOOT) {
-            throw new Error("IDRESUMOOT is required");
-        }
-
+        
         const result = await this.client.atualizarOT(
             IDRESUMOOT,
             IDEMPRESAORIGEM,
             IDEMPRESADESTINO,
-            DATAEXPEDICAO,
             IDOPERADOREXPEDICAO,
             NUTOTALITENS,
             QTDTOTALITENS,
@@ -138,21 +131,17 @@ export class OTService {
             IDOPERADORRECEPTOR,
             DSOBSERVACAO,
             IDUSRCANCELAMENTO,
-            DTULTALTERACAO,
             IDSTDIVERGENCIA,
             OBSDIVERGENCIA,
             STEMISSAONFE,
             NUMERONFE,
             STENTRADAINVENTARIO,
             QTDCONFERENCIA,
-            dadosdetalheot,
             IDSTATUSOT,
             IDUSRAJUSTE,
             DTAJUSTE,
             QTDTOTALITENSAJUSTE,
-            CONFEREITENS,
-            IDROTINA,
-            DATAENTREGA,
+            dadosdetalheot,
         )
         return result;
     }
