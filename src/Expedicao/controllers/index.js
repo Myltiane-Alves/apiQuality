@@ -353,9 +353,9 @@ class ExpedicaoControllers {
      
 
             const response = await otService.updateOT(
+                    value.IDRESUMOOT,
                     value.IDEMPRESAORIGEM,
                     value.IDEMPRESADESTINO,
-                    value.DATAEXPEDICAO,
                     value.IDOPERADOREXPEDICAO,
                     value.NUTOTALITENS,
                     value.QTDTOTALITENS,
@@ -369,22 +369,17 @@ class ExpedicaoControllers {
                     value.IDOPERADORRECEPTOR,
                     value.DSOBSERVACAO,
                     value.IDUSRCANCELAMENTO,
-                    value.DTULTALTERACAO,
                     value.IDSTDIVERGENCIA,
                     value.OBSDIVERGENCIA,
                     value.STEMISSAONFE,
                     value.NUMERONFE,
                     value.STENTRADAINVENTARIO,
                     value.QTDCONFERENCIA,
-                    value.dadosdetalheot,
-                    value.IDRESUMOOT,
                     value.IDSTATUSOT,
                     value.IDUSRAJUSTE,
                     value.DTAJUSTE,
                     value.QTDTOTALITENSAJUSTE,
-                    value.CONFEREITENS,
-                    value.IDROTINA,
-                    value.DATAENTREGA
+                    value.dadosdetalheot,
     
             );
     

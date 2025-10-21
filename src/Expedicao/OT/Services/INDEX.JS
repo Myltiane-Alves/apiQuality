@@ -31,13 +31,13 @@ export class OTService {
         DTAJUSTE,
         QTDTOTALITENSAJUSTE,
         dadosdetalheot,
-    ){
-        if(!IDEMPRESAORIGEM) {
+    ) {
+        if (!IDEMPRESAORIGEM) {
             throw new Error("IDEMPRESAORIGEM is required, services");
         }
         console.log("IDEMPRESAORIGEM", IDEMPRESAORIGEM)
 
-        if(!IDEMPRESADESTINO) {
+        if (!IDEMPRESADESTINO) {
             throw new Error("IDEMPRESADESTINO is required, services");
         }
 
@@ -74,46 +74,46 @@ export class OTService {
     }
 
     async updateOT(
-         IDRESUMOOT,
-            IDEMPRESAORIGEM,
-            IDEMPRESADESTINO,
-            IDOPERADOREXPEDICAO,
-            NUTOTALITENS,
-            QTDTOTALITENS,
-            QTDTOTALITENSRECEPCIONADO,
-            QTDTOTALITENSDIVERGENCIA,
-            NUTOTALVOLUMES,
-            TPVOLUME,
-            VRTOTALCUSTO,
-            VRTOTALVENDA,
-            DTRECEPCAO,
-            IDOPERADORRECEPTOR,
-            DSOBSERVACAO,
-            IDUSRCANCELAMENTO,
-            IDSTDIVERGENCIA,
-            OBSDIVERGENCIA,
-            STEMISSAONFE,
-            NUMERONFE,
-            STENTRADAINVENTARIO,
-            QTDCONFERENCIA,
-            IDSTATUSOT,
-            IDUSRAJUSTE,
-            DTAJUSTE,
-            QTDTOTALITENSAJUSTE,
-            dadosdetalheot,
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        IDEMPRESADESTINO,
+        IDOPERADOREXPEDICAO,
+        NUTOTALITENS,
+        QTDTOTALITENS,
+        QTDTOTALITENSRECEPCIONADO,
+        QTDTOTALITENSDIVERGENCIA,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        VRTOTALCUSTO,
+        VRTOTALVENDA,
+        DTRECEPCAO,
+        IDOPERADORRECEPTOR,
+        DSOBSERVACAO,
+        IDUSRCANCELAMENTO,
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        STEMISSAONFE,
+        NUMERONFE,
+        STENTRADAINVENTARIO,
+        QTDCONFERENCIA,
+        IDSTATUSOT,
+        IDUSRAJUSTE,
+        DTAJUSTE,
+        QTDTOTALITENSAJUSTE,
+        dadosdetalheot,
     ) {
-        if(!IDRESUMOOT) {
+        if (!IDRESUMOOT) {
             throw new Error("IDRESUMOOT is required");
         }
-        
-        if(!IDEMPRESAORIGEM) {
+
+        if (!IDEMPRESAORIGEM) {
             throw new Error("IDEMPRESAORIGEM is required");
         }
 
-        if(!IDEMPRESADESTINO) {
+        if (!IDEMPRESADESTINO) {
             throw new Error("IDEMPRESADESTINO is required");
         }
-        
+
         const result = await this.client.atualizarOT(
             IDRESUMOOT,
             IDEMPRESAORIGEM,
