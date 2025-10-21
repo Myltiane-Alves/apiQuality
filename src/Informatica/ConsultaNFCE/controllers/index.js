@@ -450,6 +450,8 @@ class ConsultaNfeController {
       return res.status(500).json({ error: err.message });
     }
   }
+
+  
   // async validarConsultar(req, res) {
   //   try {
   //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
