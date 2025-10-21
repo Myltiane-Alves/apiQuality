@@ -8,7 +8,6 @@ import os from 'os';
 import 'dotenv/config';
 
 
-
 /**
  * Carrega opções de certificado para passar ao constructor de Tools.
  * Suporta, na ordem de preferência:
