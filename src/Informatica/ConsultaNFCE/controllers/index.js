@@ -318,15 +318,8 @@ class ConsultaNfeController {
 
    async validarConsultar(req, res) {
     try {
-      // Certificado usando apenas variáveis de ambiente PEM (sem dependência de arquivo .pfx)
-      const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
-      const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
-
-      if (!pemCertBase64 || !pemKeyBase64) {
-        return res.status(500).json({ 
-          error: 'Certificados PEM não configurados. Configure CERT_PEM_CERT_BASE64 e CERT_PEM_KEY_BASE64 nas variáveis de ambiente.' 
-        });
-      }
+      const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
+      const SENHA = '#senhagto2024#';
 
       // Pega vendas do body.vendas ou busca na API se não informado
       let vendas = req.body?.vendas;
@@ -359,10 +352,7 @@ class ConsultaNfeController {
         return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
       }
 
-      // Prepara certificado PEM direto das variáveis de ambiente
-      const certBuf = Buffer.from(pemCertBase64, 'base64');
-      const keyBuf = Buffer.from(pemKeyBase64, 'base64');
-      const certOptions = { cert: certBuf, key: keyBuf };
+      const certOptions = await getCertOptions(SENHA, CERTIFICADO);
       let processados = 0;
       const resultados = [];
 
@@ -384,7 +374,7 @@ class ConsultaNfeController {
             versao: '4.00',
             xmllint: '../libxml/bin/xmllint.exe',
           };
-          const myTools = new Tools(toolsOpts, certOptions);
+          const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
 
           const resposta = await myTools.consultarNFe(CHAVE);
           const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
@@ -450,8 +440,6 @@ class ConsultaNfeController {
       return res.status(500).json({ error: err.message });
     }
   }
-
-  
   // async validarConsultar(req, res) {
   //   try {
   //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
