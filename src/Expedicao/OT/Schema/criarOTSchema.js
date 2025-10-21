@@ -98,7 +98,7 @@ const criarOTSchema = Joi.object({
     .messages({
         "number.base": "A quantidade de conferência deve ser um número"
     }),
-    dadosDetalheot: Joi.array().items(
+    dadosdetalheot: Joi.array().items(
         Joi.object({
             IDPRODUTO: Joi.number().required()
             .messages({
