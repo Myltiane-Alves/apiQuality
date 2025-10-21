@@ -5,11 +5,9 @@ import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
+import 'dotenv/config';
 
-function extrairCStat(xml) {
-  const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
-  return match ? match[1] : 'SEM_CSTAT';
-}
+
 
 /**
  * Carrega opções de certificado para passar ao constructor de Tools.
@@ -96,10 +94,21 @@ async function getCertOptions() {
   const pfxBase64 = process.env.CERT_PFX_BASE64;
   const senha = process.env.CERT_SENHA;
 
-  if (!pfxBase64) throw new Error('Certificado não configurado.');
+  if (!pfxBase64) {
+    throw new Error("Certificado (CERT_PFX_BASE64) não configurado nas variáveis de ambiente.");
+  }
 
-  const pfxBuffer = Buffer.from(pfxBase64, 'base64');
+  const pfxBuffer = Buffer.from(pfxBase64, "base64");
   return { pfx: pfxBuffer, senha };
+}
+
+/**
+ * Extrai o código cStat de uma resposta XML da SEFAZ
+ */
+function extrairCStat(xml) {
+  if (!xml) return null;
+  const match = xml.match(/<cStat>(\d+)<\/cStat>/);
+  return match ? match[1] : null;
 }
 
 class ConsultaNfeController {
