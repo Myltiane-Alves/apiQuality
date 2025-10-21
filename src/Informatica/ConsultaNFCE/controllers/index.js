@@ -89,15 +89,35 @@ import 'dotenv/config';
 //   return null;
 // }
 
-async function getCertOptions() {
-  const pfxBase64 = process.env.CERT_PFX_BASE64;
-  const senha = process.env.CERT_SENHA;
-
-  if (!pfxBase64) {
-    throw new Error("Certificado (CERT_PFX_BASE64) não configurado nas variáveis de ambiente.");
+function getXmllintPath() {
+  const localPath = path.resolve("../libxml/bin/xmllint.exe");
+  if (fs.existsSync(localPath)) {
+    return localPath;
   }
 
+  // Na Vercel, o binário não existe — apenas evita crash
+  console.warn("⚠️ xmllint não encontrado neste ambiente (Vercel).");
+  return null;
+}
+
+async function getCertOptions() {
+  let pfxBase64;
+
+  // 🔹 Tenta primeiro carregar da variável de ambiente
+  if (process.env.CERT_PFX_BASE64) {
+    pfxBase64 = process.env.CERT_PFX_BASE64;
+  } else {
+    // 🔹 Caso esteja localmente, lê o arquivo cert_base64.txt
+    const filePath = "./cert_base64.txt";
+    if (!fs.existsSync(filePath)) {
+      throw new Error("Arquivo cert_base64.txt não encontrado.");
+    }
+    pfxBase64 = fs.readFileSync(filePath, "utf8").trim();
+  }
+
+  const senha = process.env.CERT_SENHA || "#senhagto2024#";
   const pfxBuffer = Buffer.from(pfxBase64, "base64");
+
   return { pfx: pfxBuffer, senha };
 }
 
@@ -336,102 +356,75 @@ class ConsultaNfeController {
 
   
   async validarConsultar(req, res) {
-    try {
-      const certOptions = await getCertOptions();
-      const SENHA = process.env.CERT_SENHA;
+  try {
+    const certOptions = await getCertOptions();
+    let vendas = req.body?.vendas;
 
-      // Vendas enviadas no body ou buscadas via API se não houver
-      let vendas = req.body?.vendas;
-      if (!vendas) {
-        const apiUrl =
-          "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs";
-        const response = await axios.get(apiUrl);
-        vendas = response.data;
+    // Se não vier vendas no body, busca via API
+    if (!vendas) {
+      const apiUrl =
+        "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs";
+      const response = await axios.get(apiUrl);
+      vendas = response.data;
+    }
+
+    if (vendas && !Array.isArray(vendas)) {
+      vendas =
+        vendas.data ||
+        vendas.rows ||
+        (vendas.data?.rows ?? Object.values(vendas).find(Array.isArray));
+    }
+
+    if (!Array.isArray(vendas) || vendas.length === 0)
+      return res.status(400).json({ error: "Nenhuma venda para consultar." });
+
+    const resultados = [];
+    let processados = 0;
+
+    for (const row of vendas) {
+      const IDVENDA = String(row.IDVENDA ?? "").trim();
+      const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
+      const CHAVE = String(row.CHAVE ?? "").trim();
+
+      if (!CHAVE) {
+        resultados.push({ IDVENDA, UF, CHAVE, error: "CHAVE ausente" });
+        continue;
       }
 
-      // Normaliza formatos possíveis
-      if (vendas && !Array.isArray(vendas)) {
-        if (Array.isArray(vendas.data)) vendas = vendas.data;
-        else if (Array.isArray(vendas.rows)) vendas = vendas.rows;
-        else if (vendas.data && Array.isArray(vendas.data.rows)) vendas = vendas.data.rows;
-        else {
-          const possibleArray = Object.values(vendas).find((v) => Array.isArray(v));
-          if (Array.isArray(possibleArray)) vendas = possibleArray;
-        }
-      }
+      try {
+        const xmllintPath = getXmllintPath();
 
-      if (!Array.isArray(vendas) || vendas.length === 0) {
-        return res.status(400).json({ error: "Nenhuma venda para consultar." });
-      }
-
-      const resultados = [];
-      let processados = 0;
-
-      for (const row of vendas) {
-        const IDVENDA = String(row.IDVENDA ?? "").trim();
-        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
-        const CHAVE = String(row.CHAVE ?? "").trim();
-
-        if (!CHAVE) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: "CHAVE ausente" });
-          continue;
-        }
-
-        try {
-          const toolsOpts = {
+        const myTools = new Tools(
+          {
             mod: "55",
-            tpAmb: 1,
+            tpAmb: 1, // 1=Produção | 2=Homologação
             UF,
             versao: "4.00",
-            xmllint: "../libxml/bin/xmllint.exe",
-          };
+            xmllint: xmllintPath,
+          },
+          certOptions
+        );
+        // console.log(certOptions, 'certOptions');
+        const resposta = await myTools.consultarNFe(CHAVE);
+        const xml = resposta?.xml ?? resposta;
+        console.log(`✅${xml} e ${resposta}`);
+        const cstat =
+          resposta?.retConsSitNFe?.cStat ?? extrairCStat(xml) ?? "SEM_CSTAT";
 
-          const myTools = new Tools(toolsOpts, certOptions);
-          const resposta = await myTools.consultarNFe(CHAVE);
-
-          const xmlContent = resposta?.xml ?? resposta;
-          const cstat =
-            resposta?.retConsSitNFe?.cStat ??
-            extrairCStat(xmlContent) ??
-            "SEM_CSTAT";
-
-          resultados.push({
-            IDVENDA,
-            UF,
-            CHAVE,
-            CSTAT: cstat,
-            XML: xmlContent,
-          });
-
-          processados++;
-        } catch (errInner) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: errInner.message });
-        }
+        resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
+        processados++;
+      } catch (err) {
+        resultados.push({ IDVENDA, UF, CHAVE, error: err.message });
       }
-
-      // Resumo dos resultados
-      const statSummary = {};
-      resultados.forEach((r) => {
-        const stat = r.error ? "ERROR" : r.CSTAT || "NO_CSTAT";
-        statSummary[stat] = (statSummary[stat] || 0) + 1;
-      });
-
-      console.log("=== RESUMO POR STATUS ===");
-      Object.entries(statSummary).forEach(([stat, count]) => {
-        console.log(`${stat}: ${count}`);
-      });
-
-      // Retorno final
-      return res.json({
-        total: resultados.length,
-        processados,
-        data: resultados,
-      });
-    } catch (err) {
-      console.error("❌ Erro geral:", err.message);
-      return res.status(500).json({ error: err.message });
     }
+    console.log(`✅ Processados ${processados} de ${vendas.length} vendas.`);
+    return res.json({ total: resultados.length, processados, data: resultados });
+  } catch (err) {
+    console.error("❌ Erro geral:", err.message);
+    return res.status(500).json({ error: err.message });
   }
+}
+
   // async validarConsultar(req, res) {
   //   try {
   //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
