@@ -398,7 +398,7 @@ class ConsultaNfeController {
           {
             mod: "55",
             tpAmb: 1, // 1=Produção | 2=Homologação
-            UF,
+            UF: UF,
             versao: "4.00",
             xmllint: xmllintPath,
           },
@@ -407,7 +407,7 @@ class ConsultaNfeController {
         // console.log(certOptions, 'certOptions');
         const resposta = await myTools.consultarNFe(CHAVE);
         const xml = resposta?.xml ?? resposta;
-        console.log(`✅${xml} e ${resposta}`);
+        console.log(`✅${xml?.xml} e ${resposta}`);
         const cstat =
           resposta?.retConsSitNFe?.cStat ?? extrairCStat(xml) ?? "SEM_CSTAT";
 
