@@ -20,76 +20,86 @@ function extrairCStat(xml) {
  *  - PEM via caminhos process.env.CERT_PEM_CERT_PATH / process.env.CERT_PEM_KEY_PATH
  * Retorna um objeto que pode ser passado como 2º argumento do Tools, por exemplo { pfx: Buffer, senha } ou { cert: Buffer, key: Buffer }
  */
-async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
-  // 1) PFX via env base64
+// async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
+//   // 1) PFX via env base64
+//   const pfxBase64 = process.env.CERT_PFX_BASE64;
+//   if (pfxBase64) {
+//     try {
+//       const pfxBuf = Buffer.from(pfxBase64, 'base64');
+//       // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
+//       try {
+//         const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+//         fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
+//         process.env.CERT_PFX_PATH = tmpPath;
+//       } catch (e) {
+//         // se não gravar, não é crítico — ainda temos o buffer
+//         console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
+//       }
+//       return { pfx: pfxBuf, senha };
+//     } catch (e) {
+//       console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
+//     }
+//   }
+
+//   // 2) PFX arquivo local
+//   if (fs.existsSync(fallbackPfxPath)) {
+//     try {
+//       const pfxBuf = fs.readFileSync(fallbackPfxPath);
+//       process.env.CERT_PFX_PATH = fallbackPfxPath;
+//       return { pfx: pfxBuf, senha };
+//     } catch (e) {
+//       console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
+//     }
+//   }
+
+//   // 3) PEM via envs base64
+//   const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
+//   const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
+//   if (pemCertBase64 && pemKeyBase64) {
+//     try {
+//       const certBuf = Buffer.from(pemCertBase64, 'base64');
+//       const keyBuf = Buffer.from(pemKeyBase64, 'base64');
+//       try {
+//         const certPath = path.join(os.tmpdir(), 'cert.pem');
+//         const keyPath = path.join(os.tmpdir(), 'key.pem');
+//         fs.writeFileSync(certPath, certBuf, { flag: 'w' });
+//         fs.writeFileSync(keyPath, keyBuf, { flag: 'w' });
+//         process.env.CERT_PEM_CERT_PATH = certPath;
+//         process.env.CERT_PEM_KEY_PATH = keyPath;
+//       } catch (e) {
+//         console.warn('getCertOptions: não foi possível gravar PEMs em tmp:', e?.message || e);
+//       }
+//       return { cert: certBuf, key: keyBuf };
+//     } catch (e) {
+//       console.error('getCertOptions: falha ao decodificar CERT_PEM_*_BASE64:', e?.message || e);
+//     }
+//   }
+
+//   // 4) PEM via caminhos já apontados no ambiente
+//   const certPathEnv = process.env.CERT_PEM_CERT_PATH;
+//   const keyPathEnv = process.env.CERT_PEM_KEY_PATH;
+//   if (certPathEnv && keyPathEnv && fs.existsSync(certPathEnv) && fs.existsSync(keyPathEnv)) {
+//     try {
+//       const certBuf = fs.readFileSync(certPathEnv);
+//       const keyBuf = fs.readFileSync(keyPathEnv);
+//       return { cert: certBuf, key: keyBuf };
+//     } catch (e) {
+//       console.warn('getCertOptions: falha ao ler PEMs dos caminhos apontados:', e?.message || e);
+//     }
+//   }
+
+//   // nada encontrado
+//   return null;
+// }
+
+async function getCertOptions() {
   const pfxBase64 = process.env.CERT_PFX_BASE64;
-  if (pfxBase64) {
-    try {
-      const pfxBuf = Buffer.from(pfxBase64, 'base64');
-      // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
-      try {
-        const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
-        fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
-        process.env.CERT_PFX_PATH = tmpPath;
-      } catch (e) {
-        // se não gravar, não é crítico — ainda temos o buffer
-        console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
-      }
-      return { pfx: pfxBuf, senha };
-    } catch (e) {
-      console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
-    }
-  }
+  const senha = process.env.CERT_SENHA;
 
-  // 2) PFX arquivo local
-  if (fs.existsSync(fallbackPfxPath)) {
-    try {
-      const pfxBuf = fs.readFileSync(fallbackPfxPath);
-      process.env.CERT_PFX_PATH = fallbackPfxPath;
-      return { pfx: pfxBuf, senha };
-    } catch (e) {
-      console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
-    }
-  }
+  if (!pfxBase64) throw new Error('Certificado não configurado.');
 
-  // 3) PEM via envs base64
-  const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
-  const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
-  if (pemCertBase64 && pemKeyBase64) {
-    try {
-      const certBuf = Buffer.from(pemCertBase64, 'base64');
-      const keyBuf = Buffer.from(pemKeyBase64, 'base64');
-      try {
-        const certPath = path.join(os.tmpdir(), 'cert.pem');
-        const keyPath = path.join(os.tmpdir(), 'key.pem');
-        fs.writeFileSync(certPath, certBuf, { flag: 'w' });
-        fs.writeFileSync(keyPath, keyBuf, { flag: 'w' });
-        process.env.CERT_PEM_CERT_PATH = certPath;
-        process.env.CERT_PEM_KEY_PATH = keyPath;
-      } catch (e) {
-        console.warn('getCertOptions: não foi possível gravar PEMs em tmp:', e?.message || e);
-      }
-      return { cert: certBuf, key: keyBuf };
-    } catch (e) {
-      console.error('getCertOptions: falha ao decodificar CERT_PEM_*_BASE64:', e?.message || e);
-    }
-  }
-
-  // 4) PEM via caminhos já apontados no ambiente
-  const certPathEnv = process.env.CERT_PEM_CERT_PATH;
-  const keyPathEnv = process.env.CERT_PEM_KEY_PATH;
-  if (certPathEnv && keyPathEnv && fs.existsSync(certPathEnv) && fs.existsSync(keyPathEnv)) {
-    try {
-      const certBuf = fs.readFileSync(certPathEnv);
-      const keyBuf = fs.readFileSync(keyPathEnv);
-      return { cert: certBuf, key: keyBuf };
-    } catch (e) {
-      console.warn('getCertOptions: falha ao ler PEMs dos caminhos apontados:', e?.message || e);
-    }
-  }
-
-  // nada encontrado
-  return null;
+  const pfxBuffer = Buffer.from(pfxBase64, 'base64');
+  return { pfx: pfxBuffer, senha };
 }
 
 class ConsultaNfeController {
@@ -316,127 +326,101 @@ class ConsultaNfeController {
   //   }
   // }
 
-   async validarConsultar(req, res) {
+  
+  async validarConsultar(req, res) {
     try {
-      const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
-      const SENHA = '#senhagto2024#';
+      const certOptions = await getCertOptions();
+      const SENHA = process.env.CERT_SENHA;
 
-      // Pega vendas do body.vendas ou busca na API se não informado
+      // Vendas enviadas no body ou buscadas via API se não houver
       let vendas = req.body?.vendas;
       if (!vendas) {
-        const apiUrl = 'http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs';
+        const apiUrl =
+          "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs";
         const response = await axios.get(apiUrl);
         vendas = response.data;
-        // console.log('Vendas buscadas da API (raw):', vendas);
       }
 
-      // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+      // Normaliza formatos possíveis
       if (vendas && !Array.isArray(vendas)) {
-        if (Array.isArray(vendas.data)) {
-          vendas = vendas.data;
-        } else if (Array.isArray(vendas.rows)) {
-          vendas = vendas.rows;
-        } else if (vendas.data && Array.isArray(vendas.data.rows)) {
-          vendas = vendas.data.rows;
-        } else {
-          // tenta encontrar a primeira propriedade que é array
-          const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
-          if (Array.isArray(possibleArray)) {
-            vendas = possibleArray;
-          }
+        if (Array.isArray(vendas.data)) vendas = vendas.data;
+        else if (Array.isArray(vendas.rows)) vendas = vendas.rows;
+        else if (vendas.data && Array.isArray(vendas.data.rows)) vendas = vendas.data.rows;
+        else {
+          const possibleArray = Object.values(vendas).find((v) => Array.isArray(v));
+          if (Array.isArray(possibleArray)) vendas = possibleArray;
         }
-        console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
       }
 
       if (!Array.isArray(vendas) || vendas.length === 0) {
-        return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
+        return res.status(400).json({ error: "Nenhuma venda para consultar." });
       }
 
-      const certOptions = await getCertOptions(SENHA, CERTIFICADO);
-      let processados = 0;
       const resultados = [];
+      let processados = 0;
 
       for (const row of vendas) {
-        const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
-        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
-        const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
+        const IDVENDA = String(row.IDVENDA ?? "").trim();
+        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
+        const CHAVE = String(row.CHAVE ?? "").trim();
 
         if (!CHAVE) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
+          resultados.push({ IDVENDA, UF, CHAVE, error: "CHAVE ausente" });
           continue;
         }
 
         try {
           const toolsOpts = {
-            mod: '55',
+            mod: "55",
             tpAmb: 1,
-            UF: UF,
-            versao: '4.00',
-            xmllint: '../libxml/bin/xmllint.exe',
+            UF,
+            versao: "4.00",
+            xmllint: "../libxml/bin/xmllint.exe",
           };
-          const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
 
+          const myTools = new Tools(toolsOpts, certOptions);
           const resposta = await myTools.consultarNFe(CHAVE);
-          const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
-          const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
+
+          const xmlContent = resposta?.xml ?? resposta;
+          const cstat =
+            resposta?.retConsSitNFe?.cStat ??
+            extrairCStat(xmlContent) ??
+            "SEM_CSTAT";
 
           resultados.push({
             IDVENDA,
             UF,
             CHAVE,
-            cstat,
-            xml: xmlContent,
+            CSTAT: cstat,
+            XML: xmlContent,
           });
 
           processados++;
-        } catch (innerErr) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
+        } catch (errInner) {
+          resultados.push({ IDVENDA, UF, CHAVE, error: errInner.message });
         }
       }
-      
-      // Log detalhado dos resultados para análise
-      // console.log('=== RESULTADOS DETALHADOS ===');
-      // console.log('Total de resultados:', resultados.length);
-      // console.log('Processados:', processados);
-      
-      // resultados.forEach((r, index) => {
-      //   // console.log(`\n[${index + 1}] IDVENDA: ${r.IDVENDA}, UF: ${r.UF}, cStat: ${r.cstat}`);
-      //   if (r.error) {
-      //     console.log(`    ERROR: ${r.error}`);
-      //   } else {
-      //     console.log(`    CHAVE: ${r.CHAVE?.substring(0, 10)}...`);
-      //     console.log(`    XML length: ${r.xml} chars`);
-      //   }
-      // });
-      
-      // Resumo por cStat
+
+      // Resumo dos resultados
       const statSummary = {};
-      resultados.forEach(r => {
-        const stat = r.error ? 'ERROR' : (r.cstat || 'NO_CSTAT');
+      resultados.forEach((r) => {
+        const stat = r.error ? "ERROR" : r.CSTAT || "NO_CSTAT";
         statSummary[stat] = (statSummary[stat] || 0) + 1;
       });
-      // console.log('\n=== RESUMO POR STATUS ===');
-      // Object.entries(statSummary).forEach(([stat, count]) => {
-      //   console.log(`${stat}: ${count}`);
-      // });
-      // console.log('========================\n');
-      
-      // Retorna apenas os resultados consultados com CHAVE, IDVENDA, UF, CSTAT e XML
-      const responseData = resultados.map(r => ({
-        CHAVE: r.CHAVE,
-        IDVENDA: r.IDVENDA,
-        UF: r.UF,
-        CSTAT: r.cstat,
-        XML: r.xml,
-        ...(r.error && { ERROR: r.error })
-      }));
- 
+
+      console.log("=== RESUMO POR STATUS ===");
+      Object.entries(statSummary).forEach(([stat, count]) => {
+        console.log(`${stat}: ${count}`);
+      });
+
+      // Retorno final
       return res.json({
         total: resultados.length,
         processados,
-        data: responseData
+        data: resultados,
       });
     } catch (err) {
+      console.error("❌ Erro geral:", err.message);
       return res.status(500).json({ error: err.message });
     }
   }
