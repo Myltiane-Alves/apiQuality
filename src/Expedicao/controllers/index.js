@@ -3,6 +3,7 @@ import { dataFormatada } from "../../utils/dataFormatada.js";
 import 'dotenv/config';
 import { OTClient } from "../OT/Client/index.js";
 import { OTService } from "../OT/Services/index.js";
+import criarOTSchema from '../OT/Schema/criarOTSchema.js';
 // const url = process.env.API_URL;
 const url = 'http://164.152.245.77:8000/quality/concentrador_homologacao';
 const otClient = new OTClient(url);
@@ -414,92 +415,68 @@ class ExpedicaoControllers {
     }
 
     async postResumoOrdemTransferencia(req, res) {
-        let {
-            IDEMPRESAORIGEM,
-            IDEMPRESADESTINO,
-            DATAEXPEDICAO,
-            IDOPERADOREXPEDICAO,
-            NUTOTALITENS,
-            QTDTOTALITENS,
-            QTDTOTALITENSRECEPCIONADO,
-            QTDTOTALITENSDIVERGENCIA,
-            NUTOTALVOLUMES,
-            TPVOLUME,
-            VRTOTALCUSTO,
-            VRTOTALVENDA,
-            DTRECEPCAO,
-            IDOPERADORRECEPTOR,
-            DSOBSERVACAO,
-            IDUSRCANCELAMENTO,
-            DTULTALTERACAO,
-            IDSTDIVERGENCIA,
-            OBSDIVERGENCIA,
-            STEMISSAONFE,
-            NUMERONFE,
-            STENTRADAINVENTARIO,
-            QTDCONFERENCIA,
-            dadosdetalheot,
-            IDRESUMOOT,
-            IDSTATUSOT,
-            IDUSRAJUSTE,
-            DTAJUSTE,
-            QTDTOTALITENSAJUSTE,
-            CONFEREITENS,
-            IDROTINA,
-            DATAENTREGA,
-            
-        } = req.body;
         
-        // if(!IDRESUMOOT) {
-        //     return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
-        // }
-
-
-        if(!IDEMPRESADESTINO) {
-            return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
-        }
-
-        if(!IDEMPRESAORIGEM) {
-            return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
-        }
-
         try {
-            const response = await axios.post(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs`, {
-                IDEMPRESAORIGEM,
-                IDEMPRESADESTINO,
-                DATAEXPEDICAO,
-                IDOPERADOREXPEDICAO,
-                NUTOTALITENS,
-                QTDTOTALITENS,
-                QTDTOTALITENSRECEPCIONADO,
-                QTDTOTALITENSDIVERGENCIA,
-                NUTOTALVOLUMES,
-                TPVOLUME,
-                VRTOTALCUSTO,
-                VRTOTALVENDA,
-                DTRECEPCAO,
-                IDOPERADORRECEPTOR,
-                DSOBSERVACAO,
-                IDUSRCANCELAMENTO,
-                DTULTALTERACAO,
-                IDSTDIVERGENCIA,
-                OBSDIVERGENCIA,
-                STEMISSAONFE,
-                NUMERONFE,
-                STENTRADAINVENTARIO,
-                QTDCONFERENCIA,
-                dadosdetalheot,
-                IDRESUMOOT,
-                IDSTATUSOT,
-                IDUSRAJUSTE,
-                DTAJUSTE,
-                QTDTOTALITENSAJUSTE,
-                CONFEREITENS,
-                IDROTINA,
-                DATAENTREGA
-            })
-
-            return res.status(200).json({message: 'Ordem de transferência atualizada com sucesso!'});
+            const {error, value} = criarOTSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+    
+            if(error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+    
+            const response = await otService.criarOrdemTransferencia(
+                    value.IDEMPRESAORIGEM,
+                    value.IDEMPRESADESTINO,
+                    value.DATAEXPEDICAO,
+                    value.IDOPERADOREXPEDICAO,
+                    value.NUTOTALITENS,
+                    value.QTDTOTALITENS,
+                    value.QTDTOTALITENSRECEPCIONADO,
+                    value.QTDTOTALITENSDIVERGENCIA,
+                    value.NUTOTALVOLUMES,
+                    value.TPVOLUME,
+                    value.VRTOTALCUSTO,
+                    value.VRTOTALVENDA,
+                    value.DTRECEPCAO,
+                    value.IDOPERADORRECEPTOR,
+                    value.DSOBSERVACAO,
+                    value.IDUSRCANCELAMENTO,
+                    value.DTULTALTERACAO,
+                    value.IDSTDIVERGENCIA,
+                    value.OBSDIVERGENCIA,
+                    value.STEMISSAONFE,
+                    value.NUMERONFE,
+                    value.STENTRADAINVENTARIO,
+                    value.QTDCONFERENCIA,
+                    value.dadosdetalheot,
+                    value.IDRESUMOOT,
+                    value.IDSTATUSOT,
+                    value.IDUSRAJUSTE,
+                    value.DTAJUSTE,
+                    value.QTDTOTALITENSAJUSTE,
+                    value.CONFEREITENS,
+                    value.IDROTINA,
+                    value.DATAENTREGA
+    
+            );
+    
+            if(!value.IDEMPRESADESTINO) {
+                return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
+            }
+    
+            if(!value.IDEMPRESAORIGEM) {
+                return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
+            }
+           
+            return res.status(200).json(response);
         } catch(error) {
             console.log('Erro ao atualizar ordem de transferência:', error);
             return res.status(500).json({message: 'Erro ao atualizar ordem de transferência.'});
