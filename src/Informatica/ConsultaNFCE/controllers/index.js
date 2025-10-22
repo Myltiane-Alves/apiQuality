@@ -5,7 +5,6 @@ import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
-import 'dotenv/config';
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
@@ -215,18 +214,16 @@ class ConsultaNfeController {
     }
   }
 
+
   async validarConsultar(req, res) {
   try {
-    const CERTIFICADO_BASE64 = process.env.CERT_PFX_BASE64;
-    const SENHA = process.env.CERT_SENHA;
+    const CERTIFICADO_BASE64 =
+      process.env.CERTIFICADO_BASE64 ||
+      fs.readFileSync("./cert_base64.txt", "utf-8").trim();
 
-    if (!CERTIFICADO_BASE64 || !SENHA) {
-      return res.status(500).json({
-        error: "Variáveis CERT_PFX_BASE64 ou CERT_SENHA não configuradas no ambiente.",
-      });
-    }
+    const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
 
-    // Cria um arquivo temporário com o certificado no /tmp (único diretório gravável na Vercel)
+    // Salva o arquivo temporário do certificado (PFX)
     const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
     fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
 
@@ -237,15 +234,21 @@ class ConsultaNfeController {
       );
       vendas = response.data;
     }
-
-    // Normaliza o formato das vendas
+    
+    // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
     if (!Array.isArray(vendas)) {
-      if (Array.isArray(vendas.data)) vendas = vendas.data;
-      else if (Array.isArray(vendas.rows)) vendas = vendas.rows;
-      else if (vendas.data && Array.isArray(vendas.data.rows)) vendas = vendas.data.rows;
-      else {
-        const possibleArray = Object.values(vendas).find((v) => Array.isArray(v));
-        if (Array.isArray(possibleArray)) vendas = possibleArray;
+      if (Array.isArray(vendas.data)) {
+        vendas = vendas.data;
+      } else if (Array.isArray(vendas.rows)) {
+        vendas = vendas.rows;
+      } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+        vendas = vendas.data.rows;
+      } else {
+        // tenta encontrar a primeira propriedade que é array
+        const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+        if (Array.isArray(possibleArray)) {
+          vendas = possibleArray;
+        }
       }
     }
 
@@ -277,12 +280,14 @@ class ConsultaNfeController {
             tpAmb: 1,
             UF,
             versao: "4.00",
+            // caminho do xmllint (localmente você pode ajustar)
             xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
           },
           certOptions
         );
 
         const resposta = await tools.consultarNFe(CHAVE);
+       
         const xml = resposta ?? null;
         const cstat =
           resposta?.retConsSitNFe?.cStat ??
@@ -294,7 +299,7 @@ class ConsultaNfeController {
       }
     }
 
-    // Remove o arquivo temporário
+    // remove o arquivo temporário
     fs.unlinkSync(tempPfxPath);
 
     return res.json({
@@ -305,105 +310,7 @@ class ConsultaNfeController {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
-
-
-  // async validarConsultar(req, res) {
-  // try {
-  //   const CERTIFICADO_BASE64 =
-  //     process.env.CERTIFICADO_BASE64 ||
-  //     fs.readFileSync("./cert_base64.txt", "utf-8").trim();
-
-  //   const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
-
-  //   // Salva o arquivo temporário do certificado (PFX)
-  //   const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
-  //   fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
-
-  //   let vendas = req.body?.vendas;
-  //   if (!vendas) {
-  //     const response = await axios.get(
-  //       "http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs"
-  //     );
-  //     vendas = response.data;
-  //   }
-    
-  //   // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
-  //   if (!Array.isArray(vendas)) {
-  //     if (Array.isArray(vendas.data)) {
-  //       vendas = vendas.data;
-  //     } else if (Array.isArray(vendas.rows)) {
-  //       vendas = vendas.rows;
-  //     } else if (vendas.data && Array.isArray(vendas.data.rows)) {
-  //       vendas = vendas.data.rows;
-  //     } else {
-  //       // tenta encontrar a primeira propriedade que é array
-  //       const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
-  //       if (Array.isArray(possibleArray)) {
-  //         vendas = possibleArray;
-  //       }
-  //     }
-  //   }
-
-  //   if (!Array.isArray(vendas) || vendas.length === 0) {
-  //     return res.status(400).json({ error: "Nenhuma venda para consultar." });
-  //   }
-
-  //   const certOptions = {
-  //     pfx: fs.readFileSync(tempPfxPath),
-  //     senha: SENHA,
-  //   };
-
-  //   const resultados = [];
-
-  //   for (const row of vendas) {
-  //     const IDVENDA = String(row.IDVENDA ?? "").trim();
-  //     const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
-  //     const CHAVE = String(row.CHAVE ?? "").trim();
-
-  //     if (!CHAVE) {
-  //       resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
-  //       continue;
-  //     }
-
-  //     try {
-  //       const tools = new Tools(
-  //         {
-  //           mod: "55",
-  //           tpAmb: 1,
-  //           UF,
-  //           versao: "4.00",
-  //           // caminho do xmllint (localmente você pode ajustar)
-  //           xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-  //         },
-  //         certOptions
-  //       );
-
-  //       const resposta = await tools.consultarNFe(CHAVE);
-       
-  //       const xml = resposta ?? null;
-  //       const cstat =
-  //         resposta?.retConsSitNFe?.cStat ??
-  //         (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
-
-  //       resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
-  //     } catch (e) {
-  //       resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
-  //     }
-  //   }
-
-  //   // remove o arquivo temporário
-  //   fs.unlinkSync(tempPfxPath);
-
-  //   return res.json({
-  //     total: resultados.length,
-  //     processados: resultados.filter((r) => !r.error).length,
-  //     data: resultados,
-  //   });
-  // } catch (err) {
-  //   return res.status(500).json({ error: err.message });
-  // }
-  // } 
+  } 
 }
 
 export default new ConsultaNfeController();
