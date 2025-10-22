@@ -5,6 +5,7 @@ import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
+import 'dotenv/config';
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
