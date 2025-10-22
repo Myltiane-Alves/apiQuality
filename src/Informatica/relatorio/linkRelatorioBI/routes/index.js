@@ -4,7 +4,7 @@ import { Router } from "express";
 const routes = new Router();
 
 routes.post('/criarlinkRelatorioBI', LinkRelatorioBiController.postLinkRelatorioBi)
-routes.post('/linkRelatorioBI/:id', LinkRelatorioBiController.postLinkRelatorioBi)
+routes.put('/linkRelatorioBI/:id', LinkRelatorioBiController.postLinkRelatorioBi)
 
 
 export default routes;

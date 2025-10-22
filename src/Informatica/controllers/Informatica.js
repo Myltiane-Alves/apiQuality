@@ -14,7 +14,7 @@ import { getVendasAlloc } from "../vendas/repositories/vendasAlloc.js";
 import { getVendasContigencia } from "../vendas/repositories/vendasContigencia.js";
 import { getCliente } from "../cliente/repositories/cliente.js";
 import { createRelatarioBI, getRelatorioBI, updateRelatarioBI } from "../relatorio/ralatoriaBI/repositories/relatorioBI.js";
-import { createLinkRelatarioBI, getLinkRelatorioBI, updateLinkRelatarioBI } from "../relatorio/linkRelatorioBI/linkRelatorioBI.js";
+//import { createLinkRelatarioBI, getLinkRelatorioBI, updateLinkRelatarioBI } from "../relatorio/linkRelatorioBI/linkRelatorioBI.js";
 import { getCadastroClienteCredSystem } from "../credSystem/cadastroCliente.js";
 import { getMeioPagamentoCredSystem } from "../credSystem/meioPagamento.js";
 import { getParceriaCredSystem } from "../credSystem/parceria.js";
