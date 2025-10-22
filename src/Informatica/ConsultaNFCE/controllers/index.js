@@ -6,6 +6,8 @@ import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
 import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function extrairCStat(xml) {
   if (!xml || typeof xml !== "string") return null;
@@ -13,51 +15,54 @@ function extrairCStat(xml) {
   return match ? match[1] : null;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// ======================================================
+// ✅ Carrega o certificado corretamente (Vercel + Local)
+// ======================================================
+async function getCertOptions() {
+  const senha =
+    process.env.CERT_SENHA ||
+    process.env.SENHA_CERTIFICADO ||
+    "#senhagto2024#";
 
-// ===========================
-// Função para obter o certificado
-// ===========================
-async function getCertOptions(senha, caminhoCertificado, caminhoBase64) {
-  try {
-    // Caminho absoluto do certificado PFX
-    const certPath = path.resolve(__dirname, caminhoCertificado);
+  // 🔹 1. Primeiro tenta variável de ambiente Base64 (Vercel)
+  const pfxBase64 = process.env.CERT_PFX_BASE64;
+  if (pfxBase64) {
+    console.log("✅ Usando certificado da variável de ambiente CERT_PFX_BASE64");
 
-    // Caminho absoluto do arquivo Base64 (caso use base64 em texto)
-    const base64Path = path.resolve(__dirname, caminhoBase64);
-
-    let certBuffer;
-
-    // 🔸 1) Tenta carregar o arquivo PFX local
-    if (fs.existsSync(certPath)) {
-      certBuffer = fs.readFileSync(certPath);
-      console.log("✅ Certificado PFX carregado com sucesso:", certPath);
-      return { pfx: certBuffer, senha };
-    }
-
-    // 🔸 2) Se não houver PFX, tenta o arquivo base64.txt
-    if (fs.existsSync(base64Path)) {
-      const base64Data = fs.readFileSync(base64Path, "utf-8").trim();
-      certBuffer = Buffer.from(base64Data, "base64");
-      console.log("✅ Certificado Base64 carregado com sucesso:", base64Path);
-      return { pfx: certBuffer, senha };
-    }
-
-    throw new Error("❌ Nenhum certificado encontrado (PFX ou Base64).");
-  } catch (err) {
-    console.error("Erro ao carregar o certificado:", err.message);
-    throw err;
+    const tempPath = path.join(os.tmpdir(), "certificado_vercel.pfx");
+    fs.writeFileSync(tempPath, Buffer.from(pfxBase64, "base64"));
+    return { pfx: fs.readFileSync(tempPath), senha };
   }
-}
-class ConsultaNfeController {
- async validarConsultar(req, res) {
-  try {
-    const CERTIFICADO_PFX = "../GTO COMERCIO 2025-2026.pfx";
-    const CERTIFICADO_BASE64 = "../cert_base64.txt";
-    const SENHA = "#senhagto2024#";
 
-    // 🔹 Busca vendas do body ou da API
+  // 🔹 2. Se não existir env, tenta ler o arquivo local (modo dev)
+  const certBase64Path = path.resolve(__dirname, "../cert_base64.txt");
+  const certPfxPath = path.resolve(__dirname, "./GTO COMERCIO 2025-2026.pfx");
+
+  if (fs.existsSync(certPfxPath)) {
+    console.log("✅ Usando certificado PFX local");
+    return { pfx: fs.readFileSync(certPfxPath), senha };
+  }
+
+  if (fs.existsSync(certBase64Path)) {
+    console.log("✅ Usando certificado Base64 local");
+    const base64Data = fs.readFileSync(certBase64Path, "utf-8").trim();
+    return { pfx: Buffer.from(base64Data, "base64"), senha };
+  }
+
+  throw new Error("❌ Nenhum certificado encontrado (PFX ou Base64).");
+}
+
+class ConsultaNfeController {
+async validarConsultar(req, res) {
+  try {
+    // 🔹 Carrega certificado
+    const certOptions = await getCertOptions();
+
+    // 🔹 Caminho fixo do xmllint local (ignorado na Vercel)
+    const xmllintPath = path.resolve(
+      "C:\\quality\\react_node\\homologacao\\apiQuality\\libs\\libxml\\bin\\xmllint.exe"
+    );
+
     let vendas = req.body?.vendas;
     if (!vendas) {
       const apiUrl =
@@ -66,8 +71,7 @@ class ConsultaNfeController {
       vendas = response.data;
     }
 
-    // 🔹 Normaliza estrutura de dados
-    if (vendas && !Array.isArray(vendas)) {
+    if (!Array.isArray(vendas)) {
       vendas =
         vendas.data ??
         vendas.rows ??
@@ -80,80 +84,49 @@ class ConsultaNfeController {
       return res.status(400).json({ error: "Nenhuma venda para consultar." });
     }
 
-    // 🔹 Carrega certificado
-    const certOptions = await getCertOptions(
-      SENHA,
-      CERTIFICADO_PFX,
-      CERTIFICADO_BASE64
-    );
-
-    // 🔹 Caminho absoluto do xmllint
-    const xmllintPath = path.resolve(
-      "C:\\quality\\react_node\\homologacao\\apiQuality\\libs\\libxml\\bin\\xmllint.exe"
-    );
-
-    if (!fs.existsSync(xmllintPath)) {
-      throw new Error(`xmllint não encontrado em: ${xmllintPath}`);
-    }
-
-    let processados = 0;
     const resultados = [];
 
-    // ===========================
-    // Loop principal
-    // ===========================
     for (const row of vendas) {
       const IDVENDA = String(row.IDVENDA ?? "").trim();
       const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
       const CHAVE = String(row.CHAVE ?? "").trim();
 
       if (!CHAVE) {
-        resultados.push({ IDVENDA, UF, CHAVE, error: "CHAVE ausente" });
+        resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
         continue;
       }
 
       try {
-        const toolsOpts = {
-          mod: "55",
-          tpAmb: 1,
-          UF,
-          versao: "4.00",
-          xmllint: xmllintPath,
-        };
+        const tools = new Tools(
+          {
+            mod: "55",
+            tpAmb: 1,
+            UF,
+            versao: "4.00",
+            xmllint: xmllintPath,
+          },
+          certOptions
+        );
 
-        const myTools = new Tools(toolsOpts, certOptions);
-        const resposta = await myTools.consultarNFe(CHAVE);
-
-        const xmlContent = resposta?.xml || resposta;
+        const resposta = await tools.consultarNFe(CHAVE);
+        const xml = resposta?.xml || resposta;
         const cstat =
-          resposta?.retConsSitNFe?.cStat || extrairCStat(xmlContent);
+          resposta?.retConsSitNFe?.cStat ||
+          extrairCStat(xml) ||
+          "SEM_CSTAT";
 
-        resultados.push({ IDVENDA, UF, CHAVE, cstat, xml: xmlContent });
-        processados++;
-      } catch (innerErr) {
-        resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
+        resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat });
+      } catch (e) {
+        resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
       }
     }
 
-    // ===========================
-    // Retorno final
-    // ===========================
-    const responseData = resultados.map((r) => ({
-      CHAVE: r.CHAVE,
-      IDVENDA: r.IDVENDA,
-      UF: r.UF,
-      CSTAT: r.cstat,
-      XML: r.xml,
-      ...(r.error && { ERROR: r.error }),
-    }));
-
     return res.json({
       total: resultados.length,
-      processados,
-      data: responseData,
+      processados: resultados.filter((r) => !r.error).length,
+      data: resultados,
     });
   } catch (err) {
-    console.error("Erro geral:", err);
     return res.status(500).json({ error: err.message });
   }
 }
