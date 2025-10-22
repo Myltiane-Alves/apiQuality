@@ -8,6 +8,7 @@ import os from 'os';
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import 'dotenv/config';
 
 function extrairCStat(xml) {
   if (!xml || typeof xml !== "string") return null;
@@ -18,6 +19,29 @@ function extrairCStat(xml) {
 // ======================================================
 // ✅ Carrega o certificado corretamente (Vercel + Local)
 // ======================================================
+const { CERT_PFX_BASE64, CERT_SENHA } = process.env;
+export async function getCert() {
+  try {
+    if (!CERT_PFX_BASE64) throw new Error("❌ Nenhum certificado base64 encontrado.");
+
+    const certBuffer = Buffer.from(CERT_PFX_BASE64, "base64");
+    const tempPath = path.join("/tmp", "certificado.pfx"); // diretório temporário permitido na Vercel
+    fs.writeFileSync(tempPath, certBuffer);
+
+    const cert = await new Promise((resolve, reject) => {
+      pem.readPkcs12(tempPath, { p12Password: CERT_SENHA  }, (err, data) => {
+        if (err) return reject(err);
+        resolve(data);
+      });
+    });
+
+    return cert;
+  } catch (error) {
+    console.error("Erro ao carregar certificado:", error);
+    throw error;
+  }
+}
+
 async function getCertOptions() {
   const senha =
     process.env.CERT_SENHA ||
@@ -56,7 +80,12 @@ class ConsultaNfeController {
 async validarConsultar(req, res) {
   try {
     // 🔹 Carrega certificado
-    const certOptions = await getCertOptions();
+    // const certOptions = await getCertOptions();
+    const certOptions = { 
+      pfx: fs.readFileSync(path.join("/tmp", "certificado.pfx")), 
+      senha: process.env.CERT_SENHA 
+    };
+
 
     // 🔹 Caminho fixo do xmllint local (ignorado na Vercel)
     const xmllintPath = path.resolve(
@@ -103,13 +132,14 @@ async validarConsultar(req, res) {
             tpAmb: 1,
             UF,
             versao: "4.00",
-            xmllint: xmllintPath,
+           // xmllint: xmllintPath,
           },
           certOptions
         );
 
         const resposta = await tools.consultarNFe(CHAVE);
-        const xml = resposta?.xml || resposta;
+        console.log("resposta consultaNFe:", resposta);
+        const xml = resposta || resposta;
         const cstat =
           resposta?.retConsSitNFe?.cStat ||
           extrairCStat(xml) ||
