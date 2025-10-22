@@ -81,8 +81,18 @@ async validarConsultar(req, res) {
   try {
     // 🔹 Carrega certificado
     // const certOptions = await getCertOptions();
+    const tempPfxPath = path.join("/tmp", "certificado.pfx");
+
+if (!fs.existsSync(tempPfxPath)) {
+  if (!process.env.CERT_PFX_BASE64) {
+    throw new Error("❌ Nenhum certificado base64 encontrado nas variáveis de ambiente.");
+  }
+  const pfxBuffer = Buffer.from(process.env.CERT_PFX_BASE64, "base64");
+  fs.writeFileSync(tempPfxPath, pfxBuffer);
+}
+
     const certOptions = { 
-      pfx: fs.readFileSync(path.join("/tmp", "certificado.pfx")), 
+      pfx: fs.readFileSync(tempPfxPath),
       senha: process.env.CERT_SENHA 
     };
 
