@@ -451,7 +451,8 @@ routes.post('/criar-caixas', CaixaControllers.postCaixaLojas)
 
 // PUT
 routes.put('/inativar-funcionario', InformaticaControllers.putInativarFuncionario)
-routes.put('/relatorioInformaticaBI/:id', InformaticaControllers.putRelatorioBI)
+//routes.put('/relatorioInformaticaBI/:id', InformaticaControllers.putRelatorioBI)
+routes.put('/relatorioInformaticaBI/:id',  RelatorioBIController.putRelatorioBi)
 routes.put('/linkRelatorioBI/:id', InformaticaControllers.putLinkRelatorioBI)
 routes.put('/atualiza-empresa-diario/:id', InformaticaControllers.putAtualizaEmpresaDiario)
 routes.put('/atualizar-todos-caixa', InformaticaControllers.putAtualizarTodosCaixas)

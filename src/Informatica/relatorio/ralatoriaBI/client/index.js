@@ -23,9 +23,18 @@ export class RelatorioBiClient {
         }
 
 
+        async atualizarRelatorioBi(      
+            DSRELATORIOBI,
+            STATIVO,
+            IDRELATORIOBI
+        ) {
+            const response = await this.api.put(`${url}/api/informatica/relatoriobi.xsjs`, {
+                DSRELATORIOBI,
+                STATIVO,
+                IDRELATORIOBI
+            })
+            return response.data;
 
-
-
-
+        }
 
 }
