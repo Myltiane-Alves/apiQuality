@@ -31,6 +31,7 @@ import LogsControllers from './LogsUsuario/controllers/log.js';
 import PromocaoControllers from './Promocao/controllers/Promocao.js'
 import CaixaControllers from './Informatica/caixas/controllers/controllersCaixas.js'
 import RelatorioBIController from './Informatica/relatorio/ralatoriaBI/controller/controllerRelatorioBi.js';
+import LinkRelatorioBiController from './Informatica/relatorio/linkRelatorioBI/controller/controllersLinkRelatorioBi'
 
 
 // Financeiro Início
@@ -443,7 +444,8 @@ routes.get('/lista-parceria-credsystem', InformaticaControllers.getListaParceria
 // POST
 routes.post('/createRelatorioInformaticaBI', RelatorioBIController.postRelatorioBi)
 //routes.post('/createRelatorioInformaticaBI', InformaticaControllers.postRelatorioBI)
-routes.post('/criarlinkRelatorioBI', InformaticaControllers.postLinkRelatorioBI)
+routes.post('/criarlinkRelatorioBI', LinkRelatorioBiController.postLinkRelatorioBi)
+//routes.post('/criarlinkRelatorioBI', InformaticaControllers.postLinkRelatorioBI)
 routes.post('/configuracao-todos', InformaticaControllers.postCaixaLoja)
 routes.post('/criar-lista-caixas', InformaticaControllers.postConfiguracao)
 routes.post('/criar-caixas', CaixaControllers.postCaixaLojas)
@@ -453,7 +455,8 @@ routes.post('/criar-caixas', CaixaControllers.postCaixaLojas)
 routes.put('/inativar-funcionario', InformaticaControllers.putInativarFuncionario)
 //routes.put('/relatorioInformaticaBI/:id', InformaticaControllers.putRelatorioBI)
 routes.put('/relatorioInformaticaBI/:id',  RelatorioBIController.putRelatorioBi)
-routes.put('/linkRelatorioBI/:id', InformaticaControllers.putLinkRelatorioBI)
+//routes.put('/linkRelatorioBI/:id', InformaticaControllers.putLinkRelatorioBI)
+routes.post('/linkRelatorioBI/:id', LinkRelatorioBiController.postLinkRelatorioBi)
 routes.put('/atualiza-empresa-diario/:id', InformaticaControllers.putAtualizaEmpresaDiario)
 routes.put('/atualizar-todos-caixa', InformaticaControllers.putAtualizarTodosCaixas)
 routes.put('/lista-caixas/:id', CaixaControllers.putCaixaLoja)

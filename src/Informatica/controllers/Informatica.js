@@ -536,7 +536,7 @@ class InformaticaControllers {
             return res.status(500).json({ error: error.message });
         }
     }
-    async putLinkRelatorioBI(req, res) {
+/*     async putLinkRelatorioBI(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body]; 
             const response = await axios.put(`${url}/api/informatica/linkrelatoriobi.xsjs`, dados)
@@ -548,7 +548,7 @@ class InformaticaControllers {
             return res.status(500).json({ error: error.message });
         }
     }
-
+ */
   
     async putAtualizaEmpresaDiario(req, res) {
         try {
@@ -651,7 +651,7 @@ class InformaticaControllers {
             throw error;
         }
     } */
-    async postLinkRelatorioBI(req, res) {
+/*     async postLinkRelatorioBI(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
             const response = await axios.post(`${url}/api/informatica/linkrelatoriobi.xsjs`, dados)
@@ -664,7 +664,7 @@ class InformaticaControllers {
             throw error;
         }
     }
-
+ */
     async postCaixaLoja(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
