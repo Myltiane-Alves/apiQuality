@@ -82,7 +82,7 @@ function extrairCStat(xml) {
         tpAmb: 1,
         UF: UF,
         versao: '4.00',
-        xmllint: '../libxml/bin/xmllint.exe',
+        xmllint: './libs/libxml/bin/xmllint.exe',
       }, {
         pfx: certificadoBuffer,
         senha: SENHA,

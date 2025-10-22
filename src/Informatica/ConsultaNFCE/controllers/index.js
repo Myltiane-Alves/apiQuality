@@ -5,8 +5,11 @@ import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
-import 'dotenv/config';
 
+function extrairCStat(xml) {
+  const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
+  return match ? match[1] : 'SEM_CSTAT';
+}
 
 /**
  * Carrega opções de certificado para passar ao constructor de Tools.
@@ -17,117 +20,76 @@ import 'dotenv/config';
  *  - PEM via caminhos process.env.CERT_PEM_CERT_PATH / process.env.CERT_PEM_KEY_PATH
  * Retorna um objeto que pode ser passado como 2º argumento do Tools, por exemplo { pfx: Buffer, senha } ou { cert: Buffer, key: Buffer }
  */
-// async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
-//   // 1) PFX via env base64
-//   const pfxBase64 = process.env.CERT_PFX_BASE64;
-//   if (pfxBase64) {
-//     try {
-//       const pfxBuf = Buffer.from(pfxBase64, 'base64');
-//       // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
-//       try {
-//         const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
-//         fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
-//         process.env.CERT_PFX_PATH = tmpPath;
-//       } catch (e) {
-//         // se não gravar, não é crítico — ainda temos o buffer
-//         console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
-//       }
-//       return { pfx: pfxBuf, senha };
-//     } catch (e) {
-//       console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
-//     }
-//   }
-
-//   // 2) PFX arquivo local
-//   if (fs.existsSync(fallbackPfxPath)) {
-//     try {
-//       const pfxBuf = fs.readFileSync(fallbackPfxPath);
-//       process.env.CERT_PFX_PATH = fallbackPfxPath;
-//       return { pfx: pfxBuf, senha };
-//     } catch (e) {
-//       console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
-//     }
-//   }
-
-//   // 3) PEM via envs base64
-//   const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
-//   const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
-//   if (pemCertBase64 && pemKeyBase64) {
-//     try {
-//       const certBuf = Buffer.from(pemCertBase64, 'base64');
-//       const keyBuf = Buffer.from(pemKeyBase64, 'base64');
-//       try {
-//         const certPath = path.join(os.tmpdir(), 'cert.pem');
-//         const keyPath = path.join(os.tmpdir(), 'key.pem');
-//         fs.writeFileSync(certPath, certBuf, { flag: 'w' });
-//         fs.writeFileSync(keyPath, keyBuf, { flag: 'w' });
-//         process.env.CERT_PEM_CERT_PATH = certPath;
-//         process.env.CERT_PEM_KEY_PATH = keyPath;
-//       } catch (e) {
-//         console.warn('getCertOptions: não foi possível gravar PEMs em tmp:', e?.message || e);
-//       }
-//       return { cert: certBuf, key: keyBuf };
-//     } catch (e) {
-//       console.error('getCertOptions: falha ao decodificar CERT_PEM_*_BASE64:', e?.message || e);
-//     }
-//   }
-
-//   // 4) PEM via caminhos já apontados no ambiente
-//   const certPathEnv = process.env.CERT_PEM_CERT_PATH;
-//   const keyPathEnv = process.env.CERT_PEM_KEY_PATH;
-//   if (certPathEnv && keyPathEnv && fs.existsSync(certPathEnv) && fs.existsSync(keyPathEnv)) {
-//     try {
-//       const certBuf = fs.readFileSync(certPathEnv);
-//       const keyBuf = fs.readFileSync(keyPathEnv);
-//       return { cert: certBuf, key: keyBuf };
-//     } catch (e) {
-//       console.warn('getCertOptions: falha ao ler PEMs dos caminhos apontados:', e?.message || e);
-//     }
-//   }
-
-//   // nada encontrado
-//   return null;
-// }
-
-function getXmllintPath() {
-  const localPath = path.resolve("../libxml/bin/xmllint.exe");
-  if (fs.existsSync(localPath)) {
-    return localPath;
-  }
-
-  // Na Vercel, o binário não existe — apenas evita crash
-  console.warn("⚠️ xmllint não encontrado neste ambiente (Vercel).");
-  return null;
-}
-
-async function getCertOptions() {
-  let pfxBase64;
-
-  // 🔹 Tenta primeiro carregar da variável de ambiente
-  if (process.env.CERT_PFX_BASE64) {
-    pfxBase64 = process.env.CERT_PFX_BASE64;
-  } else {
-    // 🔹 Caso esteja localmente, lê o arquivo cert_base64.txt
-    const filePath = "./cert_base64.txt";
-    if (!fs.existsSync(filePath)) {
-      throw new Error("Arquivo cert_base64.txt não encontrado.");
+async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
+  // 1) PFX via env base64
+  const pfxBase64 = process.env.CERT_PFX_BASE64;
+  if (pfxBase64) {
+    try {
+      const pfxBuf = Buffer.from(pfxBase64, 'base64');
+      // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
+      try {
+        const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+        fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
+        process.env.CERT_PFX_PATH = tmpPath;
+      } catch (e) {
+        // se não gravar, não é crítico — ainda temos o buffer
+        console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
+      }
+      return { pfx: pfxBuf, senha };
+    } catch (e) {
+      console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
     }
-    pfxBase64 = fs.readFileSync(filePath, "utf8").trim();
   }
 
-  const senha = process.env.CERT_SENHA || "#senhagto2024#";
-  const pfxBuffer = Buffer.from(pfxBase64, "base64");
+  // 2) PFX arquivo local
+  if (fs.existsSync(fallbackPfxPath)) {
+    try {
+      const pfxBuf = fs.readFileSync(fallbackPfxPath);
+      process.env.CERT_PFX_PATH = fallbackPfxPath;
+      return { pfx: pfxBuf, senha };
+    } catch (e) {
+      console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
+    }
+  }
 
-  return { pfx: pfxBuffer, senha };
-}
+  // 3) PEM via envs base64
+  const pemCertBase64 = process.env.CERT_PEM_CERT_BASE64;
+  const pemKeyBase64 = process.env.CERT_PEM_KEY_BASE64;
+  if (pemCertBase64 && pemKeyBase64) {
+    try {
+      const certBuf = Buffer.from(pemCertBase64, 'base64');
+      const keyBuf = Buffer.from(pemKeyBase64, 'base64');
+      try {
+        const certPath = path.join(os.tmpdir(), 'cert.pem');
+        const keyPath = path.join(os.tmpdir(), 'key.pem');
+        fs.writeFileSync(certPath, certBuf, { flag: 'w' });
+        fs.writeFileSync(keyPath, keyBuf, { flag: 'w' });
+        process.env.CERT_PEM_CERT_PATH = certPath;
+        process.env.CERT_PEM_KEY_PATH = keyPath;
+      } catch (e) {
+        console.warn('getCertOptions: não foi possível gravar PEMs em tmp:', e?.message || e);
+      }
+      return { cert: certBuf, key: keyBuf };
+    } catch (e) {
+      console.error('getCertOptions: falha ao decodificar CERT_PEM_*_BASE64:', e?.message || e);
+    }
+  }
 
-/**
- * Extrai o código cStat de uma resposta XML da SEFAZ
- */
-function extrairCStat(xml) {
-  if (!xml) return null;
-  const match = xml.match(/<cStat>(\d+)<\/cStat>/);
-  return match ? match[1] : null;
+  // 4) PEM via caminhos já apontados no ambiente
+  const certPathEnv = process.env.CERT_PEM_CERT_PATH;
+  const keyPathEnv = process.env.CERT_PEM_KEY_PATH;
+  if (certPathEnv && keyPathEnv && fs.existsSync(certPathEnv) && fs.existsSync(keyPathEnv)) {
+    try {
+      const certBuf = fs.readFileSync(certPathEnv);
+      const keyBuf = fs.readFileSync(keyPathEnv);
+      return { cert: certBuf, key: keyBuf };
+    } catch (e) {
+      console.warn('getCertOptions: falha ao ler PEMs dos caminhos apontados:', e?.message || e);
+    }
+  }
+
+  // nada encontrado
+  return null;
 }
 
 class ConsultaNfeController {
@@ -242,7 +204,7 @@ class ConsultaNfeController {
     try {
       let { IDVENDA, STVALIDACONTINGENCIA } = req.body;
 
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`, {
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`, {
         IDVENDA
       })
       return res.json(response.data);
@@ -251,6 +213,8 @@ class ConsultaNfeController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  
 
   // async validarConsultar(req, res) {
   //   try {
@@ -354,32 +318,53 @@ class ConsultaNfeController {
   //   }
   // }
 
-  
-  async validarConsultar(req, res) {
+ async validarConsultar(req, res) {
   try {
-    const certOptions = await getCertOptions();
-    let vendas = req.body?.vendas;
+    const CERTIFICADO_BASE64 =
+      process.env.CERTIFICADO_BASE64 ||
+      fs.readFileSync("./cert_base64.txt", "utf-8").trim();
 
-    // Se não vier vendas no body, busca via API
+    const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
+
+    // Salva o arquivo temporário do certificado (PFX)
+    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
+    fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
+
+    let vendas = req.body?.vendas;
     if (!vendas) {
-      const apiUrl =
-        "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs";
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(
+        "http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs"
+      );
       vendas = response.data;
     }
-
-    if (vendas && !Array.isArray(vendas)) {
-      vendas =
-        vendas.data ||
-        vendas.rows ||
-        (vendas.data?.rows ?? Object.values(vendas).find(Array.isArray));
+    
+    // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+    if (!Array.isArray(vendas)) {
+      if (Array.isArray(vendas.data)) {
+        vendas = vendas.data;
+      } else if (Array.isArray(vendas.rows)) {
+        vendas = vendas.rows;
+      } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+        vendas = vendas.data.rows;
+      } else {
+        // tenta encontrar a primeira propriedade que é array
+        const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+        if (Array.isArray(possibleArray)) {
+          vendas = possibleArray;
+        }
+      }
     }
 
-    if (!Array.isArray(vendas) || vendas.length === 0)
+    if (!Array.isArray(vendas) || vendas.length === 0) {
       return res.status(400).json({ error: "Nenhuma venda para consultar." });
+    }
+
+    const certOptions = {
+      pfx: fs.readFileSync(tempPfxPath),
+      senha: SENHA,
+    };
 
     const resultados = [];
-    let processados = 0;
 
     for (const row of vendas) {
       const IDVENDA = String(row.IDVENDA ?? "").trim();
@@ -387,43 +372,49 @@ class ConsultaNfeController {
       const CHAVE = String(row.CHAVE ?? "").trim();
 
       if (!CHAVE) {
-        resultados.push({ IDVENDA, UF, CHAVE, error: "CHAVE ausente" });
+        resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
         continue;
       }
 
       try {
-        const xmllintPath = getXmllintPath();
-
-        const myTools = new Tools(
+        const tools = new Tools(
           {
             mod: "55",
-            tpAmb: 1, // 1=Produção | 2=Homologação
-            UF: UF,
+            tpAmb: 1,
+            UF,
             versao: "4.00",
-            xmllint: xmllintPath,
+            // caminho do xmllint (localmente você pode ajustar)
+            xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
           },
           certOptions
         );
-        // console.log(certOptions, 'certOptions');
-        const resposta = await myTools.consultarNFe(CHAVE);
-        const xml = resposta?.xml ?? resposta;
-        console.log(`✅${xml?.xml} e ${resposta}`);
+
+        const resposta = await tools.consultarNFe(CHAVE);
+       
+        const xml = resposta ?? null;
         const cstat =
-          resposta?.retConsSitNFe?.cStat ?? extrairCStat(xml) ?? "SEM_CSTAT";
+          resposta?.retConsSitNFe?.cStat ??
+          (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
 
         resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
-        processados++;
-      } catch (err) {
-        resultados.push({ IDVENDA, UF, CHAVE, error: err.message });
+      } catch (e) {
+        resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
       }
     }
-    console.log(`✅ Processados ${processados} de ${vendas.length} vendas.`);
-    return res.json({ total: resultados.length, processados, data: resultados });
+
+    // remove o arquivo temporário
+    fs.unlinkSync(tempPfxPath);
+
+    return res.json({
+      total: resultados.length,
+      processados: resultados.filter((r) => !r.error).length,
+      data: resultados,
+    });
   } catch (err) {
-    console.error("❌ Erro geral:", err.message);
     return res.status(500).json({ error: err.message });
   }
-}
+} 
+
 
   // async validarConsultar(req, res) {
   //   try {
