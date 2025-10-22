@@ -30,6 +30,8 @@ import ListaPrecoControllers from './controllers/ListaPreco.js';
 import LogsControllers from './LogsUsuario/controllers/log.js';
 import PromocaoControllers from './Promocao/controllers/Promocao.js'
 import CaixaControllers from './Informatica/caixas/controllers/controllersCaixas.js'
+import RelatorioBIController from './Informatica/relatorio/ralatoriaBI/controller/controllerRelatorioBi.js';
+
 
 // Financeiro Início
 import AdiantamentosControllers from './Financeiro/Adiantamentos/controllers/adiantamentos.js'
@@ -439,11 +441,13 @@ routes.get('/lista-meio-pagamento-credsystem', InformaticaControllers.getListaMe
 routes.get('/lista-parceria-credsystem', InformaticaControllers.getListaParceriaCredSystem)
 
 // POST
-routes.post('/createRelatorioInformaticaBI', InformaticaControllers.postRelatorioBI)
+routes.post('/createRelatorioInformaticaBI', RelatorioBIController.postRelatorioBi)
+//routes.post('/createRelatorioInformaticaBI', InformaticaControllers.postRelatorioBI)
 routes.post('/criarlinkRelatorioBI', InformaticaControllers.postLinkRelatorioBI)
 routes.post('/configuracao-todos', InformaticaControllers.postCaixaLoja)
 routes.post('/criar-lista-caixas', InformaticaControllers.postConfiguracao)
 routes.post('/criar-caixas', CaixaControllers.postCaixaLojas)
+
 
 // PUT
 routes.put('/inativar-funcionario', InformaticaControllers.putInativarFuncionario)

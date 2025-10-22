@@ -1,8 +1,8 @@
 import { CaixaClient } from "../client/index.js";
 import { caixaPutSchema } from "../schema/caixaPutSchema.js";
 import { caixaSchema } from "../schema/index.js";
-
 import { caixaServices as CaixaServices } from "../services/index.js";
+
 const caixaClient = new CaixaClient(process.env.API_URL);
 const caixaServices = new CaixaServices(caixaClient);
 
