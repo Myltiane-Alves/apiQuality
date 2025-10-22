@@ -42,38 +42,16 @@ export async function getCert() {
   }
 }
 
-async function getCertOptions() {
-  const senha =
-    process.env.CERT_SENHA ||
-    process.env.SENHA_CERTIFICADO ||
-    "#senhagto2024#";
+export function getCertOptions() {
+  const base64 = process.env.CERT_PFX_BASE64;
+  const senha = process.env.CERT_SENHA;
 
-  // 🔹 1. Primeiro tenta variável de ambiente Base64 (Vercel)
-  const pfxBase64 = process.env.CERT_PFX_BASE64;
-  if (pfxBase64) {
-    console.log("✅ Usando certificado da variável de ambiente CERT_PFX_BASE64");
+  if (!base64) throw new Error("Nenhum certificado Base64 encontrado");
 
-    const tempPath = path.join(os.tmpdir(), "certificado_vercel.pfx");
-    fs.writeFileSync(tempPath, Buffer.from(pfxBase64, "base64"));
-    return { pfx: fs.readFileSync(tempPath), senha };
-  }
+  const tempPath = path.join(os.tmpdir(), "certificado.pfx");
+  fs.writeFileSync(tempPath, Buffer.from(base64, 'base64'));
 
-  // 🔹 2. Se não existir env, tenta ler o arquivo local (modo dev)
-  const certBase64Path = path.resolve(__dirname, "../cert_base64.txt");
-  const certPfxPath = path.resolve(__dirname, "./GTO COMERCIO 2025-2026.pfx");
-
-  if (fs.existsSync(certPfxPath)) {
-    console.log("✅ Usando certificado PFX local");
-    return { pfx: fs.readFileSync(certPfxPath), senha };
-  }
-
-  if (fs.existsSync(certBase64Path)) {
-    console.log("✅ Usando certificado Base64 local");
-    const base64Data = fs.readFileSync(certBase64Path, "utf-8").trim();
-    return { pfx: Buffer.from(base64Data, "base64"), senha };
-  }
-
-  throw new Error("❌ Nenhum certificado encontrado (PFX ou Base64).");
+  return { pfx: fs.readFileSync(tempPath), senha };
 }
 
 class ConsultaNfeController {
@@ -142,7 +120,6 @@ if (!fs.existsSync(tempPfxPath)) {
             tpAmb: 1,
             UF,
             versao: "4.00",
-           // xmllint: xmllintPath,
           },
           certOptions
         );
