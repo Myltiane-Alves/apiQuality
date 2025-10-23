@@ -666,6 +666,29 @@ class ComprasControllers {
         }
     }
 
+    async getListaProdutosPorPedido(req, res) {
+        let {idResumoPedido, idFilial, dataInicio, dataFim, idProduto, descricaoProduto, codBarras, page, pageSize} = req.query;
+            idResumoPedido = idResumoPedido ? idResumoPedido : '';
+            idFilial = idFilial ? idFilial : '';
+            dataInicio = dataInicio ? dataInicio : '';
+            dataFim = dataFim ? dataFim : '';
+            idProduto = idProduto ? idProduto : '';
+            descricaoProduto = descricaoProduto ? descricaoProduto : '';
+            codBarras = codBarras ? codBarras : '';
+            page = page ? page : '';
+            pageSize = pageSize ? pageSize : '';
+        
+        try {
+            const apiUrl = `${url}/api/compras/lista-produtos-por-pedido-e-filial.xsjs?dtInicio=${dataInicio}&dtFim=${dataFim}&idFilial=${idFilial}&idResumoPedido=${idResumoPedido}&idProd=${idProduto}&descProd=${descricaoProduto}&codBarrasProd=${codBarras}&page=${page}&pageSize=${pageSize}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
+
     //  UPDATE
     async updateProdutoImagem(req, res) {
         let { IDIMAGEMPRODUTO, STATIVO } = req.body;
