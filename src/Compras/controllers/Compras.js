@@ -500,7 +500,7 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/tipotecidos.xsjs?idTecido=${idTecido}&descTecido=${descricao}`
             const response = await axios.get(apiUrl)
-
+       
             return res.json(response.data);
         } catch (error) {
             console.error("erro nos campos do banco:", error);
@@ -569,20 +569,20 @@ class ComprasControllers {
         }
     }
 
-    async getListaTipoTecidos(req, res) {
-        let { idTecido, descricao} = req.query;
-        idTecido = idTecido ? idTecido : '';
-        descricao = descricao ? descricao : '';
-        try {
-            const apiUrl = `${url}/api/compras/tipo-tecido.xsjs`
-            const response = await axios.get(apiUrl)
+    // async getListaTipoTecidos(req, res) {
+    //     let { idTecido, descricao} = req.query;
+    //     idTecido = idTecido ? idTecido : '';
+    //     descricao = descricao ? descricao : '';
+    //     try {
+    //         const apiUrl = `${url}/api/compras/tipo-tecido.xsjs`
+    //         const response = await axios.get(apiUrl)
 
-            return res.json(response.data);
-        } catch (error) {
-            console.error("erro nos campos do banco:", error);
-            throw error;
-        }
-    }
+    //         return res.json(response.data);
+    //     } catch (error) {
+    //         console.error("erro nos campos do banco:", error);
+    //         throw error;
+    //     }
+    // }
 
     async getListaLocalExposicao(req, res) {
         let { } = req.query;
@@ -885,7 +885,7 @@ class ComprasControllers {
     }
 
     async updateTipoTecidos(req, res) {
-        let dados = {
+        let {
             IDTPTECIDO,
             DSTIPOTECIDO,
             STATIVO
@@ -894,7 +894,9 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/tipotecidos.xsjs`
             const response = await axios.put(apiUrl, {
-                dados
+                IDTPTECIDO: parseInt(IDTPTECIDO),
+                DSTIPOTECIDO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
@@ -1053,7 +1055,7 @@ class ComprasControllers {
         }
     }
     async createTipoTecidos(req, res) {
-        let dados = {
+        let {
             IDTPTECIDO,
             DSTIPOTECIDO,
             STATIVO
@@ -1062,7 +1064,8 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/tipotecidos.xsjs`
             const response = await axios.post(apiUrl, {
-                dados
+                DSTIPOTECIDO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {

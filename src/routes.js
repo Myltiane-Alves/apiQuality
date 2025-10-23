@@ -615,7 +615,7 @@ routes.put('/atualizarUnidadeMedida', ComprasControllers.updateUnidadeMedida)
 routes.put('/atualizarCores', ComprasControllers.updateCores)
 // routes.put('/atualizarEstilos', ComprasControllers.updateEstilos)
 routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)
-routes.put('/atualizarTipoTecidos', ComprasControllers.updateTipoTecidos)
+routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
 routes.put('/atualizarCategoriaPedidos', ComprasControllers.updateCategoriaPedidos)
 
 routes.put('/deletarVinculoTamanhoCategoria', ComprasControllers.updateVinculoTamanhoCategoria)
@@ -626,7 +626,7 @@ routes.post('/cadastroSubGrupoEstrutura', ComprasControllers.createSubGrupoEstru
 routes.post('/cadastrarUnidadeMedida', ComprasControllers.createUnidadeMedida)
 routes.post('/cadastrarCores', ComprasControllers.createCores)
 routes.post('/criarlistaEstilos', ComprasControllers.postEstilos)
-routes.post('/cadastrarTipoTecidos', ComprasControllers.createTipoTecidos)
+routes.post('/cadastrar-tipo-tecido', ComprasControllers.createTipoTecidos)
 routes.post('/cadastrarCategoriaPedidos', ComprasControllers.createCategoriaPedidos)
 
 
