@@ -644,6 +644,24 @@ class ComprasControllers {
         }
     }
 
+    async getListaProdutosEntreFiliais(req, res) {
+        let {idFilialOrigem, idFilialDestino, idProduto} = req.query;
+
+        idFilialOrigem = idFilialOrigem ? idFilialOrigem : '';
+        idFilialDestino = idFilialDestino ? idFilialDestino : '';
+        idProduto = idProduto ? idProduto : '';
+        
+        try {
+            const apiUrl = `${url}/api/compras/lista-produtos-entre-filiais.xsjs?idFilialOrigem=${idFilialOrigem}&idFilialDestino=${idFilialDestino}&idProd=${idProduto}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
+
     //  UPDATE
     async updateProdutoImagem(req, res) {
         let { IDIMAGEMPRODUTO, STATIVO } = req.body;
