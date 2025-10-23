@@ -18,7 +18,7 @@ class EmpresaControllers {
         pageSize = pageSize ? pageSize : '';
        
         try {
-            const response = await axios.get(`${url}/api/empresa.xsjs?idEmpesa=${idEmpresa}`)
+            const response = await axios.get(`${url}/api/empresa.xsjs?id=${idEmpresa}`)
             // const response = await getEmpresasLista(idEmpresa, idSubGrupoEmpresa,  page, pageSize)
             
             return res.json(response.data); 

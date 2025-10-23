@@ -6,19 +6,19 @@ import { updateFuncionarioLoja } from "../Funcionarios/repositories/funcionario.
 import { createFuncionario, getFuncionariosLoja, updateFuncionario } from "../../Funcionarios/repositories/funcionarioLoja.js";
 import { updateInativarFuncionario } from "../../Funcionarios/repositories/funcionarioInativa.js";
 import { getAtualizaEmpresaDiario, updateAtualizaEmpresaDiario } from "../Empresas/autualizaEmpresDiario.js";
-import { updateAtualizarTodosCaixa } from "../caixas/atualizarTodosCaixas.js";
+import { updateAtualizarTodosCaixa } from "../caixas/repositories/atualizarTodosCaixas.js";
 import { getVendasLoja } from "../vendas/repositories/vendasLoja.js";
 import { getPagamentoTEF } from "../pagamento/pagamentoTef.js";
 import { getPagamentoPOS } from "../pagamento/pagamentoPos.js";
 import { getVendasAlloc } from "../vendas/repositories/vendasAlloc.js";
 import { getVendasContigencia } from "../vendas/repositories/vendasContigencia.js";
 import { getCliente } from "../cliente/repositories/cliente.js";
-import { createRelatarioBI, getRelatorioBI, updateRelatarioBI } from "../relatorio/ralatoriaBI/relatorioBI.js";
-import { createLinkRelatarioBI, getLinkRelatorioBI, updateLinkRelatarioBI } from "../relatorio/linkRelatorioBI/linkRelatorioBI.js";
+import { createRelatarioBI, getRelatorioBI, updateRelatarioBI } from "../relatorio/ralatoriaBI/repositories/relatorioBI.js";
+//import { createLinkRelatarioBI, getLinkRelatorioBI, updateLinkRelatarioBI } from "../relatorio/linkRelatorioBI/linkRelatorioBI.js";
 import { getCadastroClienteCredSystem } from "../credSystem/cadastroCliente.js";
 import { getMeioPagamentoCredSystem } from "../credSystem/meioPagamento.js";
 import { getParceriaCredSystem } from "../credSystem/parceria.js";
-import { createCaixa, getCaixa, updateCaixa } from "../caixas/caixa.js";
+import { createCaixa, getCaixa, updateCaixa } from "../caixas/repositories/caixa.js";
 import { createConfiguracao, getConfiguracoes, updateConfiguracao } from "../configuracao/repositories/configuracao.js";
 import { updateFuncionarioDesconto } from "../Funcionarios/repositories/funcionarioDesconto.js";
 import 'dotenv/config';
@@ -134,7 +134,7 @@ class InformaticaControllers {
     }
 
     async getListaCaixas(req, res) {
-        let { idEmpresa, idCaixaWeb, dataUltimaAtualizacao,   page, pageSize } = req.query;
+        let { idEmpresa, idCaixaWeb, dataUltimaAtualizacao,   page, pageSize, byId} = req.query;
        
             try {
                 idEmpresa = idEmpresa ? idEmpresa : '';
@@ -142,10 +142,11 @@ class InformaticaControllers {
                 dataUltimaAtualizacao = dataUltimaAtualizacao ? dataFormatada(dataUltimaAtualizacao) : '';
                 page = page ? page : '';
                 pageSize = pageSize ? pageSize : '';
+                byId = byId ? byId : '';
 
-                const apiUrl = `${url}/api/informatica/caixa.xsjs?idEmpresa=${idEmpresa}`
+                const apiUrl = `${url}/api/informatica/caixa.xsjs?idEmpresa=${idEmpresa}&id=${idCaixaWeb}`
                 const response = await axios.get(apiUrl)
-                // const response = await getCaixa(idEmpresa, idCaixaWeb, dataUltimaAtualizacao,   page, pageSize) 
+                 //const response = await getCaixa(idEmpresa, idCaixaWeb, dataUltimaAtualizacao,   page, pageSize) 
                 
                 return res.json(response.data); 
              
@@ -535,7 +536,7 @@ class InformaticaControllers {
             return res.status(500).json({ error: error.message });
         }
     }
-    async putLinkRelatorioBI(req, res) {
+/*     async putLinkRelatorioBI(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body]; 
             const response = await axios.put(`${url}/api/informatica/linkrelatoriobi.xsjs`, dados)
@@ -547,7 +548,7 @@ class InformaticaControllers {
             return res.status(500).json({ error: error.message });
         }
     }
-
+ */
   
     async putAtualizaEmpresaDiario(req, res) {
         try {
@@ -637,7 +638,7 @@ class InformaticaControllers {
         }
     }
 
-    async postRelatorioBI(req, res) {
+/*     async postRelatorioBI(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
             const response = await axios.post(`${url}/api/informatica/relatoriobi.xsjs`, dados)
@@ -649,8 +650,8 @@ class InformaticaControllers {
             console.error("Unable to connect to the database:", error);
             throw error;
         }
-    }
-    async postLinkRelatorioBI(req, res) {
+    } */
+/*     async postLinkRelatorioBI(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
             const response = await axios.post(`${url}/api/informatica/linkrelatoriobi.xsjs`, dados)
@@ -663,7 +664,7 @@ class InformaticaControllers {
             throw error;
         }
     }
-
+ */
     async postCaixaLoja(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
