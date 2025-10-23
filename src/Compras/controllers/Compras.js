@@ -645,14 +645,18 @@ class ComprasControllers {
     }
 
     async getListaProdutosEntreFiliais(req, res) {
-        let {idFilialOrigem, idFilialDestino, idProduto} = req.query;
+        let {idFilialOrigem, idFilialDestino, idProduto, descricaoProduto, codBarras, page, pageSize} = req.query;
 
         idFilialOrigem = idFilialOrigem ? idFilialOrigem : '';
         idFilialDestino = idFilialDestino ? idFilialDestino : '';
         idProduto = idProduto ? idProduto : '';
+        descricaoProduto = descricaoProduto ? descricaoProduto : '';
+        codBarras = codBarras ? codBarras : '';
+        page = page ? page : '';
+        pageSize = pageSize ? pageSize : '';
         
         try {
-            const apiUrl = `${url}/api/compras/lista-produtos-entre-filiais.xsjs?idFilialOrigem=${idFilialOrigem}&idFilialDestino=${idFilialDestino}&idProd=${idProduto}`
+            const apiUrl = `${url}/api/compras/lista-produtos-entre-filiais.xsjs?idFilialOrigem=${idFilialOrigem}&idFilialDestino=${idFilialDestino}&idProd=${idProduto}&descProd=${descricaoProduto}&codBarrasProd=${codBarras}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data);
