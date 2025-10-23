@@ -92,9 +92,6 @@ class EmpresaControllers {
                 stripUnknown: true
             });
 
-            console.log("BODY RECEBIDO:", req.body);
-console.log("VALUE VALIDADO:", value);
-
             if (error) {
                 return res.status(400).json({
                     message: 'Dados inválidos',
