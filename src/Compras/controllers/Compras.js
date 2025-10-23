@@ -482,9 +482,9 @@ class ComprasControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-            // const apiUrl = `${url}/api/compras/estilos.xsjs?idEstilo=${idEstilo}&descEstilo=${descricao}`
-            // const response = await axios.get(apiUrl)
-            const response = await getEstilos(idEstilo, idGrupoEstilo, descEstilo, page, pageSize)
+            const apiUrl = `${url}/api/compras/estilos.xsjs?idEstilo=${idEstilo}&descEstilo=${descricao}`
+            const response = await axios.get(apiUrl)
+            // const response = await getEstilos(idEstilo, idGrupoEstilo, descEstilo, page, pageSize)
 
             return res.json(response);
         } catch (error) {

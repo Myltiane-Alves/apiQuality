@@ -1,13 +1,14 @@
 import axios from "axios";
 import { dataFormatada } from "../../utils/dataFormatada.js";
-import { getResumoOrdemTransferencia } from "../repositories/resumoOrdemTransferencia.js";
-import { getDetalheOrdemTransferencia } from "../repositories/detalheOrdemTransferencia.js";
-import { getProdutos } from "../repositories/produto.js";
-import { getRotinaMovimentacao } from "../repositories/rotinaMovimentacao.js";
-import { getImpressaoEtiquetaOT } from "../repositories/impressaoEtiquetaOT.js";
-import { getNFESaidaTransferencia } from "../../ServiceLayer/repositories/NotasTransferencia/consultaNFESaidaTransferencia.js";
 import 'dotenv/config';
-const url = process.env.API_URL;
+import { OTClient } from "../OT/Client/index.js";
+import { OTService } from "../OT/Services/index.js";
+import criarOTSchema from '../OT/Schema/criarOTSchema.js';
+import atualizarOTSchema from '../OT/Schema/atualizarOTSchema.js';
+// const url = process.env.API_URL;
+const url = 'http://164.152.245.77:8000/quality/concentrador_node';
+const otClient = new OTClient(url);
+const otService = new OTService(otClient);
 
 class ExpedicaoControllers {
 
@@ -23,7 +24,7 @@ class ExpedicaoControllers {
         try {
             const apiUrl = `${url}/api/expedicao/produto.xsjs?idEmpresa=${idEmpresa}&id=${idProduto}&descProduto=${dsProduto}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
-            // const response = await getProdutos(idEmpresa, codBarras, dsProduto, page, pageSize)
+            
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -47,7 +48,7 @@ class ExpedicaoControllers {
            
             const apiUrl = `${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=${Number(idTipoFiltro)}&idEmpresaOrigem=${Number(idEmpresaOrigem)}&idEmpresaDestino=${Number(idEmpresaDestino)}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`
             const response = await axios.get(apiUrl)
-            // const response = await  getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+           
 
             return res.json(response.data); 
         } catch (error) {
@@ -67,7 +68,7 @@ class ExpedicaoControllers {
         dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';    
 
         try {
-            // ajaxGet('api/expedicao/resumo-ordem-transferencia.xsjs?page=' + numPage + '&idtipofiltro=' + 1 + '&idEmpresaOrigem=' + idlojaorigem + '&idEmpresaDestino=' + idlojadestino + '&datapesqinicio=' + datapesqinicio + '&datapesqfim=' + datapesqfim)
+            
 
             const response = await axios.get(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=1&idEmpresaOrigem=${idEmpresaLogin}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`)
 
@@ -89,7 +90,7 @@ class ExpedicaoControllers {
         try {
             // ajaxGet('api/expedicao/detalhe-ordem-transferencia.xsjs?page=' + numPage + '&id=' + id + '&idtipofiltro=' + 1)
             const response = await axios.get(`${url}/api/expedicao/detalhe-ordem-transferencia.xsjs?id=${idResumoOT}`)
-            // const response = await getDetalheOrdemTransferencia(idResumoOT, idTipoFiltro, pageSize, page)
+     
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -109,7 +110,7 @@ class ExpedicaoControllers {
         dataPesquisaFim = dataFormatada(dataPesquisaFim)
 
         try {
-            // ajaxGet('api/expedicao/resumo-ordem-transferencia.xsjs?page=' + numPage + '&idtipofiltro=' + 2 + '&idEmpresaOrigem=' + IDEmpresaLogin + '&idEmpresaDestino=' + idlojadestino + '&datapesqinicio=' + datapesqinicio + '&datapesqfim=' + datapesqfim)
+
             const apiUrl = `${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=2&idEmpresaOrigem=${idEmpresaLogin}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`
             const response = await axios.get(apiUrl)
 
@@ -144,7 +145,7 @@ class ExpedicaoControllers {
         idStatusOt = idStatusOt ? idStatusOt : '';
         try {
             const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/expedicao/resumo-ordem-transferencia.xsjs?page=1&idtipofiltro=1&idEmpresaOrigem=${idLojaOrigem}&idEmpresaDestino=${idLojaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}&idstatusot=${idStatusOt}&dtinifat=${dataInicioFatura}&dtfimfat=${dataFimFatura}`)
-            // const response = await getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+           
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -166,7 +167,7 @@ class ExpedicaoControllers {
         page = page ? page : '';
         try {
             const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/expedicao/resumo-ordem-transferencia.xsjs?page=1&idtipofiltro=2&idEmpresaOrigem=${idEmpresaOrigem}&idEmpresaDestino=${idEmpresaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}&idrotina=${idRotina}&dtinient=${dataPesquisaInicio}&dtfiment=${dataPesquisaFim}`)
-            // const response = await getResumoOrdemTransferencia(idEmpresaDestino, idEmpresaOrigem, idTipoFiltro, dataPesquisaInicio, dataPesquisaFim,  pageSize, page)
+            
             
             return res.json(response.data); 
         } catch (error) {
@@ -196,7 +197,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/expedicao/rotina-movimentacao.xsjs`)
-            // const response = await getRotinaMovimentacao(idRotina,  pageSize, page)
+         
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -212,7 +213,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/expedicao/impressao-etiqueta-ot.xsjs?id=${idResumoOT}&stAtivo=${stAtivo}&pageSize=${pageSize}&page=${page}`)
-            // const response = await getImpressaoEtiquetaOT(idResumoOT, stAtivo,  pageSize, page)
+          
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -227,7 +228,7 @@ class ExpedicaoControllers {
         pageSize = pageSize ? pageSize : '';
         try {
             const response = await axios.get(`${url}/api/service-layer/notas-transferencia/consulta-nfe-saida-tranferencia.xsjs?id=${idSapOrigem}&pageSize=${pageSize}&page=${page}`)
-            // const response = await getNFESaidaTransferencia(idSapOrigem,  pageSize, page)
+            
             return res.json(response.data); 
         } catch (error) {
             console.error("Unable to connect to the database:", error);
@@ -329,84 +330,68 @@ class ExpedicaoControllers {
     }
 
     async putResumoOrdemTransferencia(req, res) {
-        let {
-            IDEMPRESAORIGEM,
-            IDEMPRESADESTINO,
-            DATAEXPEDICAO,
-            IDOPERADOREXPEDICAO,
-            NUTOTALITENS,
-            QTDTOTALITENS,
-            QTDTOTALITENSRECEPCIONADO,
-            QTDTOTALITENSDIVERGENCIA,
-            NUTOTALVOLUMES,
-            TPVOLUME,
-            VRTOTALCUSTO,
-            VRTOTALVENDA,
-            DTRECEPCAO,
-            IDOPERADORRECEPTOR,
-            DSOBSERVACAO,
-            IDUSRCANCELAMENTO,
-            DTULTALTERACAO,
-            IDSTDIVERGENCIA,
-            OBSDIVERGENCIA,
-            STEMISSAONFE,
-            NUMERONFE,
-            STENTRADAINVENTARIO,
-            QTDCONFERENCIA,
-            dadosdetalheot,
-            IDRESUMOOT,
-            IDSTATUSOT,
-            IDUSRAJUSTE,
-            DTAJUSTE,
-            QTDTOTALITENSAJUSTE,
-            CONFEREITENS,
-            IDROTINA,
-            DATAENTREGA
-        } = req.body;
-
-        if(!IDRESUMOOT) {
-            return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
-        }
-
-
-
+        
         try {
-            const response = await axios.put(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs`, {
-                IDEMPRESAORIGEM,
-                IDEMPRESADESTINO,
-                DATAEXPEDICAO,
-                IDOPERADOREXPEDICAO,
-                NUTOTALITENS,
-                QTDTOTALITENS,
-                QTDTOTALITENSRECEPCIONADO,
-                QTDTOTALITENSDIVERGENCIA,
-                NUTOTALVOLUMES,
-                TPVOLUME,
-                VRTOTALCUSTO,
-                VRTOTALVENDA,
-                DTRECEPCAO,
-                IDOPERADORRECEPTOR,
-                DSOBSERVACAO,
-                IDUSRCANCELAMENTO,
-                DTULTALTERACAO,
-                IDSTDIVERGENCIA,
-                OBSDIVERGENCIA,
-                STEMISSAONFE,
-                NUMERONFE,
-                STENTRADAINVENTARIO,
-                QTDCONFERENCIA,
-                dadosdetalheot,
-                IDRESUMOOT,
-                IDSTATUSOT,
-                IDUSRAJUSTE,
-                DTAJUSTE,
-                QTDTOTALITENSAJUSTE,
-                CONFEREITENS,
-                IDROTINA,
-                DATAENTREGA
-            })
+            const {error, value} = atualizarOTSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+    
+            if(error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
 
-            return res.status(200).json({message: 'Ordem de transferência atualizada com sucesso!'});
+            if(!value.IDRESUMOOT) {
+                return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
+            }
+     
+
+            const response = await otService.updateOT(
+                    value.IDRESUMOOT,
+                    value.IDEMPRESAORIGEM,
+                    value.IDEMPRESADESTINO,
+                    value.IDOPERADOREXPEDICAO,
+                    value.NUTOTALITENS,
+                    value.QTDTOTALITENS,
+                    value.QTDTOTALITENSRECEPCIONADO,
+                    value.QTDTOTALITENSDIVERGENCIA,
+                    value.NUTOTALVOLUMES,
+                    value.TPVOLUME,
+                    value.VRTOTALCUSTO,
+                    value.VRTOTALVENDA,
+                    value.DTRECEPCAO,
+                    value.IDOPERADORRECEPTOR,
+                    value.DSOBSERVACAO,
+                    value.IDUSRCANCELAMENTO,
+                    value.IDSTDIVERGENCIA,
+                    value.OBSDIVERGENCIA,
+                    value.STEMISSAONFE,
+                    value.NUMERONFE,
+                    value.STENTRADAINVENTARIO,
+                    value.QTDCONFERENCIA,
+                    value.IDSTATUSOT,
+                    value.IDUSRAJUSTE,
+                    value.DTAJUSTE,
+                    value.QTDTOTALITENSAJUSTE,
+                    value.dadosdetalheot,
+    
+            );
+    
+            if(!value.IDEMPRESADESTINO) {
+                return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
+            }
+    
+            if(!value.IDEMPRESAORIGEM) {
+                return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
+            }
+           
+            return res.status(200).json(response);
         } catch(error) {
             console.log('Erro ao atualizar ordem de transferência:', error);
             return res.status(500).json({message: 'Erro ao atualizar ordem de transferência.'});
@@ -415,96 +400,138 @@ class ExpedicaoControllers {
     }
 
     async postResumoOrdemTransferencia(req, res) {
-        let {
-            IDEMPRESAORIGEM,
-            IDEMPRESADESTINO,
-            DATAEXPEDICAO,
-            IDOPERADOREXPEDICAO,
-            NUTOTALITENS,
-            QTDTOTALITENS,
-            QTDTOTALITENSRECEPCIONADO,
-            QTDTOTALITENSDIVERGENCIA,
-            NUTOTALVOLUMES,
-            TPVOLUME,
-            VRTOTALCUSTO,
-            VRTOTALVENDA,
-            DTRECEPCAO,
-            IDOPERADORRECEPTOR,
-            DSOBSERVACAO,
-            IDUSRCANCELAMENTO,
-            DTULTALTERACAO,
-            IDSTDIVERGENCIA,
-            OBSDIVERGENCIA,
-            STEMISSAONFE,
-            NUMERONFE,
-            STENTRADAINVENTARIO,
-            QTDCONFERENCIA,
-            dadosdetalheot,
-            IDRESUMOOT,
-            IDSTATUSOT,
-            IDUSRAJUSTE,
-            DTAJUSTE,
-            QTDTOTALITENSAJUSTE,
-            CONFEREITENS,
-            IDROTINA,
-            DATAENTREGA,
-            
-        } = req.body;
         
-        // if(!IDRESUMOOT) {
-        //     return res.status(400).json({message: 'IDRESUMOOT é obrigatório.'});
-        // }
-
-
-        if(!IDEMPRESADESTINO) {
-            return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
-        }
-
-        if(!IDEMPRESAORIGEM) {
-            return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
-        }
-
         try {
-            const response = await axios.post(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs`, {
-                IDEMPRESAORIGEM,
-                IDEMPRESADESTINO,
-                DATAEXPEDICAO,
-                IDOPERADOREXPEDICAO,
-                NUTOTALITENS,
-                QTDTOTALITENS,
-                QTDTOTALITENSRECEPCIONADO,
-                QTDTOTALITENSDIVERGENCIA,
-                NUTOTALVOLUMES,
-                TPVOLUME,
-                VRTOTALCUSTO,
-                VRTOTALVENDA,
-                DTRECEPCAO,
-                IDOPERADORRECEPTOR,
-                DSOBSERVACAO,
-                IDUSRCANCELAMENTO,
-                DTULTALTERACAO,
-                IDSTDIVERGENCIA,
-                OBSDIVERGENCIA,
-                STEMISSAONFE,
-                NUMERONFE,
-                STENTRADAINVENTARIO,
-                QTDCONFERENCIA,
-                dadosdetalheot,
-                IDRESUMOOT,
-                IDSTATUSOT,
-                IDUSRAJUSTE,
-                DTAJUSTE,
-                QTDTOTALITENSAJUSTE,
-                CONFEREITENS,
-                IDROTINA,
-                DATAENTREGA
-            })
+        //     let {
+        //         IDEMPRESAORIGEM,
+        //         IDEMPRESADESTINO,
+        //         DATAEXPEDICAO,
+        //         IDOPERADOREXPEDICAO,
+        //         NUTOTALITENS,
+        //         QTDTOTALITENS,
+        //         QTDTOTALITENSRECEPCIONADO,
+        //         QTDTOTALITENSDIVERGENCIA,
+        //         NUTOTALVOLUMES,
+        //         TPVOLUME,
+        //         VRTOTALCUSTO,
+        //         VRTOTALVENDA,
+        //         DTRECEPCAO,
+        //         IDOPERADORRECEPTOR,
+        //         DSOBSERVACAO,
+        //         IDUSRCANCELAMENTO,
+        //         DTULTALTERACAO,
+        //         IDSTDIVERGENCIA,
+        //         OBSDIVERGENCIA,
+        //         STEMISSAONFE,
+        //         NUMERONFE,
+        //         STENTRADAINVENTARIO,
+        //         QTDCONFERENCIA,
+        //         dadosdetalheot,
+        //         IDRESUMOOT,
+        //         IDSTATUSOT,
+        //         IDUSRAJUSTE,
+        //         DTAJUSTE,
+        //         QTDTOTALITENSAJUSTE,
+        //         CONFEREITENS,
+        //         IDROTINA,
+        //         DATAENTREGA
+        //     } = req.body;
+        //     const response = await axios.post(`${url}/api/expedicao/resumo-ordem-transferencia.xsjs`,{
+        //     IDEMPRESAORIGEM,
+        //     IDEMPRESADESTINO,
+        //     DATAEXPEDICAO,
+        //     IDOPERADOREXPEDICAO,
+        //     NUTOTALITENS,
+        //     QTDTOTALITENS,
+        //     QTDTOTALITENSRECEPCIONADO,
+        //     QTDTOTALITENSDIVERGENCIA,
+        //     NUTOTALVOLUMES,
+        //     TPVOLUME,
+        //     VRTOTALCUSTO,
+        //     VRTOTALVENDA,
+        //     DTRECEPCAO,
+        //     IDOPERADORRECEPTOR,
+        //     DSOBSERVACAO,
+        //     IDUSRCANCELAMENTO,
+        //     DTULTALTERACAO,
+        //     IDSTDIVERGENCIA,
+        //     OBSDIVERGENCIA,
+        //     STEMISSAONFE,
+        //     NUMERONFE,
+        //     STENTRADAINVENTARIO,
+        //     QTDCONFERENCIA,
+        //     dadosdetalheot,
+        //     IDRESUMOOT,
+        //     IDSTATUSOT,
+        //     IDUSRAJUSTE,
+        //     DTAJUSTE,
+        //     QTDTOTALITENSAJUSTE,
+        //     CONFEREITENS,
+        //     IDROTINA,
+        //     DATAENTREGA,
+        // });
+      
+        // return res.status(200).json(response.data);
+            const {error, value} = criarOTSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+    
+            if(error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+        
+            const response = await otService.createOT(
+                    value.IDRESUMOOT,
+                    value.IDEMPRESAORIGEM,
+                    value.IDEMPRESADESTINO,
+                    value.IDOPERADOREXPEDICAO,
+                    value.NUTOTALITENS,
+                    value.QTDTOTALITENS,
+                    value.QTDTOTALITENSRECEPCIONADO,
+                    value.QTDTOTALITENSDIVERGENCIA,
+                    value.NUTOTALVOLUMES,
+                    value.TPVOLUME,
+                    value.VRTOTALCUSTO,
+                    value.VRTOTALVENDA,
+                    value.DTRECEPCAO,
+                    value.IDOPERADORRECEPTOR,
+                    value.DSOBSERVACAO,
+                    value.IDUSRCANCELAMENTO,
+                    value.IDSTDIVERGENCIA,
+                    value.OBSDIVERGENCIA,
+                    value.STEMISSAONFE,
+                    value.NUMERONFE,
+                    value.STENTRADAINVENTARIO,
+                    value.QTDCONFERENCIA,
+                    value.IDSTATUSOT,
+                    value.IDUSRAJUSTE,
+                    value.DTAJUSTE,
+                    value.QTDTOTALITENSAJUSTE,
+                    value.dadosdetalheot,
 
-            return res.status(200).json({message: 'Ordem de transferência atualizada com sucesso!'});
+    
+            );
+    
+            if(!value.IDEMPRESADESTINO) {
+                return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
+            }
+    
+            if(!value.IDEMPRESAORIGEM) {
+                return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
+            }
+           console.log('response', response);
+            return res.status(200).json(response);
         } catch(error) {
-            console.log('Erro ao atualizar ordem de transferência:', error);
-            return res.status(500).json({message: 'Erro ao atualizar ordem de transferência.'});
-            
+            console.log('Erro ao criar ordem de transferência:', error);
+            return res.status(500).json({message: 'Erro ao criar ordem de transferência.'});
+
         }
     }
 }

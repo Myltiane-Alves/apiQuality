@@ -29,9 +29,12 @@ import ConferenciaCegaControllers from './ConferenciaCega/controllers/Conferenci
 import ListaPrecoControllers from './controllers/ListaPreco.js';
 import LogsControllers from './LogsUsuario/controllers/log.js';
 import PromocaoControllers from './Promocao/controllers/Promocao.js'
+
 import CaixaControllers from './Informatica/caixas/controllers/controllersCaixas.js'
 import RelatorioBIController from './Informatica/relatorio/ralatoriaBI/controller/controllerRelatorioBi.js';
 import LinkRelatorioBiController from './Informatica/relatorio/linkRelatorioBI/controllers/controllersLinkRelatorioBi.js'
+
+import ConsultaNfeController from './Informatica/ConsultaNFCE/controllers/index.js'
 
 
 // Financeiro Início
@@ -74,6 +77,10 @@ import ComercialProdutoControllers from './Comercial/Produto/controllers/index.j
 
 import ModulosControllers from './Modulos/controllers/modulos.js';
 import DanfeControllers from './Danfe/controllers/danfe.js';
+
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' });
+
 const routes = new Router();
 // routes.use(authMiddleware)
 
@@ -465,6 +472,11 @@ routes.put('/funcionarios-loja/:id', InformaticaControllers.putFuncionarioLoja)
 routes.post('/criar-funcionarios-loja', InformaticaControllers.postFuncionarioLoja)
 routes.put('/lista-caixas/:id', InformaticaControllers.putCaixaLoja)
 routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDesconto)
+// routes.post('/consulta-nfec', ConsultaNfeController.consultar)
+routes.post('/consultar-nfe', upload.single('planilha'), ConsultaNfeController.consultar);
+routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
+routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
+routes.get('/validarConsulta', ConsultaNfeController.validarConsultar);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática

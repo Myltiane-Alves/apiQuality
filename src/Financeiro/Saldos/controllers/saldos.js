@@ -1,9 +1,5 @@
 
 import axios from "axios";
-import { dataFormatada } from "../../../utils/dataFormatada.js";
-
-import { getMovimentoSaldoBonificacaoById, postMovimentoSaldoBonificacao } from "../repositories/movimentoSaldoBonificacao.js";
-import { getLojaSaldoPorGrupo } from "../repositories/saldoLojaPorGrupo.js";
 import 'dotenv/config';
 import { SaldosClient } from "../client/index.js";
 import { SaldoService } from "../services/index.js";
@@ -20,7 +16,6 @@ class SaldosControllers {
     try {
       const apiUrl = `${url}/api/financeiro/movimento-saldo-bonificacao.xsjs?page=${page}&pageSize=${pageSize}&idFuncionario=${idFuncionario}`
       const response = await axios.get(apiUrl)
-      // const response = await getMovimentoSaldoBonificacaoById(idFuncionario,  page, pageSize)
 
       return res.json(response.data);
     } catch (error) {
@@ -35,8 +30,6 @@ class SaldosControllers {
     try {
       const apiUrl = `${url}/api/financeiro/saldo-loja-por-grupo.xsjs?idGrupoEmpresarial=${idGrupoEmpresarial}&dataPesquisa=${dataPesquisa}&pageSize=${pageSize}&page=${page}`
       const response = await axios.get(apiUrl)
-
-      // const response = await getLojaSaldoPorGrupo(idGrupoEmpresarial, dataPesquisa, pageSize, page)
 
       return res.json(response.data);
     } catch (error) {
