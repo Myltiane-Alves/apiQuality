@@ -602,6 +602,7 @@ routes.get('/distribuicaoComprasHistorico', ComprasControllers.getListaDistribui
 routes.get('/detalheDistribuicaoCompras', ComprasControllers.getListaDetalheDistribuicao)
 routes.get('/distribuicaoSugestoesHistorico', ComprasControllers.getListaDistribuicaoSugestoesHistorico)
 routes.get('/produtos-entre-filiais', ComprasControllers.getListaProdutosEntreFiliais)
+routes.get('/produtos-por-pedido', ComprasControllers.getListaProdutosPorPedido)
 
 
 
