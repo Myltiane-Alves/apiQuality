@@ -889,6 +889,7 @@ class ComprasControllers {
                 IDGRUPOESTRUTURA,
                 STATIVO,
             })
+            
             return res.json(response.data);
         } catch (error) {
             console.error("Erro no ComprasControllers.putEstilos:", error);
