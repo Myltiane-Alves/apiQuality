@@ -217,7 +217,10 @@ class ConsultaNfeController {
 
  async validarConsultar(req, res) {
   try {
-    const CERTIFICADO_BASE64 =  process.env.CERTIFICADO_BASE64 
+    const CERTIFICADO_BASE64 =
+      process.env.CERTIFICADO_BASE64 ||
+      fs.readFileSync("../cert_base64.txt", "utf-8").trim();
+
     const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
 
     // Salva o arquivo temporário do certificado (PFX)
