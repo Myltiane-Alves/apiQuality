@@ -482,11 +482,11 @@ class ComprasControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-            const apiUrl = `${url}/api/compras/estilos.xsjs?idEstilo=${idEstilo}&descEstilo=${descricao}`
+            const apiUrl = `${url}/api/compras/estilos.xsjs?idEstilo=${idEstilo}&descEstilo=${descEstilo}&idGrupoEstilo=${idGrupoEstilo}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
             // const response = await getEstilos(idEstilo, idGrupoEstilo, descEstilo, page, pageSize)
 
-            return res.json(response);
+            return res.json(response.data);
         } catch (error) {
             console.error("erro nos campos do banco:", error);
             throw error;
