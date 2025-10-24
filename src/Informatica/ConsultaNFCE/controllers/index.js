@@ -214,8 +214,6 @@ class ConsultaNfeController {
     }
   }
 
-  
-
 
  async validarConsultar(req, res) {
   try {
