@@ -383,7 +383,7 @@ class ConsultaNfeController {
             tpAmb: 1,
             UF,
             versao: "4.00",
-            // caminho do xmllint (localmente você pode ajustar)
+      
             xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
           },
           certOptions
