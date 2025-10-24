@@ -5,6 +5,7 @@ import { getPedidos } from "../repositories/listaPedidos.js";
 import { getDetalhePedido } from "../repositories/listaDetalhePedidosGrade.js";
 import { createEstilo, getEstilos, updateEstilo } from "../repositories/estilos.js";
 import 'dotenv/config';
+import { parse } from "path";
 const url = process.env.API_URL;
 
 class ComprasControllers {
@@ -854,7 +855,7 @@ class ComprasControllers {
     }
 
     async updateCores(req, res) {
-        let dados = {
+        let {
             IDCOR,
             IDGRUPOCOR,
             DSCOR,
@@ -864,7 +865,10 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/cores.xsjs`
             const response = await axios.put(apiUrl, {
-                dados
+                IDCOR,
+                IDGRUPOCOR,
+                DSCOR,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
@@ -875,11 +879,19 @@ class ComprasControllers {
 
     async putEstilos(req, res) {
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await  updateEstilo(dados);
-            return res.json(response);
+            let { IDVINCESTILOSESTRUTURA, IDGRUPOESTRUTURAANTIGA, IDESTILO, DSESTILO, IDGRUPOESTRUTURA, STATIVO } = req.body;
+            const apiUrl = `${url}/api/compras/estilos.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDVINCESTILOSESTRUTURA,
+                IDGRUPOESTRUTURAANTIGA,
+                IDESTILO,
+                DSESTILO,
+                IDGRUPOESTRUTURA,
+                STATIVO,
+            })
+            return res.json(response.data);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("Erro no ComprasControllers.putEstilos:", error);
             return res.status(500).json({ error: error.message });
         }
     }
@@ -1046,9 +1058,19 @@ class ComprasControllers {
 
     async postEstilos(req, res) {
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body]; 
-            const response = await  createEstilo(dados);
-            return res.json(response);
+            let { DSESTILO, IDGRUPOESTRUTURA, STATIVO, IDESTILO, IDGRUPOESTRUTURAANTIGA, IDVINCESTILOSESTRUTURA } = req.body;
+            const apiUrl = `${url}/api/compras/estilos.xsjs`
+            console.log(req.body, 'req.body no postEstilos');
+            const response = await axios.post(apiUrl, {
+                IDGRUPOESTRUTURAANTIGA: parseInt(null),
+                IDVINCESTILOSESTRUTURA: parseInt(null),
+                IDESTILO: parseInt(null),
+                DSESTILO,
+                IDGRUPOESTRUTURA,
+                STATIVO,
+            });
+            console.log(response.data, 'response data');
+            return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             return res.status(500).json({ error: error.message });
