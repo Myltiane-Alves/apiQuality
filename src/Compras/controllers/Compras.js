@@ -810,7 +810,7 @@ class ComprasControllers {
     }
 
     async updateSubGrupoEstrutura(req, res) {
-        let dados = {
+        let {
             IDGRUPOESTRUTURAANTIGA,
             IDGRUPOESTRUTURA,
             DSSUBGRUPOESTRUTURA,
@@ -822,8 +822,15 @@ class ComprasControllers {
 
         try {
             const apiUrl = `${url}/api/compras/subgrupoestrutura.xsjs`
+            return console.log(req.body, 'request.body');
             const response = await axios.put(apiUrl, {
-                dados
+                IDGRUPOESTRUTURAANTIGA,
+                IDGRUPOESTRUTURA,
+                DSSUBGRUPOESTRUTURA,
+                DSSUBGRUPOESTRUTURAFIM,
+                CODSUBGRUPOESTRUTURA,
+                IDSUBGRUPOESTRUTURA,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
