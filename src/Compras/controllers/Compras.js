@@ -870,6 +870,7 @@ class ComprasControllers {
                 DSCOR,
                 STATIVO
             });
+
             return res.json(response.data);
         } catch (error) {
             console.error("erro nos campos do banco:", error);
@@ -1038,8 +1039,7 @@ class ComprasControllers {
     }
 
     async createCores(req, res) {
-        let dados = {
-            IDCOR,
+        let  {
             IDGRUPOCOR,
             DSCOR,
             STATIVO
@@ -1048,11 +1048,13 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/cores.xsjs`
             const response = await axios.post(apiUrl, {
-                dados
+                IDGRUPOCOR,
+                DSCOR,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos do banco:", error);
+            console.error("erro ComprasController.createCores:", error);
             throw error;
         }
     }
