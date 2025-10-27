@@ -596,6 +596,7 @@ routes.get('/vinculoTamanhoCategoria', ComprasControllers.getListaTamanhosCatego
 routes.get('/fornecedor-produto', ComprasControllers.getListaFornecedorProduto)
 routes.get('/listaDetalhePedidos', ComprasControllers.getListaDetalhePedidos)
 routes.get('/unidadeMedida', ComprasControllers.getListaUnidadeMedida)
+routes.get('/unidades-de-Medidas', ComprasControllers.getListaUnidadesMedidas)
 
 routes.get('/localExposicao', ComprasControllers.getListaLocalExposicao)
 routes.get('/distribuicaoComprasHistorico', ComprasControllers.getListaDistribuicaoHistorico)
@@ -611,7 +612,7 @@ routes.put('/atualizarCondicaoPagamento', ComprasControllers.updateCondicaoPagam
 routes.put('/atualizarTransportador', ComprasControllers.updateCadastroTransportador)
 routes.put('/atualizarProdutoImagem', ComprasControllers.updateProdutoImagem)
 routes.put('/atualizarSubGrupoEstrutura', ComprasControllers.updateSubGrupoEstrutura)
-routes.put('/atualizarUnidadeMedida', ComprasControllers.updateUnidadeMedida)
+routes.put('/unidadeMedida/:id', ComprasControllers.updateUnidadeMedida)
 routes.put('/cores/:id', ComprasControllers.updateCores)
 // routes.put('/atualizarEstilos', ComprasControllers.updateEstilos)
 routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)

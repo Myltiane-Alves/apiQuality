@@ -429,7 +429,7 @@ class ComprasControllers {
         }
     }
 
-    async getListaUnidadeMedida(req, res) {
+    async getListaUnidadesMedidas(req, res) {
         let { idUnidadeMedida, descricao} = req.query;
         idUnidadeMedida = idUnidadeMedida ? idUnidadeMedida : '';
         descricao = descricao ? descricao : '';
@@ -439,7 +439,7 @@ class ComprasControllers {
 
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos do banco:", error);
+            console.error("erro ComprasControllers.getListaUnidadesMedidas:", error);
             throw error;
         }
     }
@@ -833,7 +833,7 @@ class ComprasControllers {
     }
 
     async updateUnidadeMedida(req, res) {
-        let dados = {
+        let {
             IDUNIDADEMEDIDA,
             DSUNIDADE,
             DSSIGLA,
@@ -845,9 +845,14 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/unidadesdemedidas.xsjs`
             const response = await axios.put(apiUrl, {
-                dados
+                IDUNIDADEMEDIDA,
+                DSUNIDADE,
+                DSSIGLA,
+                DTCADASTRO,
+                DTULTATUALIZACAO,
+                STATIVO
             });
-            return res.json(response.data);
+            return res.status(200).json({message: 'Atualizado com sucesso'});
         } catch (error) {
             console.error("erro nos campos do banco:", error);
             throw error;
@@ -1017,8 +1022,7 @@ class ComprasControllers {
     }
 
     async createUnidadeMedida(req, res) {
-        let dados = {
-            IDUNIDADEMEDIDA,
+        let {
             DSUNIDADE,
             DSSIGLA,
             DTCADASTRO,
@@ -1029,7 +1033,11 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/unidadesdemedidas.xsjs`
             const response = await axios.post(apiUrl, {
-                dados
+                DSUNIDADE,
+                DSSIGLA,
+                DTCADASTRO,
+                DTULTATUALIZACAO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
