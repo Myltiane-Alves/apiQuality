@@ -1,6 +1,8 @@
 import { CaixaClient } from "../client/index.js";
 import { caixaPutSchema } from "../schema/caixaPutSchema.js";
+import { empresaDiarioSchema } from "../schema/empresaDiario.js";
 import { caixaSchema } from "../schema/index.js";
+import { todosCaixasSchema } from "../schema/todosCaixas.js";
 import { caixaServices as CaixaServices } from "../services/index.js";
 
 const caixaClient = new CaixaClient(process.env.API_URL);
@@ -101,6 +103,67 @@ class CaixaControllers {
             return res.status(200).json(response);
         } catch (error) {
             console.error("Erro no CaixaControllers.putCaixaLoja", error);
+            return res.status(500).json({ error: "Erro no servidor" });
+        }
+    }
+
+    async putAtualizaEmpresaDiario(req, res) {
+        try {
+            const { error, value } = empresaDiarioSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+            const response = await caixaServices.updateEmpresaDiario({
+                IDEMPRESA: value.IDEMPRESA,
+                HORAATUALIZA: value.HORAATUALIZA,
+                STATUALIZADIARIO: value.STATUALIZADIARIO,
+                STLOJAABERTA: value.STLOJAABERTA,
+                IDFUNCIONARIOSUPERVISOR: value.IDFUNCIONARIOSUPERVISOR
+            });
+
+            return res.status(200).json(response);
+        } catch (error) {
+            console.error("Erro no CaixaControllers.putAtualizaEmpresaDiario", error);
+            return res.status(500).json({ error: "Erro no servidor" });
+        }
+    }
+
+    async putAtualizarTodosCaixas(req, res) {
+        try {
+            const { error, value } = todosCaixasSchema.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+            const response = await caixaServices.updaterTodosCaixas({
+                STATUALIZA: value.STATUALIZA,
+                STLIMPAR: value.STLIMPAR
+            });
+
+            return res.status(200).json(response);
+        } catch (error) {
+            console.error("Erro no CaixaControllers.putAtualizarTodosCaixas", error);
             return res.status(500).json({ error: "Erro no servidor" });
         }
     }

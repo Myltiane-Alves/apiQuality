@@ -120,9 +120,9 @@ export class caixaServices {
         IDCAIXAWEB
     }
     ) {
-       if (!DSCAIXAWEB) {
+        if (!DSCAIXAWEB) {
             throw new Error('DSCAIXAWEB obrigatorio');
-        } 
+        }
         if (!TBEMISSAOFISCAL) {
             throw new Error('TBEMISSAOFISCAL obrigatorio');
         }
@@ -172,6 +172,87 @@ export class caixaServices {
         return result
     }
 
+
+    async updateEmpresaDiario({
+        IDEMPRESA,
+        HORAATUALIZA,
+        STATUALIZADIARIO,
+        STLOJAABERTA,
+        IDFUNCIONARIOSUPERVISOR,
+    }
+    ) {
+        if (!IDEMPRESA) {
+            throw new Error('DSCAIXAWEB obrigatorio');
+        }
+        if (!HORAATUALIZA) {
+            throw new Error('DSCAIXAWEB obrigatorio');
+        }
+        if (!STATUALIZADIARIO) {
+            throw new Error('DSCAIXAWEB obrigatorio');
+        }
+        if (!STLOJAABERTA) {
+            throw new Error('DSCAIXAWEB obrigatorio');
+        }
+        if (!IDFUNCIONARIOSUPERVISOR) {
+            throw new Error('DSCAIXAWEB obrigatorio');
+        }
+        const result = await this.client.atualizarCaixa(
+            IDEMPRESA,
+            HORAATUALIZA,
+            STATUALIZADIARIO,
+            STLOJAABERTA,
+            IDFUNCIONARIOSUPERVISOR,
+        );
+
+        //console.log(IDCAIXAWEB, 'idcaixaweb');
+        return result
+    }
+
+    async updateEmpresaDiario({
+        IDEMPRESA,
+        HORAATUALIZA,
+        STATUALIZADIARIO,
+        STLOJAABERTA,
+        IDFUNCIONARIOSUPERVISOR,
+    }
+    ) {
+        if (!IDEMPRESA) {
+            throw new Error('IDEMPRESA obrigatorio');
+        }
+        if (!HORAATUALIZA) {
+            throw new Error('HORAATUALIZA obrigatorio');
+        }
+        if (!STATUALIZADIARIO) {
+            throw new Error('STATUALIZADIARIO obrigatorio');
+        }
+        if (!STLOJAABERTA) {
+            throw new Error('STLOJAABERTA obrigatorio');
+        }
+ 
+        const result = await this.client.atualizarEmpresaDiario(
+            IDEMPRESA,
+            HORAATUALIZA,
+            STATUALIZADIARIO,
+            STLOJAABERTA,
+            IDFUNCIONARIOSUPERVISOR,
+        );
+
+        //console.log(IDCAIXAWEB, 'idcaixaweb');
+        return result
+    }
+
+    async updaterTodosCaixas({
+        STATUALIZA,
+        STLIMPAR,
+    }
+    ) {
+
+        const result = await this.client.atualizarTodosCaixas(
+            STATUALIZA,
+            STLIMPAR,
+        );
+        //console.log(IDCAIXAWEB, 'idcaixaweb');
+        return result
+    }
+
 }
-
-

@@ -550,7 +550,7 @@ class InformaticaControllers {
     }
  */
   
-    async putAtualizaEmpresaDiario(req, res) {
+/*     async putAtualizaEmpresaDiario(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
             const response = await axios.put(`${url}/api/informatica/atualiza-empresa-diario.xsjs`, dados)
@@ -560,10 +560,10 @@ class InformaticaControllers {
             console.error("Unable to connect to the database:", error);
             throw error;
         }
-    }
+    } */
    
 
-    async putAtualizarTodosCaixas(req, res) {
+/*     async putAtualizarTodosCaixas(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
             const response = await axios.put(`${url}/api/informatica/atualizar_todos_caixa.xsjs`, dados)
@@ -576,7 +576,7 @@ class InformaticaControllers {
             throw error;
         }
     }
-
+ */
     async putFuncionarioLoja(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body];   
