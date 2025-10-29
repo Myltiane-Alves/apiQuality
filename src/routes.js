@@ -623,7 +623,7 @@ routes.put('/deletarVinculoTamanhoCategoria', ComprasControllers.updateVinculoTa
 
 // POST
 routes.post('/cadastrarCondicaoPagamento', ComprasControllers.createCondicaoPagamento)
-routes.post('/cadastroSubGrupoEstrutura', ComprasControllers.createSubGrupoEstrutura)
+routes.post('/cadastro-sub-grupo-estrutura', ComprasControllers.createSubGrupoEstrutura)
 routes.post('/cadastrarUnidadeMedida', ComprasControllers.createUnidadeMedida)
 routes.post('/cadastrar-cores', ComprasControllers.createCores)
 routes.post('/criarlistaEstilos', ComprasControllers.postEstilos)

@@ -327,7 +327,7 @@ class ConsultaNfeController {
     let vendas = req.body?.vendas;
     if (!vendas) {
       const response = await axios.get(
-        "http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs"
+        "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs"
       );
       vendas = response.data;
     }
@@ -407,7 +407,7 @@ class ConsultaNfeController {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-} 
+ } 
 
 
   // async validarConsultar(req, res) {
