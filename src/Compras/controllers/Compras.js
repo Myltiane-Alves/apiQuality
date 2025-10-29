@@ -1023,6 +1023,7 @@ class ComprasControllers {
     async postGrupoEstrutura(req, res) {
         let {
             DSGRUPOESTRUTURA,
+            IDGRUPOEMPRESARIAL,
             STATIVO
         } = req.body;
 
@@ -1030,6 +1031,7 @@ class ComprasControllers {
             const apiUrl = `${url}/api/compras/grupoextrutura.xsjs`
             const response = await axios.post(apiUrl, {
                 DSGRUPOESTRUTURA,
+                IDGRUPOEMPRESARIAL,
                 STATIVO
             });
             return res.json(response.data);
