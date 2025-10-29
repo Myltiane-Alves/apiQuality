@@ -53,6 +53,8 @@ class LinkRelatorioBiController {
                     }))
                 });
             }
+            console.log("params:", req.params);
+            console.log("body:", req.body);
 
             const response = await linkRelatorioBiServices.createLinkRelatorioBi({
                 IDRELATORIOBI: value.IDRELATORIOBI,
@@ -63,7 +65,7 @@ class LinkRelatorioBiController {
             });
             return res.status(200).json(response);
         } catch (error) {
-            console.error('Error no LinkRelatorioBiController.postLinkRelatorioBi:', error);
+            console.error('Error no LinkRelatorioBiController.putLinkRelatorioBi:', error);
             return res.status(500).json({ error: 'Error no servidor' });
         }
     }

@@ -111,4 +111,31 @@ export class CaixaClient {
         return response.data;
     }
 
+    async atualizarEmpresaDiario(
+        IDEMPRESA,
+        HORAATUALIZA,
+        STATUALIZADIARIO,
+        STLOJAABERTA,
+        IDFUNCIONARIOSUPERVISOR
+    ) {
+        const response = await this.api.put(`${url}/api/informatica/atualiza-empresa-diario.xsjs`, {
+            IDEMPRESA,
+            HORAATUALIZA,
+            STATUALIZADIARIO,
+            STLOJAABERTA,
+            IDFUNCIONARIOSUPERVISOR
+        })
+        return response.data;
+    }
+
+    async atualizarTodosCaixas(
+        STATUALIZA,
+        STLIMPAR
+    ) {
+        const response = await this.api.put(`${url}/api/informatica/atualizar_todos_caixa.xsjs`, {
+            STATUALIZA,
+            STLIMPAR
+        })
+        return response.data;
+    }
 }

@@ -9,7 +9,6 @@ export class EmpresaClient {
             baseURL: baseURL || url,
             timeout: 80000
         });
-
     }
 
     async atualizarEmpresa(
@@ -31,25 +30,18 @@ export class EmpresaClient {
         NUCEP,
         NUIBGE,
         EEMAILPRINCIPAL,
-        EEMAILCOMERCIAL,
-        EEMAILFINANCEIRO,
-        EEMAILCONTABILIDADE,
-        NUTELPUBLICO,
-        NUTELCOMERCIAL,
-        NUTELFINANCEIRO,
         NUTELGERENCIA,
-        EURL,
-        PATHIMG,
         NUCNAE,
         STECOMMERCE,
         DTULTATUALIZACAO,
         STATIVO,
         ALIQPIS,
         ALIQCOFINS,
-        IDEMPRESA,
+        IDEMPRESA
     ) {
 
-        const response = await this.api.put(`${url}/api/empresa.xsjs`, {
+        const response = await this.api.put(`${url}/api/empresa.xsjs`, [{
+           
             STGRUPOEMPRESARIAL,
             IDGRUPOEMPRESARIAL,
             IDSUBGRUPOEMPRESARIAL,
@@ -68,23 +60,15 @@ export class EmpresaClient {
             NUCEP,
             NUIBGE,
             EEMAILPRINCIPAL,
-            EEMAILCOMERCIAL,
-            EEMAILFINANCEIRO,
-            EEMAILCONTABILIDADE,
-            NUTELPUBLICO,
-            NUTELCOMERCIAL,
-            NUTELFINANCEIRO,
             NUTELGERENCIA,
-            EURL,
-            PATHIMG,
             NUCNAE,
             STECOMMERCE,
             DTULTATUALIZACAO,
             STATIVO,
             ALIQPIS,
             ALIQCOFINS,
-            IDEMPRESA,
-        })
+            IDEMPRESA
+        }])
         return response.data;
     }
 }

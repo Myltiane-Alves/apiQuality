@@ -10,16 +10,16 @@ export class linkRelatorioBIService {
         STATIVO
     }) {
 
-        if (IDRELATORIOBI) {
+        if (!IDRELATORIOBI) {
             throw new Error('IDRELATORIOBI obrigatorio');
         }
-        if (IDEMPRESA) {
+        if (!IDEMPRESA) {
             throw new Error('IDEMPRESA obrigatorio');
         }
-        if (LINK) {
+        if (!LINK) {
             throw new Error('LINK obrigatorio');
         }
-        if (STATIVO) {
+        if (!STATIVO) {
             throw new Error('STATIVO obrigatorio');
         }
 
@@ -39,20 +39,20 @@ export class linkRelatorioBIService {
         STATIVO,
         IDRELATORIOBIANTIGO
     }) {
-
-        if (IDRELATORIOBI) {
-            throw new Error('IDRELATORIOBI obrigatorio');
+        
+        if (!IDRELATORIOBI) {
+            throw new Error('IDRELATORIOBI obrigatorio ');
         }
-        if (IDEMPRESA) {
+        if (!IDEMPRESA) {
             throw new Error('IDEMPRESA obrigatorio');
         }
-        if (LINK) {
+        if (!LINK) {
             throw new Error('LINK obrigatorio');
         }
-        if (STATIVO) {
+        if (!STATIVO) {
             throw new Error('STATIVO obrigatorio');
         }
-        if (IDRELATORIOBIANTIGO) {
+        if (!IDRELATORIOBIANTIGO) {
             throw new Error('IDRELATORIOBIANTIGO obrigatorio');
         }
 
