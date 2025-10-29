@@ -618,7 +618,7 @@ routes.put('/cores/:id', ComprasControllers.updateCores)
 // routes.put('/atualizarEstilos', ComprasControllers.updateEstilos)
 routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)
 routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
-routes.put('/atualizarCategoriaPedidos', ComprasControllers.updateCategoriaPedidos)
+routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
 
 routes.put('/deletarVinculoTamanhoCategoria', ComprasControllers.updateVinculoTamanhoCategoria)
 

@@ -954,8 +954,8 @@ class ComprasControllers {
         }
     }
 
-    async updateCategoriaPedidos(req, res) {
-        let dados = {
+    async putCategoriaPedidos(req, res) {
+        let {
             IDCATEGORIAPEDIDO,
             DSCATEGORIAPEDIDO,
             TIPOPEDIDO,
@@ -965,11 +965,14 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/categoriapedidos.xsjs`
             const response = await axios.put(apiUrl, {
-                dados
+                IDCATEGORIAPEDIDO,
+                DSCATEGORIAPEDIDO,
+                TIPOPEDIDO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos do banco:", error);
+            console.error("error no ComprasControllers.putCategoriaPedidos:", error);
             throw error;
         }
     }
