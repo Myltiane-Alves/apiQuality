@@ -992,10 +992,30 @@ class ComprasControllers {
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos do banco:", error);
+            console.error("error no ComprasController.postGrupoEstrutura:", error);
             throw error;
         }
     }
+
+    async postGrupoEstrutura(req, res) {
+        let {
+            DSGRUPOESTRUTURA,
+            STATIVO
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/grupoextrutura.xsjs`
+            const response = await axios.post(apiUrl, {
+                DSGRUPOESTRUTURA,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasController.postGrupoEstrutura:", error);
+            throw error;
+        }
+    }
+
     async createCondicaoPagamento(req, res) {
         let dados = {
             IDCONDICAOPAGAMENTO,
