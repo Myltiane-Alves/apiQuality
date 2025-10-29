@@ -839,6 +839,29 @@ class ComprasControllers {
         }
     }
 
+    async putGrupoEstrutura(req, res) {
+        let {
+            IDGRUPOESTRUTURA,
+            IDGRUPOEMPRESARIAL,
+            DSGRUPOESTRUTURA,
+            STATIVO
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/grupoextrutura.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDGRUPOESTRUTURA,
+                IDGRUPOEMPRESARIAL,
+                DSGRUPOESTRUTURA,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasController.putGrupoEstrutura:", error);
+            throw error;
+        }
+    }
+
     async updateUnidadeMedida(req, res) {
         let {
             IDUNIDADEMEDIDA,
