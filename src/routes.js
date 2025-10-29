@@ -612,6 +612,7 @@ routes.put('/atualizarCondicaoPagamento', ComprasControllers.updateCondicaoPagam
 routes.put('/atualizarTransportador', ComprasControllers.updateCadastroTransportador)
 routes.put('/atualizarProdutoImagem', ComprasControllers.updateProdutoImagem)
 routes.put('/sub-grupo-estrutura/:id', ComprasControllers.updateSubGrupoEstrutura)
+routes.put('/grupo-estrutura/:id', ComprasControllers.putGrupoEstrutura)
 routes.put('/unidadeMedida/:id', ComprasControllers.updateUnidadeMedida)
 routes.put('/cores/:id', ComprasControllers.updateCores)
 // routes.put('/atualizarEstilos', ComprasControllers.updateEstilos)
