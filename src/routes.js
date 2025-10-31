@@ -78,6 +78,10 @@ import ComercialProdutoControllers from './Comercial/Produto/controllers/index.j
 import ModulosControllers from './Modulos/controllers/modulos.js';
 import DanfeControllers from './Danfe/controllers/danfe.js';
 
+// Criação menu Filho
+import MenuFilhoController from "./MenuFilho/controller/controllerMenuFilho.js";
+
+
 import multer from 'multer';
 const upload = multer({ dest: 'uploads/' });
 
@@ -97,6 +101,10 @@ routes.post('/gerar-danfe', DanfeControllers.gerarDanfeLocal);
 // routes.use(authMiddleware)
 
 
+// Criação Menu Filho
+routes.get('/menu-pai', MenuFilhoController.getMenuPai)
+routes.get('/menu-filho', MenuFilhoController.getMenuFilho)
+routes.post('/menu-filho/:id', MenuFilhoController.postMenuFilho)
 //  Funcionarios 
 
 routes.get('/autorizarVoucher', FuncionariosControllers.getAutorizacaoVoucherFuncionarios)
