@@ -1,8 +1,6 @@
 import { Tools } from 'node-sped-nfe';
 import fs from 'fs';
-import xlsx from 'xlsx';
 import path from 'path';
-import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
 
