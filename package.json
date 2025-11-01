@@ -21,8 +21,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sap/hana-client": "^2.18.27",
-    "@sap/xsenv": "^4.2.0",
     "archiver": "^7.0.1",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
