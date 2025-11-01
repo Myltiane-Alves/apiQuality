@@ -104,7 +104,7 @@ class ConsultaNfeController {
       const CNPJ = process.env.CNPJ_EMITENTE || "99999999999999"; // ajuste para seu CNPJ
 
       // Salva certificado temporário
-      const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
+      const tempPfxPath = path.join(os.tmpdir(), "/temp/certificado.pfx");
       fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
 
       let vendas = req.body?.vendas;
@@ -186,6 +186,7 @@ class ConsultaNfeController {
           
           const chaveNFe = {
             cUFAutor: UF, 
+
             CNPJ: CNPJ,
             consChNFe: { chNFe: CHAVE }
           };
@@ -230,7 +231,7 @@ class ConsultaNfeController {
     const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
 
     // Salva o arquivo temporário do certificado (PFX)
-    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
+    const tempPfxPath = path.join(os.tmpdir(), "/temp/certificado.pfx");
     fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
 
     let vendas = req.body?.vendas;
