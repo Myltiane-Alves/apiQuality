@@ -26,8 +26,7 @@ class ConsultaNfeController {
       );
       vendas = response.data;
     }
-    
-    // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+  
     if (!Array.isArray(vendas)) {
       if (Array.isArray(vendas.data)) {
         vendas = vendas.data;
@@ -36,7 +35,6 @@ class ConsultaNfeController {
       } else if (vendas.data && Array.isArray(vendas.data.rows)) {
         vendas = vendas.data.rows;
       } else {
-        // tenta encontrar a primeira propriedade que é array
         const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
         if (Array.isArray(possibleArray)) {
           vendas = possibleArray;
@@ -91,7 +89,6 @@ class ConsultaNfeController {
       }
     }
 
-    // remove o arquivo temporário
     fs.unlinkSync(tempPfxPath);
 
     return res.json({
