@@ -183,9 +183,9 @@ class ConsultaNfeController {
         }
 
         try {
-          // Consulta por chave
+          
           const chaveNFe = {
-            cUFAutor: UF, // Ex: 35 para SP
+            cUFAutor: UF, 
             CNPJ: CNPJ,
             consChNFe: { chNFe: CHAVE }
           };
