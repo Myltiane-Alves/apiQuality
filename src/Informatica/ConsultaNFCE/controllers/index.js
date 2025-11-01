@@ -12,15 +12,7 @@ function extrairCStat(xml) {
   return match ? match[1] : 'SEM_CSTAT';
 }
 
-/**
- * Carrega opções de certificado para passar ao constructor de Tools.
- * Suporta, na ordem de preferência:
- *  - PFX via variável de ambiente CERT_PFX_BASE64
- *  - PFX arquivo local './GTO COMERCIO 2025-2026.pfx'
- *  - PEM via variáveis CERT_PEM_CERT_BASE64 / CERT_PEM_KEY_BASE64
- *  - PEM via caminhos process.env.CERT_PEM_CERT_PATH / process.env.CERT_PEM_KEY_PATH
- * Retorna um objeto que pode ser passado como 2º argumento do Tools, por exemplo { pfx: Buffer, senha } ou { cert: Buffer, key: Buffer }
- */
+
 async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
   // 1) PFX via env base64
   const pfxBase64 = process.env.CERT_PFX_BASE64;
