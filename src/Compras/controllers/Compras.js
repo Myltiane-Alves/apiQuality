@@ -1187,6 +1187,27 @@ class ComprasControllers {
             throw error;
         }
     }
+
+    async postVinculoCategoriaPedido(req, res) {
+        let {
+            IDCATEGORIAPEDIDO,
+            IDTAMANHO,
+            STATIVO
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/vinctamcat.xsjs`
+            const response = await axios.post(apiUrl, {
+                IDCATEGORIAPEDIDO,
+                IDTAMANHO,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasController.postVinculoCategoriaPedido:", error);
+            throw error;
+        }
+    }
 }
 
 export default new ComprasControllers();

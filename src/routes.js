@@ -594,7 +594,7 @@ routes.get('/listaEstilos', ComprasControllers.getListaEstilos)
 routes.get('/tipoTecidos', ComprasControllers.getListaTipoTecidos)
 routes.get('/categoriaPedidos', ComprasControllers.getListaCategoriaPedidos)
 routes.get('/tamanhosPedidos', ComprasControllers.getListaTamanhosPedidos)
-routes.get('/vinculo-tamanho-categoria', ComprasControllers.getListaTamanhosCategoriaPedidos)
+routes.get('/vinculo-tamanho-categoria', ComprasControllers.getListaTamanhosCategoriaPedidos) 
 routes.get('/fornecedor-produto', ComprasControllers.getListaFornecedorProduto)
 routes.get('/listaDetalhePedidos', ComprasControllers.getListaDetalhePedidos)
 routes.get('/unidadeMedida', ComprasControllers.getListaUnidadeMedida)
@@ -622,7 +622,7 @@ routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)
 routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
 routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
 
-routes.put('/deletarVinculoTamanhoCategoria', ComprasControllers.updateVinculoTamanhoCategoria)
+routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 
 // POST
 routes.post('/cadastrarCondicaoPagamento', ComprasControllers.createCondicaoPagamento)
@@ -633,6 +633,7 @@ routes.post('/criarlistaEstilos', ComprasControllers.postEstilos)
 routes.post('/cadastrar-tipo-tecido', ComprasControllers.createTipoTecidos)
 routes.post('/cadastrarCategoriaPedidos', ComprasControllers.createCategoriaPedidos)
 routes.post('/cadastro-grupoEstrutura', ComprasControllers.postGrupoEstrutura)
+routes.post('/cadastro-vinculo-tamanho-categoria', ComprasControllers.postVinculoCategoriaPedido)
 
 
 // Cadastro
