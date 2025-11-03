@@ -11,7 +11,6 @@ function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
   return match ? match[1] : 'SEM_CSTAT';
 }
-
 /**
  * Carrega opções de certificado para passar ao constructor de Tools.
  * Suporta, na ordem de preferência:
