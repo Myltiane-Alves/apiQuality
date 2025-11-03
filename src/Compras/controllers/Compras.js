@@ -1169,7 +1169,7 @@ class ComprasControllers {
     }
 
     async createCategoriaPedidos(req, res) {
-        let dados = {
+        let {
             IDCATEGORIAPEDIDO,
             DSCATEGORIAPEDIDO,
             TIPOPEDIDO,
@@ -1179,11 +1179,14 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/categoriapedidos.xsjs`
             const response = await axios.post(apiUrl, {
-                dados
+                IDCATEGORIAPEDIDO,
+                DSCATEGORIAPEDIDO,
+                TIPOPEDIDO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos preenchido:", error);
+            console.error("error ComprasController.createCategoriaPedidos:", error);
             throw error;
         }
     }
