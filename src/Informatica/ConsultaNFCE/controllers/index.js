@@ -1,5 +1,5 @@
 import { Tools } from 'node-sped-nfe';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import xlsx from 'xlsx';
 import path from 'path';
 import archiver from 'archiver';
@@ -92,6 +92,28 @@ async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026
   return null;
 }
 
+let toolsInstance = null;
+
+async function getToolsInstance() {
+
+  if(toolsInstance) return toolsInstance;
+
+  const temp = JSON.parse(fs,readFileSync(path.join(os.tmpdir(), "certificado.pfx")));
+
+  toolsInstance = new Tools(
+    {
+      mod: "65",
+      tpAmb: 1,
+      UF: "SP",
+      versao: "4.00",
+      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      CSC: temp.CSC || "",
+      CSCid: temp.CSCid || "",
+    },
+    await getCertOptions(temp.SENHA || "#senhagto2024#")
+  );
+  return toolsInstance;
+}
 class ConsultaNfeController {
  async validarConsultar(req, res) {
   try {
@@ -190,6 +212,54 @@ class ConsultaNfeController {
   }
  } 
 
+ async  gerarXML(payload) {
+  const NFe = new Make()
+  NFe.tagIde({Id: null, versao:"4.00"})
+
+  NFe.tagIde({
+    cUF: "51",
+    cNF: "00002023",
+    natOp: "VENDA",
+    mod: "65",
+    serie: "0",
+    nNF: "251",
+    dhEmi: NFe.formatData(),
+    tpNF: "1",
+    idDest: "1",
+    cMunFG: "5106257",
+    tpImp: "4",
+    tpEmis: "1",
+    cDV: "1",
+    tpAmb: "2",
+    finNFe: "1",
+    indFinal: "1",
+    indPres: "1",
+    indIntermed: "0",
+    procEmi: "0",
+    verProc: "4.13"
+  })
+
+  NFe.tagEmit(payload.emit || {
+    CNPJ: "0000000000000",
+    xNome: "NOME",
+    xFant: "NOME FANTASIA",
+    IE: "00000000",
+    CRT: "1"
+  });
+
+   NFe.tagEnderEmit(payload.enderEmit || {
+    xLgr: "Av. Nodejs",
+    nro: "22",
+    xBairro: "Githubsom",
+    cMun: "00000",
+    xMun: "Nova Commite",
+    UF: "SP",
+    CEP: "0000000",
+    cPais: "1058",
+    xPais: "BRASIL",
+    fone: "1140028922"
+  });
+ }
  async vendaNFe(req, res) {
   try {
     const CERTIFICADO_BASE64 =
