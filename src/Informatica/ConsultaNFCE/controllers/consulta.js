@@ -1,10 +1,11 @@
 import { Tools } from 'node-sped-nfe';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import xlsx from 'xlsx';
 import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
+import { url } from 'inspector';
 
 
 function extrairCStat(xml) {
@@ -92,22 +93,29 @@ async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026
   return null;
 }
 
+let toolsInstance = null;
+
+async function getToolsInstance() {
+
+  if(toolsInstance) return toolsInstance;
+
+  const temp = JSON.parse(fs,readFileSync(path.join(os.tmpdir(), "certificado.pfx")));
+
+  toolsInstance = new Tools(
+    {
+      mod: "65",
+      tpAmb: 1,
+      UF: "SP",
+      versao: "4.00",
+      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      CSC: temp.CSC || "",
+      CSCid: temp.CSCid || "",
+    },
+    await getCertOptions(temp.SENHA || "#senhagto2024#")
+  );
+  return toolsInstance;
+}
 class ConsultaNfeController {
-    async getListaVendasContigenciaValidas(req, res) {
-    let { } = req.query;
-
-    try {
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
-      const response = await axios.get(apiUrl)
-
-      return res.json(response.data); // Retorna
-    } catch (error) {
-      console.error("Unable to connect to the database:", error);
-      throw error;
-    }
-
-  }
-  
  async validarConsultar(req, res) {
   try {
     const CERTIFICADO_BASE64 =
@@ -125,7 +133,6 @@ class ConsultaNfeController {
       const response = await axios.get(
         "http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs"
       );
-      // console.log('response data:', response);
       vendas = response.data;
     }
     
@@ -206,7 +213,209 @@ class ConsultaNfeController {
   }
  } 
 
-async validarStatusSefaz(req, res) {
+ async  getVendas(req, res) {
+    let { idVenda } = req.query;
+    const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?idVenda=${idVenda}`);
+
+    return res.json(response.data); 
+  }
+
+ async ufToCodigo(uf) {
+  const map = {
+    "RO": "11","AC":"12","AM":"13","RR":"14","PA":"15","AP":"16","TO":"17",
+    "MA":"21","PI":"22","CE":"23","RN":"24","PB":"25","PE":"26","AL":"27","SE":"28","BA":"29",
+    "MG":"31","ES":"32","RJ":"33","SP":"35","PR":"41","SC":"42","RS":"43","MS":"50","MT":"51","GO":"52","DF":"53"
+  };
+  if (!uf) return "35";
+  const u = uf.toUpperCase();
+  return map[u] || "35";
+ }
+
+ async gerarXML(venda) {
+  const uf = venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || process.env.UF || "SP";
+  const cnpj = venda.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
+  const chave = venda.CHAVE || venda.IDVENDA || "";
+
+  const payload = {
+    ide: {
+      // cUF precisa ser código numérico do estado (ex: 35 para SP). Se você só tem sigla, converta.
+      cUF: await this.ufToCodigo(uf),
+      cNF: chave.slice(-8) || "00000000",
+      natOp: "VENDA",
+      mod: "65",
+      serie: "0",
+      nNF: chave.slice(-9) || "1",
+      dhEmi: new Date().toISOString(),
+      tpNF: "1",
+      idDest: "1",
+      cMunFG: process.env.CMUNFG || "3550308", // ajustar conforme cidade/UF
+      tpImp: "4",
+      tpEmis: "1",
+      cDV: "0",
+      tpAmb: Number(process.env.TPAMBIENTE || 2),
+      finNFe: "1",
+      indFinal: "1",
+      indPres: "1",
+      indIntermed: "0",
+      procEmi: "0",
+      verProc: "1.0"
+    },
+    emit: {
+      CNPJ: cnpj,
+      xNome: venda.emit_xNome || "Emitente Padrão",
+      xFant: venda.emit_xFant || "Fantasia",
+      IE: venda.emit_IE || "",
+      CRT: venda.emit_CRT || "1"
+    },
+    enderEmit: {
+      xLgr: venda.end_lgr || "Endereco",
+      nro: venda.end_nro || "0",
+      xBairro: venda.end_bairro || "Bairro",
+      cMun: venda.end_cMun || "3550308",
+      xMun: venda.end_xMun || "Sao Paulo",
+      UF: uf,
+      CEP: venda.end_CEP || "01000000",
+      cPais: "1058",
+      xPais: "BRASIL",
+      fone: venda.end_fone || "0000000000"
+    },
+    // se a API retornar produtos, mapeie aqui, senão use produtos default (o generateXml já trata)
+    produtos: venda.produtos || undefined,
+    // passagem da chave original para retorno/audit
+    meta: {
+      chaveVendaExterna: chave,
+      idVendaExterna: venda.IDVENDA
+    }
+  };
+
+  return payload;
+ }
+
+ async issueFromVendaId(req, res) {
+  try {
+    const { idVenda } = req.query;
+    const options = req.body || {};
+
+    if (!idVenda) {
+      return res.status(400).json({ error: "idVenda é obrigatório" });
+    }
+
+    // Função local para converter UF
+    function ufToCodigo(uf) {
+      const map = {
+        "RO": "11","AC":"12","AM":"13","RR":"14","PA":"15","AP":"16","TO":"17",
+        "MA":"21","PI":"22","CE":"23","RN":"24","PB":"25","PE":"26","AL":"27","SE":"28","BA":"29",
+        "MG":"31","ES":"32","RJ":"33","SP":"35","PR":"41","SC":"42","RS":"43","MS":"50","MT":"51","GO":"52","DF":"53"
+      };
+      if (!uf) return "35";
+      const u = uf.toUpperCase();
+      return map[u] || "35";
+    }
+
+    // Função local para gerar XML
+    function gerarXML(venda) {
+      const uf = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+      const mod = venda.data[0].NFE_INFNFE_ID_MOD || "65" || "55";
+      const serie = venda.data[0].NFE_INFNFE_IDE_SERIE || "0";
+      const chave = venda.data[0].CHAVE || "";
+      const tpNF = venda.data[0].NFE_INFNFE_IDE_TPNF || "1";
+      const idDest = venda.data[0].NFE_INFNFE_IDE_IDDEST || "1";
+      const cMunFG = venda.data[0].NFE_INFNFE_IDE_CMUNFG || "3550308";
+      const cnpj = venda.data[0].NFE_INFNFE_EMIT_CNPJ || "00000000000000";
+      const nome = venda.data[0].NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
+      const nomeFantasia = venda.data[0].NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
+      const cStat = venda.data[0].PROTNFE_INFPROT_CSTAT || "100";
+      const cep = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
+      const xPais = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
+      const cPais = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
+      const fone = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
+      const cMun = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
+      const xMun = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
+      const xBairro = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
+      const nro = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_NRO || "0";
+      const xLgr = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
+      const emit_IE = venda.data[0].NFE_INFNFE_EMIT_IE || "";
+      const emit_CRT = venda.data[0].NFE_INFNFE_EMIT_CRT || "1";
+      console.log(venda.data[0].CHAVE, 'venda')
+      // console.log(chave, 'chave')
+      const payload = {
+        ide: {
+          cUF: ufToCodigo(uf),
+          cNF: chave.slice(-8),
+          natOp: "VENDA",
+          mod: mod,
+          serie: serie,
+          nNF: chave.slice(-9) || "1",
+          dhEmi: new Date().toISOString(),
+          tpNF: tpNF,
+          idDest: idDest,
+          cMunFG: cMunFG,
+          tpImp: "4",
+          tpEmis: "1",
+          cDV: "0",
+          tpAmb: Number(process.env.TPAMBIENTE || 2),
+          finNFe: "1",
+          indFinal: "1",
+          indPres: "1",
+          indIntermed: "0",
+          procEmi: "0",
+          verProc: "1.0"
+        },
+        emit: {
+          CNPJ: cnpj,
+          xNome: nome,
+          xFant: nomeFantasia,
+          IE: emit_IE,
+          CRT: emit_CRT
+        },
+        enderEmit: {
+          xLgr: xLgr,
+          nro: nro,
+          xBairro: xBairro,
+          cMun: cMun,
+          xMun: xMun,
+          UF: uf,
+          CEP: cep,
+          cPais: cPais,
+          xPais: xPais,
+          fone: fone
+        },
+        produtos: venda.produtos || undefined,
+        icms: {
+          orig: "0",
+          cStat: cStat,
+          modBC: "3",
+          vBC: "0.00",
+          pICMS: "0.00",
+          vICMS: "0.00"
+        },
+        meta: {
+          chaveVendaExterna: chave,
+          idVendaExterna: venda.IDVENDA
+        }
+      };
+
+      return payload;
+    }
+
+    // Fazer requisição para obter dados da venda
+    const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?idVenda=${idVenda}`);
+    const vendaData = response.data;
+    
+    const payload = gerarXML(vendaData);
+
+    const result = {
+      venda: vendaData,
+      payload,
+    };
+
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+ }
+
+ async vendaNFe(req, res) {
   try {
     const CERTIFICADO_BASE64 =
       process.env.CERTIFICADO_BASE64 ||
@@ -276,6 +485,9 @@ async validarStatusSefaz(req, res) {
           certOptions
         );
 
+           const proto = Object.getPrototypeOf(tools);
+        const methodNames = Object.getOwnPropertyNames(proto).filter(n => typeof tools[n] === "function");
+        console.log('Methods available in Tools:', methodNames);
         const resposta = await tools.sefazStatus(CHAVE);
         console.log('resposta status sefaz:', resposta);
        
