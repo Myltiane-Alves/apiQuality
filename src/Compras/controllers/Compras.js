@@ -1044,8 +1044,8 @@ class ComprasControllers {
         }
     }
 
-    async createCondicaoPagamento(req, res) {
-        let dados = {
+    async postCondicaoPagamento(req, res) {
+        let  {
             IDCONDICAOPAGAMENTO,
             IDGRUPOEMPRESARIAL,
             IDEMPRESA,
@@ -1073,11 +1073,32 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/condicaopagamento.xsjs`
             const response = await axios.post(apiUrl, {
-                dados
+                IDCONDICAOPAGAMENTO,
+                IDGRUPOEMPRESARIAL,
+                IDEMPRESA,
+                DSCONDICAOPAG,
+                STPARCELADO,
+                NUPARCELAS,
+                NUNDIA1PAG,
+                NUNDIA2PAG,
+                NUNDIA3PAG,
+                NUNDIA4PAG,
+                NUNDIA5PAG,
+                NUNDIA6PAG,
+                NUNDIA7PAG,
+                NUNDIA8PAG,
+                NUNDIA9PAG,
+                NUNDIA10PAG,
+                NUNDIA11PAG,
+                NUNDIA12PAG,
+                DTULTALTERACAO,
+                QTDDIAS,
+                DSTPDOCUMENTO,
+                STATIVO
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("erro nos campos do banco:", error);
+            console.error("error no ComprasController.createCondicaoPagamento:", error);
             throw error;
         }
     }
