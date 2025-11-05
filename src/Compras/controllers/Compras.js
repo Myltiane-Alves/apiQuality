@@ -288,7 +288,7 @@ class ComprasControllers {
 
     }
 
-    async getListaTransportadora(req, res) {
+    async getListaTransportador(req, res) {
         let { idFornecedorFabricante } = req.query;
         idFornecedorFabricante = idFornecedorFabricante ? idFornecedorFabricante : '';
 
@@ -304,7 +304,7 @@ class ComprasControllers {
 
     }
 
-    async getListaTransportador(req, res) {
+    async getListaTransportadora(req, res) {
         let { idTransportador, descricaoTransportador, cnpjTransportador } = req.query;
         idTransportador = idTransportador ? idTransportador : '';
         descricaoTransportador = descricaoTransportador ? descricaoTransportador : '';
@@ -771,7 +771,7 @@ class ComprasControllers {
         }
     }
 
-    async updateCondicaoPagamento(req, res) {
+    async putCondicaoPagamento(req, res) {
         let {
             IDCONDICAOPAGAMENTO,
             IDGRUPOEMPRESARIAL,
