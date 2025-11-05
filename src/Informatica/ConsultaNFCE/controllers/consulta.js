@@ -313,6 +313,9 @@ class ConsultaNfeController {
     }
 
     // Função local para gerar XML
+    /*
+      se a tag do imposto 0.10 e não for maior que 1 centavos, deve ser preenchida com 0.00
+    */ 
     function gerarXML(venda) {
       const uf = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
       const mod = venda.data[0].NFE_INFNFE_ID_MOD || "65" || "55";

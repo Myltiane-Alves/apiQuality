@@ -1048,7 +1048,6 @@ class ComprasControllers {
         let  {
             IDCONDICAOPAGAMENTO,
             IDGRUPOEMPRESARIAL,
-            IDEMPRESA,
             DSCONDICAOPAG,
             STPARCELADO,
             NUPARCELAS,
@@ -1067,7 +1066,8 @@ class ComprasControllers {
             DTULTALTERACAO,
             QTDDIAS,
             DSTPDOCUMENTO,
-            STATIVO
+            STATIVO,
+            IDTPDOCUMENTO
         } = req.body;
 
         try {
@@ -1075,7 +1075,6 @@ class ComprasControllers {
             const response = await axios.post(apiUrl, {
                 IDCONDICAOPAGAMENTO,
                 IDGRUPOEMPRESARIAL,
-                IDEMPRESA,
                 DSCONDICAOPAG,
                 STPARCELADO,
                 NUPARCELAS,
@@ -1094,8 +1093,10 @@ class ComprasControllers {
                 DTULTALTERACAO,
                 QTDDIAS,
                 DSTPDOCUMENTO,
-                STATIVO
+                STATIVO,
+                IDTPDOCUMENTO
             });
+        
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasController.createCondicaoPagamento:", error);
