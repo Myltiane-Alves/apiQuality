@@ -273,16 +273,16 @@ class ComprasControllers {
     }
 
     async getListaCondicoesPagamento(req, res) {
-        let { idCondPagamentos, descricaoPagamento } = req.query;
-        idCondPagamentos = idCondPagamentos ? idCondPagamentos : '';
+        let { idCondPagamento, descricaoPagamento } = req.query;
+        idCondPagamento = idCondPagamento ? idCondPagamento : '';
         descricaoPagamento = descricaoPagamento ? descricaoPagamento : '';
         try {
-            const apiUrl = `${url}/api/compras/condicaopagamento.xsjs?idCondPag=${idCondPagamentos}&descCondPag=${descricaoPagamento}`
+            const apiUrl = `${url}/api/compras/condicaopagamento.xsjs?idCondPag=${idCondPagamento}&descCondPag=${descricaoPagamento}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("error no CComprasController.getListaCondicoesPagamento", error);
             throw error;
         }
 
@@ -772,10 +772,9 @@ class ComprasControllers {
     }
 
     async updateCondicaoPagamento(req, res) {
-        let dados = {
+        let {
             IDCONDICAOPAGAMENTO,
             IDGRUPOEMPRESARIAL,
-            IDEMPRESA,
             DSCONDICAOPAG,
             STPARCELADO,
             NUPARCELAS,
@@ -794,13 +793,35 @@ class ComprasControllers {
             DTULTALTERACAO,
             QTDDIAS,
             DSTPDOCUMENTO,
-            STATIVO
+            STATIVO,
+            IDTPDOCUMENTO
         } = req.body;
 
         try {
             const apiUrl = `${url}/api/compras/condicaopagamento.xsjs`
             const response = await axios.put(apiUrl, {
-                dados
+                IDCONDICAOPAGAMENTO,
+                IDGRUPOEMPRESARIAL,
+                DSCONDICAOPAG,
+                STPARCELADO,
+                NUPARCELAS,
+                NUNDIA1PAG,
+                NUNDIA2PAG,
+                NUNDIA3PAG,
+                NUNDIA4PAG,
+                NUNDIA5PAG,
+                NUNDIA6PAG,
+                NUNDIA7PAG,
+                NUNDIA8PAG,
+                NUNDIA9PAG,
+                NUNDIA10PAG,
+                NUNDIA11PAG,
+                NUNDIA12PAG,
+                DTULTALTERACAO,
+                QTDDIAS,
+                DSTPDOCUMENTO,
+                STATIVO,
+                IDTPDOCUMENTO
             });
             return res.json(response.data);
         } catch (error) {
