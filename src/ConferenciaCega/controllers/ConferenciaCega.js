@@ -2,7 +2,8 @@ import axios from "axios";
 import { dataFormatada } from "../../utils/dataFormatada.js";
 import { getDetalheOrdemTransferencia } from "../repositories/detalheOrdemTransferencia.js";
 import { createStatusDivergencia, getStatusDivergencia, updateStatusDivergencia } from "../repositories/statusDivergencia.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
+//let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
+const url = 'http://164.152.245.77:8000/quality/concentrador_node';
 
 class ConferenciaCegaControllers  {
 
@@ -21,8 +22,10 @@ class ConferenciaCegaControllers  {
 
         try {
         
-            const response = await axios.get(`${url}/api/conferencia-cega/resumo-ordem-transferencia.xsjs?id=${idResumoOT}&idtipofiltro=${idTipoFiltro}&idEmpresaOrigem=${idEmpresaOrigem}&idEmpresaDestino=${idEmpresaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`)
+            const response = await axios.get(`${url}/api/conferencia-cega/resumo-ordem-transferencia.xsjs?page=1&idtipofiltro=${idResumoOT}&idEmpresaOrigem=${idEmpresaOrigem}&idEmpresaDestino=${idEmpresaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`)
+            //const response = await axios.get(`${url}/api/conferencia-cega/resumo-ordem-transferencia.xsjs?id=${idResumoOT}&idtipofiltro=${idTipoFiltro}&idEmpresaOrigem=${idEmpresaOrigem}&idEmpresaDestino=${idEmpresaDestino}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`)
             
+   
             return res.json(response.data); // Retorna
         } catch (error) {
             console.error("Unable to connect to the database:", error);
