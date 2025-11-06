@@ -708,7 +708,7 @@ class ComprasControllers {
         }
     }
 
-    async updateCadastroTransportador(req, res) {
+    async putCadastroTransportador(req, res) {
         let {
             IDTRANSPORTADORA,
             IDGRUPOEMPRESARIAL,

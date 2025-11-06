@@ -612,7 +612,7 @@ routes.get('/produtos-por-pedido', ComprasControllers.getListaProdutosPorPedido)
 
 // UPDATE'
 routes.put('/condicaoPagamento/:id', ComprasControllers.putCondicaoPagamento)
-routes.put('/atualizarTransportador', ComprasControllers.updateCadastroTransportador)
+routes.put('/transportador/:id', ComprasControllers.putCadastroTransportador)
 routes.put('/atualizarProdutoImagem', ComprasControllers.updateProdutoImagem)
 routes.put('/sub-grupo-estrutura/:id', ComprasControllers.updateSubGrupoEstrutura)
 routes.put('/grupo-estrutura/:id', ComprasControllers.putGrupoEstrutura)
