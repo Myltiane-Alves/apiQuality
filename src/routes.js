@@ -635,6 +635,7 @@ routes.post('/cadastrar-tipo-tecido', ComprasControllers.createTipoTecidos)
 routes.post('/criar-categoria-pedidos', ComprasControllers.createCategoriaPedidos)
 routes.post('/cadastro-grupoEstrutura', ComprasControllers.postGrupoEstrutura)
 routes.post('/cadastro-vinculo-tamanho-categoria', ComprasControllers.postVinculoCategoriaPedido)
+routes.post('/cadastrar-transportador', ComprasControllers.postCadastroTransportador)
 
 
 // Cadastro

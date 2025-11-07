@@ -1254,6 +1254,69 @@ class ComprasControllers {
             throw error;
         }
     }
+
+    async postCadastroTransportador(req, res) {
+        let {
+            IDTRANSPORTADORA,
+            IDGRUPOEMPRESARIAL,
+            IDSUBGRUPOEMPRESARIAL,
+            NORAZAOSOCIA,
+            NOFANTASIA,
+            NUCNPJ,
+            NUINSCESTADUAL,
+            NUINSCMUNICIPAL,
+            NUIBGE,
+            EENDERECO,
+            ENUMERO,
+            ECOMPLEMENTO,
+            EBAIRRO,
+            ECIDADE,
+            SGUF,
+            NUCEP,
+            EEMAIL,
+            NUTELEFONE1,
+            NUTELEFONE2,
+            NUTELEFONE3,
+            NOREPRESENTANTE,
+            DTCADASTRO,
+            DTULTATUALIZACAO,
+            STATIVO
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/transportador.xsjs`
+            const response = await axios.post(apiUrl, {
+                IDTRANSPORTADORA,
+                IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL,
+                NORAZAOSOCIA,
+                NOFANTASIA,
+                NUCNPJ,
+                NUINSCESTADUAL,
+                NUINSCMUNICIPAL,
+                NUIBGE,
+                EENDERECO,
+                ENUMERO,
+                ECOMPLEMENTO,
+                EBAIRRO,
+                ECIDADE,
+                SGUF,
+                NUCEP,
+                EEMAIL,
+                NUTELEFONE1,
+                NUTELEFONE2,
+                NUTELEFONE3,
+                NOREPRESENTANTE,
+                DTCADASTRO,
+                DTULTATUALIZACAO,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
 }
 
 export default new ComprasControllers();
