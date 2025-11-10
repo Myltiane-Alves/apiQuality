@@ -622,6 +622,7 @@ routes.put('/cores/:id', ComprasControllers.updateCores)
 routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)
 routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
 routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
+routes.put('/fabricante-fornecedor/:id', ComprasControllers.putFabricanteFornecedor)
 
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 

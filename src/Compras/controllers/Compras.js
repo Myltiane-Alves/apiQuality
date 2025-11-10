@@ -1003,6 +1003,7 @@ class ComprasControllers {
             IDFABRICANTE,
             DSFABRICANTE,
             DTULTATUALIZACAO,
+            DTCADASTRO,
             STATIVO,
         } = req.body;
 
@@ -1012,6 +1013,7 @@ class ComprasControllers {
                 IDFABRICANTE,
                 DSFABRICANTE,
                 DTULTATUALIZACAO,
+                DTCADASTRO,
                 STATIVO
             });
             return res.json(response.data);
