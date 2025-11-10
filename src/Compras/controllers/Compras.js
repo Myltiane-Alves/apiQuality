@@ -245,7 +245,7 @@ class ComprasControllers {
 
 
         try {
-            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/fabricante-fornecedor.xsjs?idFab=${idFabricante}&descFab=${descricaoFabricante}&idFor=${idFornecedor}`
+            const apiUrl = `${url}/api/compras/fabricante-fornecedor.xsjs?idFab=${idFabricante}&descFab=${descricaoFabricante}&idFor=${idFornecedor}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
@@ -1361,6 +1361,23 @@ class ComprasControllers {
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.postFabricanteFornecedor:", error);
+            throw error;
+        }
+    }
+
+    async postMigrarFabricanteSap(req, res) {
+        let {
+            IDFABRICANTE
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/service-layer/pedido-compra/por-codigo/fabricante.xsjs?codFabricante=${IDFABRICANTE}&descFabricante=${DSFABRICANTE}`
+            const response = await axios.post(apiUrl, {
+                IDFABRICANTE,
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.postMigrarFabricanteSap:", error);
             throw error;
         }
     }
