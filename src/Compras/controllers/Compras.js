@@ -245,7 +245,7 @@ class ComprasControllers {
 
 
         try {
-            const apiUrl = `${url}/api/compras/fabricante-fornecedor.xsjs?idFab=${idFabricante}&descFab=${descricaoFabricante}&idFor=${idFornecedor}`
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/fabricante-fornecedor.xsjs?idFab=${idFabricante}&descFab=${descricaoFabricante}&idFor=${idFornecedor}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
