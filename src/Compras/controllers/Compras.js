@@ -1368,13 +1368,14 @@ class ComprasControllers {
     async postMigrarFabricanteSap(req, res) {
         let {
             IDFABRICANTE
-        } = req.body;
+        } = req.query;
 
         try {
             const apiUrl = `${url}/api/service-layer/pedido-compra/por-codigo/fabricante.xsjs?codFabricante=${IDFABRICANTE}`
             const response = await axios.post(apiUrl, {
                 IDFABRICANTE,
             });
+            console.log(response.data,'response.data');
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.postMigrarFabricanteSap:", error);
