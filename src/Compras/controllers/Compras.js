@@ -998,6 +998,29 @@ class ComprasControllers {
         }
     }
 
+    async putFabricanteFornecedor(req, res) {
+        let {
+            IDFABRICANTE,
+            DSFABRICANTE,
+            DTULTATUALIZACAO,
+            STATIVO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fabricante.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDFABRICANTE,
+                DSFABRICANTE,
+                DTULTATUALIZACAO,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putFabricanteFornecedor:", error);
+            throw error;
+        }
+    }
+
     //  este update é para excluir vinculo de tamanho com categoria
     async updateVinculoTamanhoCategoria(req, res) {
         let {
@@ -1175,7 +1198,7 @@ class ComprasControllers {
         try {
             let { DSESTILO, IDGRUPOESTRUTURA, STATIVO, IDESTILO, IDGRUPOESTRUTURAANTIGA, IDVINCESTILOSESTRUTURA } = req.body;
             const apiUrl = `${url}/api/compras/estilos.xsjs`
-            console.log(req.body, 'req.body no postEstilos');
+
             const response = await axios.post(apiUrl, {
                 IDGRUPOESTRUTURAANTIGA: parseInt(null),
                 IDVINCESTILOSESTRUTURA: parseInt(null),
@@ -1184,13 +1207,14 @@ class ComprasControllers {
                 IDGRUPOESTRUTURA,
                 STATIVO,
             });
-            console.log(response.data, 'response data');
+         
             return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
             return res.status(500).json({ error: error.message });
         }
     }
+
     async createTipoTecidos(req, res) {
         let {
             IDTPTECIDO,
@@ -1314,6 +1338,29 @@ class ComprasControllers {
             return res.json(response.data);
         } catch (error) {
             console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
+
+    async postFabricanteFornecedor(req, res) {
+        let {
+            IDFABRICANTE,
+            DSFABRICANTE,
+            DTULTATUALIZACAO,
+            STATIVO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fabricante.xsjs`
+            const response = await axios.post(apiUrl, {
+                IDFABRICANTE,
+                DSFABRICANTE,
+                DTULTATUALIZACAO,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.postFabricanteFornecedor:", error);
             throw error;
         }
     }
