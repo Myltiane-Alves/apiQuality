@@ -637,6 +637,7 @@ routes.post('/cadastro-grupoEstrutura', ComprasControllers.postGrupoEstrutura)
 routes.post('/cadastro-vinculo-tamanho-categoria', ComprasControllers.postVinculoCategoriaPedido)
 routes.post('/cadastrar-transportador', ComprasControllers.postCadastroTransportador)
 routes.post('/cadastrar-fabricante', ComprasControllers.postFabricanteFornecedor)
+routes.post('/migrar-fabricante', ComprasControllers.postMigrarFabricanteSap)
 
 
 // Cadastro

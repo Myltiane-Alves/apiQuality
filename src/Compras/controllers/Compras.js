@@ -1371,7 +1371,7 @@ class ComprasControllers {
         } = req.body;
 
         try {
-            const apiUrl = `${url}/api/service-layer/pedido-compra/por-codigo/fabricante.xsjs?codFabricante=${IDFABRICANTE}&descFabricante=${DSFABRICANTE}`
+            const apiUrl = `${url}/api/service-layer/pedido-compra/por-codigo/fabricante.xsjs?codFabricante=${IDFABRICANTE}`
             const response = await axios.post(apiUrl, {
                 IDFABRICANTE,
             });
