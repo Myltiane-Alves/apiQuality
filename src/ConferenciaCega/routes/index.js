@@ -7,4 +7,7 @@ routes.get('/listaOrdemTransferenciaConferenciaCega', ConferenciaCegaControllers
 routes.put('/resumo-ordem-transferencia/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
 
 routes.post('/inserir-status-divergencia', ConferenciaCegaControllers.postStatusDivergencia)
+
+//routes.put('/resumo-ordem-transferencia/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
+//routes.post('/criar-resumo-ordem-transferencia', ConferenciaCegaControllers.postResumoOrdemTransferencia)
 export default routes;
