@@ -255,6 +255,7 @@ class ComprasControllers {
         }
 
     }
+
     async getEditFornecedorFabricante(req, res) {
         let { idFornecedorFabricante, idFornecedorPedido } = req.query;
         idFornecedorFabricante = idFornecedorFabricante ? idFornecedorFabricante : '';
@@ -998,7 +999,7 @@ class ComprasControllers {
         }
     }
 
-    async putFabricanteFornecedor(req, res) {
+    async putFabricante(req, res) {
         let {
             IDFABRICANTE,
             DSFABRICANTE,
@@ -1015,6 +1016,29 @@ class ComprasControllers {
                 DTULTATUALIZACAO,
                 DTCADASTRO,
                 STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putFabricante:", error);
+            throw error;
+        }
+    }
+
+    async putFabricanteFornecedor(req, res) {
+        let {
+            IDFABRICANTEFORN,
+            IDFABRICANTE,
+            IDFORNECEDOR,
+            STATIVO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fabricante-fornecedor.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDFABRICANTEFORN,
+                IDFABRICANTE,
+                IDFORNECEDOR,
+                STATIVO,
             });
             return res.json(response.data);
         } catch (error) {
@@ -1344,10 +1368,11 @@ class ComprasControllers {
         }
     }
 
-    async postFabricanteFornecedor(req, res) {
+    async postFabricante(req, res) {
         let {
             IDFABRICANTE,
             DSFABRICANTE,
+            DTCADASTRO,
             DTULTATUALIZACAO,
             STATIVO,
         } = req.body;
@@ -1357,6 +1382,7 @@ class ComprasControllers {
             const response = await axios.post(apiUrl, {
                 IDFABRICANTE,
                 DSFABRICANTE,
+                DTCADASTRO,
                 DTULTATUALIZACAO,
                 STATIVO
             });
@@ -1381,6 +1407,31 @@ class ComprasControllers {
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.postMigrarFabricanteSap:", error);
+            throw error;
+        }
+    }
+
+    async postFabricanteFornecedor(req, res) {
+        let {
+            IDFABRICANTE,
+            DSFABRICANTE,
+            DTCADASTRO,
+            DTULTATUALIZACAO,
+            STATIVO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fabricante.xsjs`
+            const response = await axios.post(apiUrl, {
+                IDFABRICANTE,
+                DSFABRICANTE,
+                DTCADASTRO,
+                DTULTATUALIZACAO,
+                STATIVO
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.postFabricanteFornecedor:", error);
             throw error;
         }
     }

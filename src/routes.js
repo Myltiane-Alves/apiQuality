@@ -622,6 +622,7 @@ routes.put('/cores/:id', ComprasControllers.updateCores)
 routes.put('/listaEstilos/:id', ComprasControllers.putEstilos)
 routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
 routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
+routes.put('/fabricante/:id', ComprasControllers.putFabricante)
 routes.put('/fabricante-fornecedor/:id', ComprasControllers.putFabricanteFornecedor)
 
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
@@ -637,7 +638,7 @@ routes.post('/criar-categoria-pedidos', ComprasControllers.createCategoriaPedido
 routes.post('/cadastro-grupoEstrutura', ComprasControllers.postGrupoEstrutura)
 routes.post('/cadastro-vinculo-tamanho-categoria', ComprasControllers.postVinculoCategoriaPedido)
 routes.post('/cadastrar-transportador', ComprasControllers.postCadastroTransportador)
-routes.post('/cadastrar-fabricante', ComprasControllers.postFabricanteFornecedor)
+routes.post('/cadastrar-fabricante', ComprasControllers.postFabricante)
 routes.post('/migrar-fabricante', ComprasControllers.postMigrarFabricanteSap)
 
 
