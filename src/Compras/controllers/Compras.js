@@ -1414,19 +1414,15 @@ class ComprasControllers {
     async postFabricanteFornecedor(req, res) {
         let {
             IDFABRICANTE,
-            DSFABRICANTE,
-            DTCADASTRO,
-            DTULTATUALIZACAO,
+            IDFORNECEDOR,
             STATIVO,
         } = req.body;
 
         try {
-            const apiUrl = `${url}/api/compras/fabricante.xsjs`
+            const apiUrl = `${url}/api/compras/fabricante-fornecedor.xsjs`
             const response = await axios.post(apiUrl, {
                 IDFABRICANTE,
-                DSFABRICANTE,
-                DTCADASTRO,
-                DTULTATUALIZACAO,
+                IDFORNECEDOR,
                 STATIVO
             });
             return res.json(response.data);
