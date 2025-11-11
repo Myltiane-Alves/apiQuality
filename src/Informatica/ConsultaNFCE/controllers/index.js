@@ -6,11 +6,11 @@ import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
 
+
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
   return match ? match[1] : 'SEM_CSTAT';
 }
-
 /**
  * Carrega opções de certificado para passar ao constructor de Tools.
  * Suporta, na ordem de preferência:
@@ -93,103 +93,12 @@ async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026
 }
 
 class ConsultaNfeController {
-  async consultar(req, res) {
-    try {
-      const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
-      const SENHA = '#senhagto2024#';
-      const ARQ_PLANILHA = req.file?.path || req.body?.planilhaPath;
-      const PASTA_RESULTADOS = path.resolve('python_notas/resultados');
-      const LOG_DIR = path.resolve('python_notas/consulta_nfe/log');
-      const LOG_FILE = path.join(LOG_DIR, 'consultas.csv');
-
-      fs.mkdirSync(PASTA_RESULTADOS, { recursive: true });
-      fs.mkdirSync(LOG_DIR, { recursive: true });
-
-      if (!ARQ_PLANILHA || !fs.existsSync(ARQ_PLANILHA)) {
-        return res.status(400).json({ error: 'Arquivo da planilha não enviado ou não encontrado.' });
-      }
-
-      const workbook = xlsx.readFile(ARQ_PLANILHA);
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const dados = xlsx.utils.sheet_to_json(sheet);
-
-      let chavesConsultadas = new Set();
-      if (fs.existsSync(LOG_FILE)) {
-        const linhas = fs.readFileSync(LOG_FILE, 'utf8').split('\n').slice(1);
-        for (const l of linhas) {
-          const parts = l.split(',');
-          if (parts[3]) chavesConsultadas.add(parts[3].trim());
-        }
-      }
-
-      const tarefas = dados.filter(row => !chavesConsultadas.has(row['CHAVE']?.trim()));
-      let processados = 0;
-
-      for (const row of tarefas) {
-        const IDVENDA = String(row['IDVENDA']);
-        const UF = String(row['NFE_INFNFE_EMIT_ENDEREMIT_UF']).trim();
-        const CHAVE = String(row['CHAVE']).trim();
-
-        // carrega opções de certificado (PFX ou PEM)
-        const certOptions = await getCertOptions(SENHA, CERTIFICADO);
-        const toolsOpts = Object.assign({
-          mod: '55',
-          tpAmb: 1,
-          UF: UF,
-          versao: '4.00',
-          xmllint: '../libxml/bin/xmllint.exe',
-        }, {});
-        const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
-
-        const resposta = await myTools.consultarNFe(CHAVE);
-        const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
-        const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
-
-        // Logar a venda quando o cstat NÃO for "sem" (ex.: SEM_CSTAT)
-        if (!String(cstat).toUpperCase().includes('SEM')) {
-          console.log(`Venda com cstat diferente de SEM: IDVENDA=${IDVENDA}, CHAVE=${CHAVE}, UF=${UF}, cstat=${cstat}`);
-        }
-
-        const subpasta = path.join(PASTA_RESULTADOS, `${cstat}-${UF}`);
-        fs.mkdirSync(subpasta, { recursive: true });
-        const arquivoSaida = path.join(subpasta, `${IDVENDA}.txt`);
-        fs.writeFileSync(arquivoSaida, xmlContent, 'utf8');
-        processados++;
-      }
-
-      // Compacta a pasta de resultados
-      const zipPath = path.join(PASTA_RESULTADOS, 'resultados.zip');
-      const output = fs.createWriteStream(zipPath);
-      const archive = archiver('zip', { zlib: { level: 9 } });
-
-      output.on('close', () => {
-        res.download(zipPath, 'resultados.zip', err => {
-          if (err) {
-            return res.status(500).json({ error: 'Erro ao enviar o arquivo zip.' });
-          }
-          // Opcional: remover o zip após download
-          // fs.unlinkSync(zipPath);
-        });
-      });
-
-      archive.on('error', err => {
-        throw err;
-      });
-
-      archive.pipe(output);
-      archive.directory(PASTA_RESULTADOS, false);
-      await archive.finalize();
-
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-
-  async getListaVendasContigenciaValidas(req, res) {
-    let { } = req.query;
+    async getListaVendasContigenciaValidas(req, res) {
+    // Extrai parâmetros de paginação da query string
+    const { page = 1, pageSize = 150 } = req.query;
 
     try {
-      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
 
       return res.json(response.data); // Retorna
@@ -199,127 +108,13 @@ class ConsultaNfeController {
     }
 
   }
-
-  async putValidarVendaContigencia(req, res) {
-    try {
-      let { IDVENDA, STVALIDACONTINGENCIA } = req.body;
-
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs`, {
-        IDVENDA
-      })
-      return res.json(response.data);
-    } catch (error) {
-      console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
-      return res.status(500).json({ error: error.message });
-    }
-  }
-
   
-
-  // async validarConsultar(req, res) {
-  //   try {
-  //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
-  //     const SENHA = '#senhagto2024#';
-
-  //     // Pega vendas do body.vendas ou busca na API se não informado
-  //     let vendas = req.body?.vendas;
-  //     if (!vendas) {
-  //       const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-  //       const response = await axios.get(apiUrl);
-  //       vendas = response.data;
-  //       // console.log('Vendas buscadas da API (raw):', vendas);
-  //     }
-
-  //     // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
-  //     if (vendas && !Array.isArray(vendas)) {
-  //       if (Array.isArray(vendas.data)) {
-  //         vendas = vendas.data;
-  //       } else if (Array.isArray(vendas.rows)) {
-  //         vendas = vendas.rows;
-  //       } else if (vendas.data && Array.isArray(vendas.data.rows)) {
-  //         vendas = vendas.data.rows;
-  //       } else {
-  //         // tenta encontrar a primeira propriedade que é array
-  //         const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
-  //         if (Array.isArray(possibleArray)) {
-  //           vendas = possibleArray;
-  //         }
-  //       }
-  //       console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
-  //     }
-
-  //     if (!Array.isArray(vendas) || vendas.length === 0) {
-  //       return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
-  //     }
-
-  //     const certOptions = await getCertOptions(SENHA, CERTIFICADO);
-  //     let processados = 0;
-  //     const resultados = [];
-
-  //     for (const row of vendas) {
-  //       const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
-  //       const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
-  //       const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
-
-  //       if (!CHAVE) {
-  //         resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
-  //         continue;
-  //       }
-
-  //       try {
-  //         const toolsOpts = {
-  //           mod: '55',
-  //           tpAmb: 1,
-  //           UF: UF,
-  //           versao: '4.00',
-  //           xmllint: '../libxml/bin/xmllint.exe',
-  //         };
-  //         const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
-
-  //         const resposta = await myTools.consultarNFe(CHAVE);
-  //         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
-  //         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
-
-  //         resultados.push({
-  //           IDVENDA,
-  //           UF,
-  //           CHAVE,
-  //           cstat,
-  //           xml: xmlContent,
-  //         });
-
-  //         processados++;
-  //       } catch (innerErr) {
-  //         resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
-  //       }
-  //     }
-
-  //     // Fazer PUT nas vendas cujo cstat é diferente de '100'
-  //     const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-  //     // enviar apenas os IDVENDA cujo cstat !== '100' (únicos, trim, não vazios)
-  //     const idVendas = Array.from(new Set(
-  //       resultados
-  //         .filter(r => !r.error && r.cstat && String(r.cstat) !== '100')
-  //         .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
-  //         .filter(v => v !== '')
-  //     ));
-
-  //     let putResponse;
-  //     if (idVendas.length === 0) {
-  //       putResponse = { data: { message: 'Nenhum ID para enviar', idVendas } };
-  //     } else {
-  //       // envia somente a lista de IDs no body
-  //       putResponse = await axios.put(putApiUrl, idVendas);
-  //     }
- 
-  //     return res.json(putResponse.data); // Retorna
-  //   } catch (err) {
-  //     return res.status(500).json({ error: err.message });
-  //   }
-  // }
-
  async validarConsultar(req, res) {
   try {
+    // Extrai parâmetros de paginação
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 150;
+
     const CERTIFICADO_BASE64 =
       process.env.CERTIFICADO_BASE64 ||
       fs.readFileSync("./cert_base64.txt", "utf-8").trim();
@@ -332,9 +127,10 @@ class ConsultaNfeController {
 
     let vendas = req.body?.vendas;
     if (!vendas) {
-      const response = await axios.get(
-        "http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs"
-      );
+      // Monta URL com parâmetros de paginação
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`;
+      const response = await axios.get(apiUrl);
+      // console.log('response data:', response);
       vendas = response.data;
     }
     
@@ -383,13 +179,133 @@ class ConsultaNfeController {
             tpAmb: 1,
             UF,
             versao: "4.00",
-            // caminho do xmllint (localmente você pode ajustar)
+      
             xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
           },
           certOptions
         );
 
         const resposta = await tools.consultarNFe(CHAVE);
+       
+        const xml = resposta ?? null;
+        const cstat =
+          resposta?.retConsSitNFe?.cStat ??
+          (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
+
+        resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
+      } catch (e) {
+        resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
+      }
+    }
+
+    // remove o arquivo temporário
+    fs.unlinkSync(tempPfxPath);
+
+    return res.json({
+      page,
+      pageSize,
+      total: resultados.length,
+      processados: resultados.filter((r) => !r.error).length,
+      data: resultados,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+ } 
+
+  async putValidarVendaContigencia(req, res) {
+    try {
+      let { IDVENDA, STVALIDACONTINGENCIA, page, pageSize } = req.body;
+      page = page ? page : ''
+      pageSize = pageSize ? pageSize : ''
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`, {
+        IDVENDA
+      })
+      return res.json(response.data);
+    } catch (error) {
+      console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
+async validarStatusSefaz(req, res) {
+  try {
+    const CERTIFICADO_BASE64 =
+      process.env.CERTIFICADO_BASE64 ||
+      fs.readFileSync("./cert_base64.txt", "utf-8").trim();
+
+    const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
+
+    // Salva o arquivo temporário do certificado (PFX)
+    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
+    fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
+
+    let { vendas } = req.body;
+    let { page, pageSize } = req.query;
+    
+    if (!vendas) {
+      page = page || '';
+      pageSize = pageSize || '';
+      
+      const queryParams = new URLSearchParams();
+      if (page) queryParams.append('page', page);
+      if (pageSize) queryParams.append('pageSize', pageSize);
+      
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`;
+      const response = await axios.get(apiUrl);
+      vendas = response.data;
+    }
+    // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+    if (!Array.isArray(vendas)) {
+      if (Array.isArray(vendas.data)) {
+        vendas = vendas.data;
+      } else if (Array.isArray(vendas.rows)) {
+        vendas = vendas.rows;
+      } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+        vendas = vendas.data.rows;
+      } else {
+        // tenta encontrar a primeira propriedade que é array
+        const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+        if (Array.isArray(possibleArray)) {
+          vendas = possibleArray;
+        }
+      }
+    }
+
+    if (!Array.isArray(vendas) || vendas.length === 0) {
+      return res.status(400).json({ error: "Nenhuma venda para consultar." });
+    }
+
+    const certOptions = {
+      pfx: fs.readFileSync(tempPfxPath),
+      senha: SENHA,
+    };
+
+    const resultados = [];
+
+    for (const row of vendas) {
+      const IDVENDA = String(row.IDVENDA ?? "").trim();
+      const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
+      const CHAVE = String(row.CHAVE ?? "").trim();
+
+      if (!CHAVE) {
+        resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
+        continue;
+      }
+
+      try {
+        const tools = new Tools(
+          {
+            mod: "65",
+            tpAmb: 1,
+            UF,
+            versao: "4.00",
+            xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+          },
+          certOptions
+        );
+
+        const resposta = await tools.sefazStatus(CHAVE);
+        console.log('resposta status sefaz:', resposta);
        
         const xml = resposta ?? null;
         const cstat =
@@ -413,118 +329,7 @@ class ConsultaNfeController {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-} 
-
-
-  // async validarConsultar(req, res) {
-  //   try {
-  //     const CERTIFICADO = './GTO COMERCIO 2025-2026.pfx';
-  //     const SENHA = '#senhagto2024#';
-
-  //     // Pega vendas do body.vendas ou busca na API se não informado
-  //     let vendas = req.body?.vendas;
-  //     if (!vendas) {
-  //       const apiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-  //       const response = await axios.get(apiUrl);
-  //       vendas = response.data;
-  //       // console.log('Vendas buscadas da API (raw):', vendas);
-  //     }
-
-  //     // Normaliza formatos paginados: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
-  //     if (vendas && !Array.isArray(vendas)) {
-  //       if (Array.isArray(vendas.data)) {
-  //         vendas = vendas.data;
-  //       } else if (Array.isArray(vendas.rows)) {
-  //         vendas = vendas.rows;
-  //       } else if (vendas.data && Array.isArray(vendas.data.rows)) {
-  //         vendas = vendas.data.rows;
-  //       } else {
-  //         // tenta encontrar a primeira propriedade que é array
-  //         const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
-  //         if (Array.isArray(possibleArray)) {
-  //           vendas = possibleArray;
-  //         }
-  //       }
-  //       console.log('Vendas após normalização:', Array.isArray(vendas) ? `array(${vendas.length})` : typeof vendas);
-  //     }
-
-  //     if (!Array.isArray(vendas) || vendas.length === 0) {
-  //       return res.status(400).json({ error: 'Nenhuma venda para consultar.' });
-  //     }
-
-  //     const certOptions = await getCertOptions(SENHA, CERTIFICADO);
-  //     let processados = 0;
-  //     const resultados = [];
-
-  //     for (const row of vendas) {
-  //       const IDVENDA = String(row.IDVENDA ?? row['IDVENDA'] ?? '').trim();
-  //       const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? row['NFE_INFNFE_EMIT_ENDEREMIT_UF'] ?? '').trim();
-  //       const CHAVE = String(row.CHAVE ?? row['CHAVE'] ?? '').trim();
-
-  //       if (!CHAVE) {
-  //         resultados.push({ IDVENDA, UF, CHAVE, error: 'CHAVE ausente' });
-  //         continue;
-  //       }
-
-  //       try {
-  //         const toolsOpts = {
-  //           mod: '55',
-  //           tpAmb: 1,
-  //           UF: UF,
-  //           versao: '4.00',
-  //           xmllint: '../libxml/bin/xmllint.exe',
-  //         };
-  //         const myTools = new Tools(toolsOpts, certOptions || { pfx: fs.readFileSync(CERTIFICADO), senha: SENHA });
-
-  //         const resposta = await myTools.consultarNFe(CHAVE);
-  //         const xmlContent = resposta && resposta.xml ? resposta.xml : resposta;
-  //         const cstat = resposta && resposta.retConsSitNFe?.cStat ? resposta.retConsSitNFe.cStat : extrairCStat(xmlContent);
-
-  //         resultados.push({
-  //           IDVENDA,
-  //           UF,
-  //           CHAVE,
-  //           cstat,
-  //           xml: xmlContent,
-  //         });
-
-  //         processados++;
-  //       } catch (innerErr) {
-  //         resultados.push({ IDVENDA, UF, CHAVE, error: innerErr.message });
-  //       }
-  //     }
-
-  //     // Fazer PUT nas vendas cujo cstat é diferente de '100'
-  //     const putApiUrl = 'http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs';
-  //     let putCount = 0;
-
-  //     for (const r of resultados) {
-  //       if (r.error) continue;
-  //       if (!r.cstat) continue;
-  //       if (String(r.cstat) === '100') continue;
-
-  //       try {
-  //         const resp = await axios.put(putApiUrl, { IDVENDA: r.IDVENDA });
-  //         r.putResult = { status: 'ok', data: resp.data };
-  //         putCount++;
-  //       } catch (putErr) {
-  //         r.putResult = { status: 'error', message: putErr.message };
-  //       }
-  //     }
-
-  //     // Extrai todos os IDVENDA de resultados (trim e não vazios) e deixa únicos
-  //     const idVendas = Array.from(new Set(
-  //       resultados
-  //         .map(r => String(r.IDVENDA ?? r['IDVENDA'] ?? '').trim())
-  //         .filter(v => v !== '')
-  //     ));
-
-  //     console.log('IDVENDAS:', idVendas);
-  //     return res.json({ processados, putCount, resultados });
-  //   } catch (err) {
-  //     return res.status(500).json({ error: err.message });
-  //   }
-  // }
+ } 
 }
 
 export default new ConsultaNfeController();

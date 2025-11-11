@@ -314,15 +314,15 @@ class ConsultaNfeController {
 
  async validarConsultar(req, res) {
   try {
-    const CERTIFICADO_BASE64 =
-      process.env.CERTIFICADO_BASE64 ||
-      fs.readFileSync("./cert_base64.txt", "utf-8").trim();
-
     const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
 
-    // Salva o arquivo temporário do certificado (PFX)
-    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
-    fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
+    // Usa o sistema de certificados robusto
+    const certOptions = await getCertOptions(SENHA);
+    if (!certOptions) {
+      return res.status(500).json({ 
+        error: "Nenhum certificado encontrado. Configure CERT_PFX_BASE64 ou CERT_PEM_CERT_BASE64/CERT_PEM_KEY_BASE64" 
+      });
+    }
 
     let vendas = req.body?.vendas;
     if (!vendas) {
@@ -352,11 +352,6 @@ class ConsultaNfeController {
     if (!Array.isArray(vendas) || vendas.length === 0) {
       return res.status(400).json({ error: "Nenhuma venda para consultar." });
     }
-
-    const certOptions = {
-      pfx: fs.readFileSync(tempPfxPath),
-      senha: SENHA,
-    };
 
     const resultados = [];
 
