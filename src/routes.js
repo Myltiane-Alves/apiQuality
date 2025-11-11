@@ -577,7 +577,7 @@ routes.get('/listaEmpresaPromocoes', ComprasControllers.getListaEmpresaPromocoes
 routes.get('/listaProdutosOrigemPromocoes', ComprasControllers.getListaProdutoOrigemPromocoes)
 routes.get('/listaProdutoDestinoPromocoes', ComprasControllers.getListaProdutoDestinoPromocoes)
 routes.get('/fornecedorFabricante', ComprasControllers.getListaFornecedorFabricante)
-routes.get('/vincularFabricanteFornecedor', ComprasControllers.getEditFornecedorFabricante)
+routes.get('/vincularFabricanteFornecedor', ComprasControllers.getListaVinculoFornecedorFabricante)
 routes.get('/condicaoPagamento', ComprasControllers.getListaCondicoesPagamento)
 routes.get('/transportadoras', ComprasControllers.getListaTransportadora)
 routes.get('/listaPedidosDetalhado', ComprasControllers.getListaPedidosDetalhado)

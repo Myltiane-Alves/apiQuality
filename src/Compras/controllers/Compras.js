@@ -256,18 +256,19 @@ class ComprasControllers {
 
     }
 
-    async getEditFornecedorFabricante(req, res) {
-        let { idFornecedorFabricante, idFornecedorPedido } = req.query;
-        idFornecedorFabricante = idFornecedorFabricante ? idFornecedorFabricante : '';
+    async getListaVinculoFornecedorFabricante(req, res) {
+        let { idFabricanteFornecedor, idFornecedorPedido, idFabricantePedido } = req.query;
+        idFabricanteFornecedor = idFabricanteFornecedor ? idFabricanteFornecedor : '';
         idFornecedorPedido = idFornecedorPedido ? idFornecedorPedido : '';
+        idFabricantePedido = idFabricantePedido ? idFabricantePedido : '';
         
         try {
-            const apiUrl = `${url}/api/compras/vincfabforn.xsjs?idvincfornfab=${idFornecedorFabricante}&idfornpedido=${idFornecedorPedido}`
+            const apiUrl = `${url}/api/compras/vincfabforn.xsjs?idvincfornfab=${idFabricanteFornecedor}&idfornpedido=${idFornecedorPedido}&idfabnpedido=${idFabricantePedido}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("error no ComprasController.getListaVinculoFornecedorFabricante:", error);
             throw error;
         }
 
