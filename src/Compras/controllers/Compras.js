@@ -155,18 +155,19 @@ class ComprasControllers {
 
 
     async getListaFornecedores(req, res) {
-        let { idFornecedor, descFornecedor, CNPJFornecedor,  page, pageSize } = req.query;
+        let { idFornecedor, descFornecedor, descFornecedorOuCNPJ, CNPJFornecedor,  page, pageSize } = req.query;
         idFornecedor = idFornecedor ? idFornecedor : '';
         descFornecedor = descFornecedor ? descFornecedor : '';
         CNPJFornecedor = CNPJFornecedor ? CNPJFornecedor : '';
+        descFornecedorOuCNPJ = descFornecedorOuCNPJ ? descFornecedorOuCNPJ : '';
         page = page ? page : '';
         pageSize = pageSize ? pageSize : '';
 
         try {
-            const apiUrl = `${url}/api/compras/fornecedor.xsjs?idFornecedor=${idFornecedor}`
+            const apiUrl = `${url}/api/compras/fornecedor.xsjs?idFornecedor=${idFornecedor}&descFornecedor=${descFornecedor}&CNPJFornecedor=${CNPJFornecedor}&descFornOrCnpj=${descFornecedorOuCNPJ}&page=${page}&pageSize=${pageSize}`
             // const response = await getFornecedores(idFornecedor, descFornecedor, CNPJFornecedor,  page, pageSize)
             const response = await axios.get(apiUrl)
-
+            
             return res.json(response.data);
         } catch (error) {
             console.error("Unable to connect to the database:", error);
