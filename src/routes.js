@@ -607,6 +607,7 @@ routes.get('/detalheDistribuicaoCompras', ComprasControllers.getListaDetalheDist
 routes.get('/distribuicaoSugestoesHistorico', ComprasControllers.getListaDistribuicaoSugestoesHistorico)
 routes.get('/produtos-entre-filiais', ComprasControllers.getListaProdutosEntreFiliais)
 routes.get('/produtos-por-pedido', ComprasControllers.getListaProdutosPorPedido)
+routes.get('/consulta-fornecedor-sap', ComprasControllers.getListaFornecedorSap)
 
 
 
@@ -625,6 +626,7 @@ routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
 routes.put('/fabricante/:id', ComprasControllers.putFabricante)
 routes.put('/fabricante-fornecedor/:id', ComprasControllers.putFabricanteFornecedor)
 routes.put('/fornecedor-fabricante/:id', ComprasControllers.putFornecedorFabricante)
+routes.put('/excluir-vinculo-fornecedor', ComprasControllers.putExcluirVinculoFornecedorFabricante)
 
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 routes.put('/fornecedor/:id', ComprasControllers.putFornecedor)

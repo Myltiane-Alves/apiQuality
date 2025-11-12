@@ -266,7 +266,7 @@ class ComprasControllers {
         try {
             const apiUrl = `${url}/api/compras/vincfabforn.xsjs?idvincfornfab=${idFabricanteFornecedor}&idfornpedido=${idFornecedorPedido}&idfabnpedido=${idFabricantePedido}`
             const response = await axios.get(apiUrl)
-
+          
             return res.json(response.data); // Retorna
         } catch (error) {
             console.error("error no ComprasController.getListaVinculoFornecedorFabricante:", error);
@@ -684,6 +684,24 @@ class ComprasControllers {
         
         try {
             const apiUrl = `${url}/api/compras/lista-produtos-por-pedido-e-filial.xsjs?dtInicio=${dataInicio}&dtFim=${dataFim}&idFilial=${idFilial}&idResumoPedido=${idResumoPedido}&idProd=${idProduto}&descProd=${descricaoProduto}&codBarrasProd=${codBarras}&page=${page}&pageSize=${pageSize}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
+    async getListaFornecedorSap(req, res) {
+        let {nomeFornecedor, cnpjFinal, cnpjFornecedorSemFormatar, page, pageSize} = req.query;
+            nomeFornecedor = nomeFornecedor ? nomeFornecedor : '';
+            cnpjFinal = cnpjFinal ? cnpjFinal : '';
+            cnpjFornecedorSemFormatar = cnpjFornecedorSemFormatar ? cnpjFornecedorSemFormatar : '';
+            page = page ? page : '';
+            pageSize = pageSize ? pageSize : '';
+        
+        try {
+            const apiUrl = `${url}/api/service-layer/pedido-compra/por-codigo/consulta-fornecedor-sap.xsjs?descFornecedor=${nomeFornecedor}&cnpjfor=${cnpjFinal}&cnpjforsemformat=${cnpjFornecedorSemFormatar}&page=${page}&pageSize=${pageSize}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data);
@@ -1166,6 +1184,20 @@ class ComprasControllers {
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.putFornecedor:", error);
+            throw error;
+        }
+    }
+
+    async putExcluirVinculoFornecedorFabricante(req, res) {
+        let {  IDFABRICANTEFORNOCEDOR    } = req.query;
+
+        try {
+            const apiUrl = `${url}/api/compras/del_vincfabforn.xsjs?IDFABRICANTEFORN=${IDFABRICANTEFORNOCEDOR}`
+        
+            const response = await axios.put(apiUrl);
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putExcluirVinculoFornecedor:", error);
             throw error;
         }
     }
