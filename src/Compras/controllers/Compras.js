@@ -1065,7 +1065,30 @@ class ComprasControllers {
         }
     }
 
-     async putFornecedor(req, res) {
+    async putFornecedorFabricante(req, res) {
+        let {
+            IDFABRICANTEFORN,
+            IDFABRICANTE,
+            IDFORNECEDOR,
+            STATIVO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fornecedor-fabricante.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDFABRICANTEFORN,
+                IDFABRICANTE,
+                IDFORNECEDOR,
+                STATIVO,
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putFornecedorFabricante:", error);
+            throw error;
+        }
+    }
+
+    async putFornecedor(req, res) {
         let {
             IDFORNECEDOR,
             IDGRUPOEMPRESARIAL,

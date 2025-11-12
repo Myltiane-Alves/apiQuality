@@ -624,6 +624,7 @@ routes.put('/tipo-tecido/:id', ComprasControllers.updateTipoTecidos)
 routes.put('/categoriaPedidos/:id', ComprasControllers.putCategoriaPedidos)
 routes.put('/fabricante/:id', ComprasControllers.putFabricante)
 routes.put('/fabricante-fornecedor/:id', ComprasControllers.putFabricanteFornecedor)
+routes.put('/fabricante-fornecedor/:id', ComprasControllers.putFornecedorFabricante)
 
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 routes.put('/fornecedor/:id', ComprasControllers.putFornecedor)
