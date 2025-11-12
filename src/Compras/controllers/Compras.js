@@ -1104,6 +1104,7 @@ class ComprasControllers {
 
         try {
             const apiUrl = `${url}/api/compras/fornecedor.xsjs`
+        
             const response = await axios.put(apiUrl, {
                 IDFORNECEDOR,
                 IDGRUPOEMPRESARIAL,
