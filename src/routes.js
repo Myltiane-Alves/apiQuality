@@ -641,6 +641,7 @@ routes.post('/cadastrar-transportador', ComprasControllers.postCadastroTransport
 routes.post('/cadastrar-fabricante', ComprasControllers.postFabricante)
 routes.post('/cadastrar-fabricante-fornecedor', ComprasControllers.postFabricanteFornecedor)
 routes.post('/migrar-fabricante', ComprasControllers.postMigrarFabricanteSap)
+routes.post('/cadastrar-fornecedor', ComprasControllers.postFornecedor)
 
 
 // Cadastro
