@@ -1065,6 +1065,87 @@ class ComprasControllers {
         }
     }
 
+     async putFornecedor(req, res) {
+        let {
+            IDFORNECEDOR,
+            IDGRUPOEMPRESARIAL,
+            IDSUBGRUPOEMPRESARIAL,
+            MODPEDIDO,
+            NORAZAOSOCIAL,
+            NOFANTASIA,
+            NUCNPJ,
+            NUINSCESTADUAL,
+            NUINSCMUNICIPAL,
+            NUIBGE,
+            EENDERECO,
+            ENUMERO,
+            ECOMPLEMENTO,
+            EBAIRRO,
+            ECIDADE,
+            SGUF,
+            NUCEP,
+            EEMAIL,
+            NUTELEFONE1,
+            NUTELEFONE2,
+            NUTELEFONE3,
+            NOREPRESENTANTE,
+            DTCADASTRO,
+            DTULTATUALIZACAO,
+            STATIVO,
+            IDCONDPAGPADRAO,
+            IDTRANSPORTADORAPADRAO,
+            TPPEDIDOPADRAO,
+            NOVENDEDORPADRAO,
+            TPFRETEPADRAO,
+            TPARQUIVOPADRAO,
+            TPFISCALPADRAO,
+            EMAILVENDEDORPADRAO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/fornecedor.xsjs`
+            const response = await axios.put(apiUrl, {
+                IDFORNECEDOR,
+                IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL,
+                MODPEDIDO,
+                NORAZAOSOCIAL,
+                NOFANTASIA,
+                NUCNPJ,
+                NUINSCESTADUAL,
+                NUINSCMUNICIPAL,
+                NUIBGE,
+                EENDERECO,
+                ENUMERO,
+                ECOMPLEMENTO,
+                EBAIRRO,
+                ECIDADE,
+                SGUF,
+                NUCEP,
+                EEMAIL,
+                NUTELEFONE1,
+                NUTELEFONE2,
+                NUTELEFONE3,
+                NOREPRESENTANTE,
+                DTCADASTRO,
+                DTULTATUALIZACAO,
+                STATIVO,
+                IDCONDPAGPADRAO,
+                IDTRANSPORTADORAPADRAO,
+                TPPEDIDOPADRAO,
+                NOVENDEDORPADRAO,
+                TPFRETEPADRAO,
+                TPARQUIVOPADRAO,
+                TPFISCALPADRAO,
+                EMAILVENDEDORPADRAO,
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putFornecedor:", error);
+            throw error;
+        }
+    }
+
     // CREATE
     async createSubGrupoEstrutura(req, res) {
         let {
