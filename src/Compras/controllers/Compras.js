@@ -373,6 +373,22 @@ class ComprasControllers {
         }
     }
 
+    async getListaProdutosImagens(req, res) {
+        let { numeroRefProduto} = req.query;
+        numeroRefProduto = numeroRefProduto ? numeroRefProduto : '';
+
+
+        try {
+            const apiUrl = `${url}/api/compras/produtos-imagens.xsjs?nuRefProd=${numeroRefProduto}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data); // Retorna
+        } catch (error) {
+            console.error("error no ComprasControllers.getListaProdutosImagens:", error);
+            throw error;
+        }
+    }
+
     async getListaDetalheImagemProduto(req, res) {
         let { idImagem } = req.query;
         idImagem = idImagem ? idImagem : '';
