@@ -585,6 +585,7 @@ routes.get('/fabricante-fornecedor', ComprasControllers.getListaFabricanteCadast
 routes.get('/subGrupoEstrutura', ComprasControllers.getListaEstruturaMercadoria)
 routes.get('/imagemProdutos', ComprasControllers.getListaImagemProduto)
 routes.get('/listaProdutosImagem', ComprasControllers.getListaDetalheImagemProduto)
+routes.get('/produtos-imagens', ComprasControllers.getListaProdutosImagens)
 routes.get('/listaTransportador', ComprasControllers.getListaTransportador)
 routes.get('/transportadorID', ComprasControllers.getListaByIdTransportador)
 routes.get('/tipoDocumento', ComprasControllers.getListaTPDocumento)
@@ -646,6 +647,7 @@ routes.post('/cadastrar-fabricante', ComprasControllers.postFabricante)
 routes.post('/cadastrar-fabricante-fornecedor', ComprasControllers.postFabricanteFornecedor)
 routes.post('/migrar-fabricante', ComprasControllers.postMigrarFabricanteSap)
 routes.post('/cadastrar-fornecedor', ComprasControllers.postFornecedor)
+routes.post('/cadastrar-imagem-produto', ComprasControllers.postImagemProduto)
 
 
 // Cadastro

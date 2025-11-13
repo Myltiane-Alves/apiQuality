@@ -1667,6 +1667,32 @@ class ComprasControllers {
             throw error;
         }
     }
+
+    async postImagemProduto(req, res) {
+        let {
+            IDRESUMOPEDIDO,
+            NUREF,
+            IMAGEM,
+            STATIVO,
+            IDPRODIMAGEM
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/imagemproduto.xsjs`
+            const response = await axios.post(apiUrl, {
+                IDRESUMOPEDIDO,
+                NUREF,
+                IMAGEM,
+                STATIVO,
+                IDPRODIMAGEM
+                
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.postImagemProduto:", error);
+            throw error;
+        }
+    }
 }
 
 export default new ComprasControllers();
