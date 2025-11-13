@@ -2,6 +2,7 @@ import axios from 'axios';
 import 'dotenv/config';
 const url = process.env.API_URL;
 
+
 export class OTClient {
     constructor(baseURL) {
         this.api = axios.create({
@@ -131,4 +132,102 @@ export class OTClient {
         });
         return response.data;
     }
+
+
+    async salvarOTDeposito(
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        IDEMPRESADESTINO,
+        IDOPERADOREXPEDICAO,
+        NUTOTALITENS,
+        QTDTOTALITENS,
+        QTDTOTALITENSRECEPCIONADO,
+        QTDTOTALITENSDIVERGENCIA,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        VRTOTALCUSTO,
+        VRTOTALVENDA,
+        DTRECEPCAO,
+        IDOPERADORRECEPTOR,
+        DSOBSERVACAO,
+        IDUSRCANCELAMENTO,
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        STEMISSAONFE,
+        NUMERONFE,
+        STENTRADAINVENTARIO,
+        QTDCONFERENCIA,
+        IDSTATUSOT,
+        IDUSRAJUSTE,
+        DTAJUSTE,
+        QTDTOTALITENSAJUSTE,
+        dadosdetalheot,
+    ) {
+
+        const response = await this.api.post(`api/conferencia-cega/resumo-ordem-transferencia.xsjs`, {
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            IDEMPRESADESTINO,
+            IDOPERADOREXPEDICAO,
+            NUTOTALITENS,
+            QTDTOTALITENS,
+            QTDTOTALITENSRECEPCIONADO,
+            QTDTOTALITENSDIVERGENCIA,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            VRTOTALCUSTO,
+            VRTOTALVENDA,
+            DTRECEPCAO,
+            IDOPERADORRECEPTOR,
+            DSOBSERVACAO,
+            IDUSRCANCELAMENTO,
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            STEMISSAONFE,
+            NUMERONFE,
+            STENTRADAINVENTARIO,
+            QTDCONFERENCIA,
+            IDSTATUSOT,
+            IDUSRAJUSTE,
+            DTAJUSTE,
+            QTDTOTALITENSAJUSTE,
+            dadosdetalheot,
+        });
+        return response.data;
+    }
+
+    async cancelarOTDeposito(
+        IDSTATUSOT,
+        IDRESUMOOT,
+        IDUSRCANCELAMENTO
+    ) {
+
+        const response = await this.api.put(`api/conferencia-cega/resumo-ordem-transferencia.xsjs`, [{
+            IDSTATUSOT,
+            IDRESUMOOT,
+            IDUSRCANCELAMENTO
+        }]);
+        return response.data;
+    }
+
+    async finalizarOTDeposito(
+        IDSTATUSOT,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        NOTAFISCAL
+    ) {
+
+        const response = await this.api.put(`api/conferencia-cega/resumo-ordem-transferencia.xsjs`, [{
+            IDSTATUSOT,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            NOTAFISCAL
+        }]);
+        return response.data;
+    }
+
 }

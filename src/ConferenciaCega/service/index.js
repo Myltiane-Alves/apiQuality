@@ -145,4 +145,125 @@ export class OTService {
         )
         return result;
     }
+
+    async criarOTDeposito(
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        IDEMPRESADESTINO,
+        IDOPERADOREXPEDICAO,
+        NUTOTALITENS,
+        QTDTOTALITENS,
+        QTDTOTALITENSRECEPCIONADO,
+        QTDTOTALITENSDIVERGENCIA,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        VRTOTALCUSTO,
+        VRTOTALVENDA,
+        DTRECEPCAO,
+        IDOPERADORRECEPTOR,
+        DSOBSERVACAO,
+        IDUSRCANCELAMENTO,
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        STEMISSAONFE,
+        NUMERONFE,
+        STENTRADAINVENTARIO,
+        QTDCONFERENCIA,
+        IDSTATUSOT,
+        IDUSRAJUSTE,
+        DTAJUSTE,
+        QTDTOTALITENSAJUSTE,
+        dadosdetalheot,
+    ) {
+        if (!IDEMPRESAORIGEM) {
+            throw new Error("IDEMPRESAORIGEM is required");
+        }
+
+        if (!IDEMPRESADESTINO) {
+            throw new Error("IDEMPRESADESTINO is required");
+        }
+
+
+
+        const result = await this.client.salvarOTDeposito(
+
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            IDEMPRESADESTINO,
+            IDOPERADOREXPEDICAO,
+            NUTOTALITENS,
+            QTDTOTALITENS,
+            QTDTOTALITENSRECEPCIONADO,
+            QTDTOTALITENSDIVERGENCIA,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            VRTOTALCUSTO,
+            VRTOTALVENDA,
+            DTRECEPCAO,
+            IDOPERADORRECEPTOR,
+            DSOBSERVACAO,
+            IDUSRCANCELAMENTO,
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            STEMISSAONFE,
+            NUMERONFE,
+            STENTRADAINVENTARIO,
+            QTDCONFERENCIA,
+            IDSTATUSOT,
+            IDUSRAJUSTE,
+            DTAJUSTE,
+            QTDTOTALITENSAJUSTE,
+            dadosdetalheot,
+        )
+        return result;
+    }
+
+    async cancelOTDeposito(
+        IDSTATUSOT,
+        IDRESUMOOT,
+        IDUSRCANCELAMENTO
+
+    ) {
+        if (!IDSTATUSOT) {
+            throw new Error("IDSTATUSOT is required");
+        }
+
+        if (!IDUSRCANCELAMENTO) {
+            throw new Error("IDUSRCANCELAMENTO is required");
+        }
+
+        const result = await this.client.cancelarOTDeposito(
+
+            IDSTATUSOT,
+            IDRESUMOOT,
+            IDUSRCANCELAMENTO
+        )
+        return result;
+    }
+
+
+    async finishOTDeposito(
+        IDSTATUSOT,
+        NUTOTALVOLUMES,
+        TPVOLUME,
+        IDRESUMOOT,
+        IDEMPRESAORIGEM,
+        NOTAFISCAL
+
+    ) {
+        if (!IDSTATUSOT) {
+            throw new Error("IDSTATUSOT is required");
+        }
+
+        const result = await this.client.finalizarOTDeposito(
+
+            IDSTATUSOT,
+            NUTOTALVOLUMES,
+            TPVOLUME,
+            IDRESUMOOT,
+            IDEMPRESAORIGEM,
+            NOTAFISCAL
+        )
+        return result;
+    }
 }

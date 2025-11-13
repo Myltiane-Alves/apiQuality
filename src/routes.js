@@ -743,10 +743,14 @@ routes.put('/atualizarConfiguracaoPixPDV', ConfiguracaoPixPDVControllers.updateC
 routes.get('/listaOrdemTransferenciaConferenciaCega', ConferenciaCegaControllers.getListaOrdemTransferenciaConferenciaCega)
 routes.get('/detalhe-ordem-transferencia-cega', ConferenciaCegaControllers.getDetalheOrdemTransferenciaConferenciaCega)
 routes.get('/status-divergencia', ConferenciaCegaControllers.getListaStatusOTConfrecencia)
+routes.get('/impressao-etiqueta-OTDeposito', ConferenciaCegaControllers.getListaImpressaoEtiquetaOTDeposito)
 routes.put('/resumo-ordem-transferencia-cega/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
 routes.put('/status-divergencia/:id', ConferenciaCegaControllers.putStatusDivergencia)
 routes.post('/inserir-status-divergencia', ConferenciaCegaControllers.postStatusDivergencia)
-
+routes.post('/criar-resumo-ordem-transferencia-deposito', ConferenciaCegaControllers.postResumoOrdemTransferenciaDepositos)
+routes.put('/listaOrdemTransferenciaConferenciaCega/:id', ConferenciaCegaControllers.putCancelarOTDeposito)
+routes.put('/cancelarOT-deposito/:id', ConferenciaCegaControllers.putCancelarOTDeposito)
+routes.put('/finalizarOT-deposito/:id', ConferenciaCegaControllers.putFinalizarOTDeposito)
 // Lista de Preço
 routes.get('/listaPreco', ListaPrecoControllers.getListaPrecoPorMarca)
 
