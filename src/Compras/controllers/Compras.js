@@ -355,15 +355,16 @@ class ComprasControllers {
     }
 
     async getListaImagemProduto(req, res) {
-        let { numPage, numeroRefProduto, idFabricante, idSubEstrutura } = req.query;
+        let { numPage, numeroRefProduto, idFabricante, idSubEstrutura, idPedido } = req.query;
         numPage = numPage ? numPage : '';
         numeroRefProduto = numeroRefProduto ? numeroRefProduto : '';
         idFabricante = idFabricante ? idFabricante : '';
         idSubEstrutura = idSubEstrutura ? idSubEstrutura : '';
+        idPedido = idPedido ? idPedido : '';
 
 
         try {
-            const apiUrl = `${url}/api/compras/imagemproduto.xsjs?page=${numPage}&NuRefImgProd=${numeroRefProduto}&IDFabImagem=${idFabricante}&IDSubEstImagem=${idSubEstrutura}`
+            const apiUrl = `${url}/api/compras/imagemproduto.xsjs?page=${numPage}&NuRefImgProd=${numeroRefProduto}&IDFabImagem=${idFabricante}&IDSubEstImagem=${idSubEstrutura}&idPedido=${idPedido}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
