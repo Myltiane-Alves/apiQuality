@@ -164,7 +164,7 @@ class ComprasControllers {
         pageSize = pageSize ? pageSize : '';
 
         try {
-            const apiUrl = `${url}/api/compras/fornecedor.xsjs?idFornecedor=${idFornecedor}&descFornecedor=${descFornecedor}&CNPJFornecedor=${CNPJFornecedor}&descFornOrCnpj=${descFornecedorOuCNPJ}&page=${page}&pageSize=${pageSize}`
+            const apiUrl = `${url}/api/compras/fornecedor.xsjs?id=${idFornecedor}&descFornecedor=${descFornecedor}&CNPJFornecedor=${CNPJFornecedor}&descFornOrCnpj=${descFornecedorOuCNPJ}&page=${page}&pageSize=${pageSize}`
             // const response = await getFornecedores(idFornecedor, descFornecedor, CNPJFornecedor,  page, pageSize)
             const response = await axios.get(apiUrl)
             

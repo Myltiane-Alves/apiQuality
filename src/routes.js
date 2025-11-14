@@ -566,7 +566,7 @@ routes.get('/produtos-mais-vendidos', ComercialProdutoControllers.getListaProdut
 routes.get('/vendas-por-estrutura', ComercialProdutoControllers.getListaVendasIndicadoresEstrutura)
 
 // Compras
-routes.get('/listaPedidos', ComprasControllers.getListaPedidos)
+routes.get('/lista-pedidos', ComprasControllers.getListaPedidos)
 routes.get('/listaDetalhePedidos', ComprasControllers.getListaDetalhePedidos)
 routes.get('/listaTodosPedidos', ComprasControllers.getListaTodosPedidos)
 routes.get('/fornecedores', ComprasControllers.getListaFornecedores)
