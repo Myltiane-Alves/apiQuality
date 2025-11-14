@@ -10,6 +10,7 @@ routes.put('/resumo-ordem-transferencia/:id', ConferenciaCegaControllers.putResu
 
 routes.post('/inserir-status-divergencia', ConferenciaCegaControllers.postStatusDivergencia)
 
+//routes.put('/encerrar-OT/:id', ConferenciaCegaControllers.putEncerrarOT)
 //routes.put('/resumo-ordem-transferencia/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
 //routes.post('/criar-resumo-ordem-transferencia', ConferenciaCegaControllers.postResumoOrdemTransferencia)
 //routes.post('/criar-resumo-ordem-transferencia-deposito', ConferenciaCegaControllers.postResumoOrdemTransferenciaDepositos)

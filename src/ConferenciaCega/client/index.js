@@ -230,4 +230,22 @@ export class OTClient {
         return response.data;
     }
 
+    async encerrarOT(
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        IDUSRAJUSTE,
+        IDSTATUSOT,
+        IDRESUMOOT
+    ) {
+
+        const response = await this.api.put(`api/conferencia-cega/resumo-ordem-transferencia.xsjs`, {
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            IDUSRAJUSTE,
+            IDSTATUSOT,
+            IDRESUMOOT
+        });
+        return response.data;
+    }
+
 }

@@ -751,9 +751,12 @@ routes.post('/criar-resumo-ordem-transferencia-deposito', ConferenciaCegaControl
 routes.put('/listaOrdemTransferenciaConferenciaCega/:id', ConferenciaCegaControllers.putCancelarOTDeposito)
 routes.put('/cancelarOT-deposito/:id', ConferenciaCegaControllers.putCancelarOTDeposito)
 routes.put('/finalizarOT-deposito/:id', ConferenciaCegaControllers.putFinalizarOTDeposito)
+routes.put('/encerrar-OT/:id', ConferenciaCegaControllers.putEncerrarOT)
+
+
+
 // Lista de Preço
 routes.get('/listaPreco', ListaPrecoControllers.getListaPrecoPorMarca)
-
 
 routes.get('/promocoes-ativas', PromocaoControllers.getListaPromocoesAtivas)
 routes.get('/produto-promocao-ativa', PromocaoControllers.getListaProdutosPromocoesAtiva)

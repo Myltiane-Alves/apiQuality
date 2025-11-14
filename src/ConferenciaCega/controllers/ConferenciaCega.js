@@ -8,6 +8,7 @@ import criarOTSchema from '../schema/shemaCriarOT.js';
 import criarOTSchemaDeposito from '../schema/shemaCriarOTDeposito.js';
 import shemaCancelarOTDeposito from "../schema/shemaCancelarOTDeposito.js";
 import schemaFinalizarOTDeposito from "../schema/schemaFinalizarOTDeposito.js";
+import schemaEncerrarOT from "../schema/schemaEncerrarOT.js";
 //let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
 const url = 'http://164.152.245.77:8000/quality/concentrador_node';
 //const url = process.env.API_URL;
@@ -16,22 +17,22 @@ const otService = new OTService(otClient);
 
 class ConferenciaCegaControllers {
 
-        async getListaImpressaoEtiquetaOTDeposito(req, res,) {
-            let { idResumoOT, stAtivo, pageSize, page } = req.query;
-            
-            idResumoOT = idResumoOT ? idResumoOT : '';
-            stAtivo = stAtivo ? stAtivo : '';
-            page = page ? page : '';
-            pageSize = pageSize ? pageSize : '';
-            try {
-                const response = await axios.get(`${url}/api/conferencia-cega/resumo-ordem-transferencia.xsjs?id=${idResumoOT}&stAtivo=${stAtivo}&pageSize=${pageSize}&page=${page}`)
-              
-                return res.json(response.data); 
-            } catch (error) {
-                console.error("Unable to connect to the database:", error);
-                throw error; 
-            }
+    async getListaImpressaoEtiquetaOTDeposito(req, res,) {
+        let { idResumoOT, stAtivo, pageSize, page } = req.query;
+
+        idResumoOT = idResumoOT ? idResumoOT : '';
+        stAtivo = stAtivo ? stAtivo : '';
+        page = page ? page : '';
+        pageSize = pageSize ? pageSize : '';
+        try {
+            const response = await axios.get(`${url}/api/conferencia-cega/resumo-ordem-transferencia.xsjs?id=${idResumoOT}&stAtivo=${stAtivo}&pageSize=${pageSize}&page=${page}`)
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("Unable to connect to the database:", error);
+            throw error;
         }
+    }
 
     async getListaOrdemTransferenciaConferenciaCega(req, res,) {
         let { idResumoOT, idTipoFiltro, idEmpresaOrigem, idEmpresaDestino, dataPesquisaInicio, dataPesquisaFim } = req.query;
@@ -429,6 +430,45 @@ class ConferenciaCegaControllers {
                 value.IDRESUMOOT,
                 value.IDEMPRESAORIGEM,
                 value.NOTAFISCAL
+
+            );
+
+            return res.status(200).json(response);
+        } catch (error) {
+            console.log('Erro ao atualizar ordem de transferência:', error);
+            return res.status(500).json({ message: 'Erro ao atualizar ordem de transferência.', error });
+
+        }
+    }
+
+
+    async putEncerrarOT(req, res) {
+
+        try {
+            const { error, value } = schemaEncerrarOT.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+
+            const response = await otService.finishOTDeposito(
+
+                value.IDSTDIVERGENCIA,
+                value.OBSDIVERGENCIA,
+                value.IDUSRAJUSTE,
+                value.IDSTATUSOT,
+                value.IDRESUMOOT
+
             );
 
             return res.status(200).json(response);

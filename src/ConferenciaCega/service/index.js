@@ -241,7 +241,6 @@ export class OTService {
         return result;
     }
 
-
     async finishOTDeposito(
         IDSTATUSOT,
         NUTOTALVOLUMES,
@@ -263,6 +262,31 @@ export class OTService {
             IDRESUMOOT,
             IDEMPRESAORIGEM,
             NOTAFISCAL
+        )
+        return result;
+    }
+
+    async closeOT(
+        IDSTDIVERGENCIA,
+        OBSDIVERGENCIA,
+        IDUSRAJUSTE,
+        IDSTATUSOT,
+        IDRESUMOOT
+
+    ) {
+        if (!IDSTATUSOT) {
+            throw new Error("IDSTATUSOT is required");
+        }
+        if (!IDRESUMOOT) {
+            throw new Error("IDSTATUSOT is required");
+        }
+
+        const result = await this.client.encerrarOT(
+            IDSTDIVERGENCIA,
+            OBSDIVERGENCIA,
+            IDUSRAJUSTE,
+            IDSTATUSOT,
+            IDRESUMOOT
         )
         return result;
     }
