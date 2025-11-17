@@ -155,12 +155,12 @@ class ComprasControllers {
     }
 
     async getListaUltimoPedido(req, res) {
-        let { idFornecedor, idProduto } = req.query;
-        idFornecedor = idFornecedor ? idFornecedor : '';
-        idProduto = idProduto ? idProduto : '';
+        let { idComprador, idPedido } = req.query;
+        idComprador = idComprador ? idComprador : '';
+        idPedido = idPedido ? idPedido : '';
 
         try {
-            const apiUrl = `${url}/api/compras/fornecedor-produto.xsjs?idFornecedor=${idFornecedor}&idProduto=${idProduto}`
+            const apiUrl = `${url}/api/compras/ultimo_pedidos.xsjs?idcomprador=${idComprador}&idPedido=${idPedido}`
             const response = await axios.get(apiUrl)
 
             return res.json(response.data); // Retorna
