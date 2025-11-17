@@ -1236,12 +1236,44 @@ class ComprasControllers {
     }
 
     async putPedido(req, res) {
-        let {  IDFABRICANTEFORNOCEDOR    } = req.query;
+        let {  
+
+           } = req.body;
 
         try {
             const apiUrl = `${url}/api/compras/finalizar-pedido.xsjs`
         
-            const response = await axios.put(apiUrl);
+            const response = await axios.put(apiUrl, {
+                "IDRESUMOPEDIDO": parseInt(id),
+                "IDGRUPOEMPRESARIAL": parseInt(IdMarcaPedido),
+                "IDSUBGRUPOEMPRESARIAL": parseInt(IdMarcaPedido),
+                "IDCOMPRADOR": parseInt(IdCompradorPedido),
+                "IDCONDICAOPAGAMENTO": parseInt(CondPag),
+                "IDFORNECEDOR": (IDFornc),
+                "IDTRANSPORTADORA": parseInt(IdTranspPedido),
+                "IDANDAMENTO": parseInt(idAndamento),
+                "MODPEDIDO": tipoPedido,
+                "NOVENDEDOR": NoVendedorPedido,
+                "EEMAILVENDEDOR": EmailVendedorPedido,
+                "DTPEDIDO": DtPedido,
+                "DTPREVENTREGA": DtPedidoEntrega,
+                "TPFRETE": TpFretePedido,
+                "DESCPERC01": parseFloat(VrDescIPedido),
+                "DESCPERC02": parseFloat(VrDescIIPedido),
+                "DESCPERC03": parseFloat(VrDescIIIPedido),
+                "PERCCOMISSAO": parseFloat(vrComissaoPedido),
+                "VRTOTALLIQUIDO": parseFloat(VrLiqPedido),
+                "OBSPEDIDO": ObsFornPedido,
+                "OBSPEDIDO2": ObsIntPedido,
+                "DTFECHAMENTOPEDIDO": dataAtualCampo,
+                "DTCADASTRO": dataAtualCampo,
+                "TPARQUIVO": IdEnviarPedido,
+                "STDISTRIBUIDO": stdistribuido,
+                "STAGRUPAPRODUTO": stagrupado,
+                "STCANCELADO": stcancelado,
+                TPFISCAL,
+                STRASCUNHO,
+            });
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.putPedido:", error);
