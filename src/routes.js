@@ -633,6 +633,7 @@ routes.put('/excluir-vinculo-fornecedor', ComprasControllers.putExcluirVinculoFo
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 routes.put('/fornecedor/:id', ComprasControllers.putFornecedor)
 routes.put('/finalizar-pedido/:id', ComprasControllers.putFinalizarPedido)
+routes.put('/atualizar-pedido/:id', ComprasControllers.putPedido)
 
 // POST
 routes.post('/cadastrarCondicaoPagamento', ComprasControllers.postCondicaoPagamento)
@@ -651,6 +652,7 @@ routes.post('/migrar-fabricante', ComprasControllers.postMigrarFabricanteSap)
 routes.post('/cadastrar-fornecedor', ComprasControllers.postFornecedor)
 routes.post('/cadastrar-imagem-produto', ComprasControllers.postImagemProduto)
 routes.post('/finalizar-pedido', ComprasControllers.postFinalizarPedido)
+routes.post('/pedido', ComprasControllers.postPedido)
 
 
 // Cadastro
