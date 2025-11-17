@@ -1235,6 +1235,20 @@ class ComprasControllers {
         }
     }
 
+    async putPedido(req, res) {
+        let {  IDFABRICANTEFORNOCEDOR    } = req.query;
+
+        try {
+            const apiUrl = `${url}/api/compras/finalizar-pedido.xsjs`
+        
+            const response = await axios.put(apiUrl);
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.putPedido:", error);
+            throw error;
+        }
+    }
+
     // CREATE
     async createSubGrupoEstrutura(req, res) {
         let {
