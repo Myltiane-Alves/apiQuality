@@ -133,6 +133,7 @@ class ComprasControllers {
             throw error;
         }
     }
+
     async getListaDetalhePedidos(req, res) {
         let {idPedido, idDetalhePedido, dataPesquisaInicio, dataPesquisaFim,  page, pageSize } = req.query;
         idPedido = idPedido ? idPedido : '';
@@ -153,6 +154,21 @@ class ComprasControllers {
         }
     }
 
+    async getListaUltimoPedido(req, res) {
+        let { idFornecedor, idProduto } = req.query;
+        idFornecedor = idFornecedor ? idFornecedor : '';
+        idProduto = idProduto ? idProduto : '';
+
+        try {
+            const apiUrl = `${url}/api/compras/fornecedor-produto.xsjs?idFornecedor=${idFornecedor}&idProduto=${idProduto}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data); // Retorna
+        } catch (error) {
+            console.error("Unable to connect to the database:", error);
+            throw error;
+        }
+    }
 
     async getListaFornecedores(req, res) {
         let { idFornecedor, descFornecedor, descFornecedorOuCNPJ, CNPJFornecedor,  page, pageSize } = req.query;
