@@ -1244,8 +1244,8 @@ class ComprasControllers {
             const apiUrl = `${url}/api/compras/finalizar-pedido.xsjs`
         
             const response = await axios.put(apiUrl, {
-                IDRESUMOPEDIDO": parseInt(id),
-                IDGRUPOEMPRESARIAL": parseInt(IdMarcaPedido),
+                IDRESUMOPEDIDO,
+                IDGRUPOEMPRESARIAL,
                 IDSUBGRUPOEMPRESARIAL": parseInt(IdMarcaPedido),
                 IDCOMPRADOR": parseInt(IdCompradorPedido),
                 IDCONDICAOPAGAMENTO": parseInt(CondPag),
