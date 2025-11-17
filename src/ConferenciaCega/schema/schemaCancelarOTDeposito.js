@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const shemaCancelarOTDeposito = Joi.object({
+const schemaCancelarOTDeposito = Joi.object({
     IDSTATUSOT: Joi.number().required()
         .messages({
             "any.required": "IDSTATUSOT é obrigatório",
@@ -21,4 +21,4 @@ const shemaCancelarOTDeposito = Joi.object({
 });
 
 
-export default shemaCancelarOTDeposito;
+export default schemaCancelarOTDeposito;

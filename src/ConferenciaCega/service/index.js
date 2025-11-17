@@ -182,9 +182,6 @@ export class OTService {
         if (!IDEMPRESADESTINO) {
             throw new Error("IDEMPRESADESTINO is required");
         }
-
-
-
         const result = await this.client.salvarOTDeposito(
 
             IDRESUMOOT,
@@ -287,6 +284,48 @@ export class OTService {
             IDUSRAJUSTE,
             IDSTATUSOT,
             IDRESUMOOT
+        )
+        return result;
+    }
+
+    async statusDivergenciaService(
+        DESCRICAODIVERGENCIA,
+        IDUSRCRIACAO,
+        STATIVO,
+
+    ) {
+        if (!IDUSRCRIACAO) {
+            throw new Error("IDUSRCRIACAO is required");
+        }
+        if (!STATIVO) {
+            throw new Error("STATIVO is required");
+        }
+
+        const result = await this.client.statusDivergenciaClient(
+            DESCRICAODIVERGENCIA,
+            IDUSRCRIACAO,
+            STATIVO,
+        )
+        return result;
+    }
+
+    async statusEditarDivergenciaService(
+        DESCRICAODIVERGENCIA,
+        IDSTATUSDIVERGENCIA,
+        STATIVO,
+
+    ) {
+        if (!IDSTATUSDIVERGENCIA) {
+            throw new Error("IDSTATUSDIVERGENCIA is required");
+        }
+        if (!STATIVO) {
+            throw new Error("STATIVO is required");
+        }
+
+        const result = await this.client.statusEditarDivergenciaClient(
+            DESCRICAODIVERGENCIA,
+            IDSTATUSDIVERGENCIA,
+            STATIVO,
         )
         return result;
     }

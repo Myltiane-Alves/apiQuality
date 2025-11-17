@@ -6,6 +6,7 @@ const routes = new Router();
 routes.get('/listaOrdemTransferenciaConferenciaCega', ConferenciaCegaControllers.getListaOrdemTransferenciaConferenciaCega)
 routes.get('/impressao-etiqueta-OTDeposito', ConferenciaCegaControllers.getListaImpressaoEtiquetaOTDeposito)
 routes.put('/resumo-ordem-transferencia/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
+routes.put('/status-divergencia/:id', ConferenciaCegaControllers.putResumoOrdemTransferencia)
 
 
 routes.post('/inserir-status-divergencia', ConferenciaCegaControllers.postStatusDivergencia)

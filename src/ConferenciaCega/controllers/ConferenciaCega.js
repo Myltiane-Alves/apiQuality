@@ -4,11 +4,13 @@ import { getDetalheOrdemTransferencia } from "../repositories/detalheOrdemTransf
 import { createStatusDivergencia, getStatusDivergencia, updateStatusDivergencia } from "../repositories/statusDivergencia.js";
 import { OTClient } from '../client/index.js';
 import { OTService } from '../service/index.js';
-import criarOTSchema from '../schema/shemaCriarOT.js';
-import criarOTSchemaDeposito from '../schema/shemaCriarOTDeposito.js';
-import shemaCancelarOTDeposito from "../schema/shemaCancelarOTDeposito.js";
+import criarOTSchema from '../schema/schemaCriarOT.js';
+import criarOTSchemaDeposito from '../schema/schemaCriarOTDeposito.js';
+import schemaCancelarOTDeposito from "../schema/schemaCancelarOTDeposito.js";
 import schemaFinalizarOTDeposito from "../schema/schemaFinalizarOTDeposito.js";
 import schemaEncerrarOT from "../schema/schemaEncerrarOT.js";
+import schemaStatusDivergencia from "../schema/schemaStatusDivergencia.js";
+import schemaEditarStatusDivergencia from "../schema/schemaEditarStatusDivergencia.js";
 //let url = `http://164.152.245.77:8000/quality/concentrador_homologacao`;
 const url = 'http://164.152.245.77:8000/quality/concentrador_node';
 //const url = process.env.API_URL;
@@ -97,25 +99,87 @@ class ConferenciaCegaControllers {
     }
 
     async putStatusDivergencia(req, res) {
+
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body];
-            const response = await updateStatusDivergencia(dados);
-            return res.json(response);
+            const { error, value } = schemaEditarStatusDivergencia.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+            const response = await otService.statusEditarDivergenciaService(
+
+                value.DESCRICAODIVERGENCIA,
+                value.IDSTATUSDIVERGENCIA,
+                value.STATIVO
+            );
+
+            if (!value.IDSTATUSDIVERGENCIA) {
+                return res.status(400).json({ message: 'IDSTATUSDIVERGENCIA é obrigatório.' });
+            }
+
+            if (!value.STATIVO) {
+                return res.status(400).json({ message: 'STATIVO é obrigatório.' });
+            }
+
+            return res.status(200).json(response);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
-            return res.status(500).json({ error: error.message });
+            console.log('Erro ao atualizar status divergência:', error);
+            return res.status(500).json({ message: 'Erro ao atualizar status divergência.' });
+
         }
     }
+
     async postStatusDivergencia(req, res) {
+
         try {
-            const dados = Array.isArray(req.body) ? req.body : [req.body];
-            const response = await createStatusDivergencia(dados);
-            return res.json(response);
+            const { error, value } = schemaStatusDivergencia.validate(req.body, {
+                abortEarly: false,
+                stripUnknown: true
+            });
+
+            if (error) {
+                return res.status(400).json({
+                    message: 'Dados inválidos',
+                    errors: error.details.map(detail => ({
+                        field: detail.path.join('.'),
+                        message: detail.message
+                    }))
+                });
+            }
+
+            const response = await otService.statusDivergenciaService(
+
+                value.DESCRICAODIVERGENCIA,
+                value.IDUSRCRIACAO,
+                value.STATIVO
+            );
+
+            if (!value.DESCRICAODIVERGENCIA) {
+                return res.status(400).json({ message: 'DESCRICAODIVERGENCIA é obrigatório.' });
+            }
+
+            if (!value.STATIVO) {
+                return res.status(400).json({ message: 'STATIVO é obrigatório.' });
+            }
+
+            return res.status(200).json(response);
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
-            return res.status(500).json({ error: error.message });
+            console.log('Erro ao atualizar status divergência:', error);
+            return res.status(500).json({ message: 'Erro ao atualizar status divergência.' });
+
         }
     }
+
 
     // async putResumoOrdemTransferencia(req, res) {
     //     try {
@@ -372,7 +436,7 @@ class ConferenciaCegaControllers {
     async putCancelarOTDeposito(req, res) {
 
         try {
-            const { error, value } = shemaCancelarOTDeposito.validate(req.body, {
+            const { error, value } = schemaCancelarOTDeposito.validate(req.body, {
                 abortEarly: false,
                 stripUnknown: true
             });
