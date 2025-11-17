@@ -1237,8 +1237,36 @@ class ComprasControllers {
 
     async putPedido(req, res) {
         let {  
-
-           } = req.body;
+                IDRESUMOPEDIDO,
+                IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL,
+                IDCOMPRADOR,
+                IDCONDICAOPAGAMENTO,
+                IDFORNECEDOR,
+                IDTRANSPORTADORA,
+                IDANDAMENTO,
+                MODPEDIDO,
+                NOVENDEDOR,
+                EEMAILVENDEDOR,
+                DTPEDIDO,
+                DTPREVENTREGA,
+                TPFRETE,
+                DESCPERC01,
+                DESCPERC02,
+                DESCPERC03,
+                PERCCOMISSAO,
+                VRTOTALLIQUIDO,
+                OBSPEDIDO,
+                OBSPEDIDO2,
+                DTFECHAMENTOPEDIDO,
+                DTCADASTRO,
+                TPARQUIVO,
+                STDISTRIBUIDO,
+                STAGRUPAPRODUTO,
+                STCANCELADO,
+                TPFISCAL,
+                STRASCUNHO,
+        } = req.body;
 
         try {
             const apiUrl = `${url}/api/compras/finalizar-pedido.xsjs`
