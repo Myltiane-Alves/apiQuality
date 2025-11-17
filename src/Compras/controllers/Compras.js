@@ -1237,35 +1237,35 @@ class ComprasControllers {
 
     async putFinalizarPedido(req, res) {
         let {  
-                IDRESUMOPEDIDO,
-                IDGRUPOEMPRESARIAL,
-                IDSUBGRUPOEMPRESARIAL,
-                IDCOMPRADOR,
-                IDCONDICAOPAGAMENTO,
-                IDFORNECEDOR,
-                IDTRANSPORTADORA,
-                IDANDAMENTO,
-                MODPEDIDO,
-                NOVENDEDOR,
-                EEMAILVENDEDOR,
-                DTPEDIDO,
-                DTPREVENTREGA,
-                TPFRETE,
-                DESCPERC01,
-                DESCPERC02,
-                DESCPERC03,
-                PERCCOMISSAO,
-                VRTOTALLIQUIDO,
-                OBSPEDIDO,
-                OBSPEDIDO2,
-                DTFECHAMENTOPEDIDO,
-                DTCADASTRO,
-                TPARQUIVO,
-                STDISTRIBUIDO,
-                STAGRUPAPRODUTO,
-                STCANCELADO,
-                TPFISCAL,
-                STRASCUNHO,
+            IDRESUMOPEDIDO,
+            IDGRUPOEMPRESARIAL,
+            IDSUBGRUPOEMPRESARIAL,
+            IDCOMPRADOR,
+            IDCONDICAOPAGAMENTO,
+            IDFORNECEDOR,
+            IDTRANSPORTADORA,
+            IDANDAMENTO,
+            MODPEDIDO,
+            NOVENDEDOR,
+            EEMAILVENDEDOR,
+            DTPEDIDO,
+            DTPREVENTREGA,
+            TPFRETE,
+            DESCPERC01,
+            DESCPERC02,
+            DESCPERC03,
+            PERCCOMISSAO,
+            VRTOTALLIQUIDO,
+            OBSPEDIDO,
+            OBSPEDIDO2,
+            DTFECHAMENTOPEDIDO,
+            DTCADASTRO,
+            TPARQUIVO,
+            STDISTRIBUIDO,
+            STAGRUPAPRODUTO,
+            STCANCELADO,
+            TPFISCAL,
+            STRASCUNHO,
         } = req.body;
 
         try {
@@ -1781,6 +1781,80 @@ class ComprasControllers {
             return res.json(response.data);
         } catch (error) {
             console.error("error no ComprasControllers.postImagemProduto:", error);
+            throw error;
+        }
+    }
+
+    async postFinalizarPedido(req, res) {
+        let {  
+            IDRESUMOPEDIDO,
+            IDGRUPOEMPRESARIAL,
+            IDSUBGRUPOEMPRESARIAL,
+            IDCOMPRADOR,
+            IDCONDICAOPAGAMENTO,
+            IDFORNECEDOR,
+            IDTRANSPORTADORA,
+            IDANDAMENTO,
+            MODPEDIDO,
+            NOVENDEDOR,
+            EEMAILVENDEDOR,
+            DTPEDIDO,
+            DTPREVENTREGA,
+            TPFRETE,
+            DESCPERC01,
+            DESCPERC02,
+            DESCPERC03,
+            PERCCOMISSAO,
+            VRTOTALLIQUIDO,
+            OBSPEDIDO,
+            OBSPEDIDO2,
+            DTFECHAMENTOPEDIDO,
+            DTCADASTRO,
+            TPARQUIVO,
+            STDISTRIBUIDO,
+            STAGRUPAPRODUTO,
+            STCANCELADO,
+            TPFISCAL,
+            STRASCUNHO,
+        } = req.body;
+
+        try {
+            const apiUrl = `${url}/api/compras/finalizar-pedido.xsjs`
+        
+            const response = await axios.post(apiUrl, {
+                IDRESUMOPEDIDO,
+                IDGRUPOEMPRESARIAL,
+                IDSUBGRUPOEMPRESARIAL,
+                IDCOMPRADOR,
+                IDCONDICAOPAGAMENTO,
+                IDFORNECEDOR,
+                IDTRANSPORTADORA,
+                IDANDAMENTO,
+                MODPEDIDO,
+                NOVENDEDOR,
+                EEMAILVENDEDOR,
+                DTPEDIDO,
+                DTPREVENTREGA,
+                TPFRETE,
+                DESCPERC01,
+                DESCPERC02,
+                DESCPERC03,
+                PERCCOMISSAO,
+                VRTOTALLIQUIDO,
+                OBSPEDIDO,
+                OBSPEDIDO2,
+                DTFECHAMENTOPEDIDO,
+                DTCADASTRO,
+                TPARQUIVO,
+                STDISTRIBUIDO,
+                STAGRUPAPRODUTO,
+                STCANCELADO,
+                TPFISCAL,
+                STRASCUNHO,
+            });
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasControllers.postFinalizarPedido:", error);
             throw error;
         }
     }
