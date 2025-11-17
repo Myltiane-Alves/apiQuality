@@ -165,7 +165,7 @@ class ComprasControllers {
 
             return res.json(response.data); // Retorna
         } catch (error) {
-            console.error("Unable to connect to the database:", error);
+            console.error("error no ComprasControllers.getListaUltimoPedido:", error);
             throw error;
         }
     }
