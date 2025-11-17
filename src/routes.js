@@ -632,6 +632,7 @@ routes.put('/excluir-vinculo-fornecedor', ComprasControllers.putExcluirVinculoFo
 
 routes.put('/deletar-vinculo-tamanho-categoria', ComprasControllers.updateVinculoTamanhoCategoria)
 routes.put('/fornecedor/:id', ComprasControllers.putFornecedor)
+routes.put('/finalizar-pedido/:id', ComprasControllers.putFinalizarPedido)
 
 // POST
 routes.post('/cadastrarCondicaoPagamento', ComprasControllers.postCondicaoPagamento)

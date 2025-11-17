@@ -1235,7 +1235,7 @@ class ComprasControllers {
         }
     }
 
-    async putPedido(req, res) {
+    async putFinalizarPedido(req, res) {
         let {  
                 IDRESUMOPEDIDO,
                 IDGRUPOEMPRESARIAL,
@@ -1304,7 +1304,7 @@ class ComprasControllers {
             });
             return res.json(response.data);
         } catch (error) {
-            console.error("error no ComprasControllers.putPedido:", error);
+            console.error("error no ComprasControllers.putFinalizarPedido:", error);
             throw error;
         }
     }
