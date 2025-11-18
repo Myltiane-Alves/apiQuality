@@ -207,6 +207,22 @@ class ComprasControllers {
             throw error;
         }
     }
+
+    async getListaProdutoPedido(req, res) {
+        let { referenciaProduto, fornecedorPedido } = req.query;
+        referenciaProduto = referenciaProduto ? referenciaProduto : '';
+        fornecedorPedido = fornecedorPedido ? fornecedorPedido : '';
+
+        try {
+            const apiUrl = `${url}/api/compras/produtospedido.xsjs?PesqProd=${referenciaProduto}&idForn=${fornecedorPedido}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data); // Retorna
+        } catch (error) {
+            console.error("error no ComprasControllers.getListaProdutoPedido:", error);
+            throw error;
+        }
+    }
     
     async getListaFabricantes(req, res) {
         let { idFabricante } = req.query;
