@@ -576,6 +576,21 @@ class ComprasControllers {
         }
     }
 
+    async getListaCategoriaPedido(req, res) {
+        let { idCategoriaPedido, descricao} = req.query;
+        idCategoriaPedido = idCategoriaPedido ? idCategoriaPedido : '';
+        descricao = descricao ? descricao : '';
+        try {
+            const apiUrl = `${url}/api/compras/categoriapedido.xsjs?idtipopedido=${idCategoriaPedido}`
+            const response = await axios.get(apiUrl)
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error("error no ComprasController.getListaCategoriaPedido:", error);
+            throw error;
+        }
+    }
+
     async getListaTamanhosPedidos(req, res) {
         let { idTamanhoPedido, descricao} = req.query;
         idTamanhoPedido = idTamanhoPedido ? idTamanhoPedido : '';
@@ -622,20 +637,20 @@ class ComprasControllers {
         }
     }
 
-    // async getListaTipoTecidos(req, res) {
-    //     let { idTecido, descricao} = req.query;
-    //     idTecido = idTecido ? idTecido : '';
-    //     descricao = descricao ? descricao : '';
-    //     try {
-    //         const apiUrl = `${url}/api/compras/tipo-tecido.xsjs`
-    //         const response = await axios.get(apiUrl)
+    async getListaTipoTecidoSelect(req, res) {
+        let { idTecido, descricao} = req.query;
+        idTecido = idTecido ? idTecido : '';
+        descricao = descricao ? descricao : '';
+        try {
+            const apiUrl = `${url}/api/compras/tipo-tecido.xsjs`
+            const response = await axios.get(apiUrl)
 
-    //         return res.json(response.data);
-    //     } catch (error) {
-    //         console.error("erro nos campos do banco:", error);
-    //         throw error;
-    //     }
-    // }
+            return res.json(response.data);
+        } catch (error) {
+            console.error("erro nos campos do banco:", error);
+            throw error;
+        }
+    }
 
     async getListaLocalExposicao(req, res) {
         let { } = req.query;
