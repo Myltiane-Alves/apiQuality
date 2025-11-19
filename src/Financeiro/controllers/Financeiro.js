@@ -1250,7 +1250,7 @@ class FinanceiroControllers {
     let { } = req.query;
 
     try {
-      const apiUrl = `${url}/api/banco.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/banco.xsjs`
       const response = await axios.get(apiUrl)
 
       return res.json(response.data);
@@ -1261,10 +1261,15 @@ class FinanceiroControllers {
   }
 
   async getListaContaBanco(req, res) {
-    let { } = req.query;
-
+    let { idContaBanco, idBanco, idEmpresa, dsConta } = req.query;
+    idContaBanco = idContaBanco ? idContaBanco : '';
+    idBanco = idBanco ? idBanco : '';
+    idEmpresa = idEmpresa ? idEmpresa : '';
+    dsConta = dsConta ? dsConta : '';
+    page = page ? page : '';
+    pageSize = pageSize ? pageSize : '';
     try {
-      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/conta-banco.xsjs?id=${idContaBanco}&idBanco=${idBanco}&idEmpresa=${idEmpresa}&dsConta=${dsConta}&page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
 
       return res.json(response.data);
