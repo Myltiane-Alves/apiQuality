@@ -1261,7 +1261,7 @@ class FinanceiroControllers {
   }
 
   async getListaContaBanco(req, res) {
-    let { idContaBanco, idBanco, idEmpresa, dsConta } = req.query;
+    let { idContaBanco, idBanco, idEmpresa, dsConta, page, pageSize } = req.query;
     idContaBanco = idContaBanco ? idContaBanco : '';
     idBanco = idBanco ? idBanco : '';
     idEmpresa = idEmpresa ? idEmpresa : '';
