@@ -74,7 +74,7 @@ class ComprasControllers {
         let { idResumoPromocoes } = req.query;
         idResumoPromocoes = idResumoPromocoes ? idResumoPromocoes : '';
         try {
-            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/lista_empresapromocoes.xsjs?idResPromo=${idResumoPromocoes}`;
+            const apiUrl = `${url}/api/compras/lista_empresapromocoes.xsjs?idResPromo=${idResumoPromocoes}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); // Retorna
         } catch (error) {
@@ -125,6 +125,7 @@ class ComprasControllers {
 
         try {
             const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/lista_pedidos.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFornPesquisa=${idFornecedor}&idMarcaPesquisa=${idMarca}&idpedido=${idPedido}&idFabPesquisa=${idFabricante}&idCompradorPesquisa=${idComprador}&stSituacaoSAP=${stSituacaoSap}`;
+            // const apiUrl = `${url}/api/compras/lista_pedidos.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&idFornPesquisa=${idFornecedor}&idMarcaPesquisa=${idMarca}&idpedido=${idPedido}&idFabPesquisa=${idFabricante}&idCompradorPesquisa=${idComprador}&stSituacaoSAP=${stSituacaoSap}`;
            
             const response = await axios.get(apiUrl)
             // const response = await getPedidos(idPedido, dataPesquisaFim, dataPesquisaInicio, idMarca, idFornecedor, idFabricante, idComprador, stSituacaoSap, page, pageSize)
@@ -182,6 +183,7 @@ class ComprasControllers {
 
         try {
             const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/fornecedor.xsjs?id=${idFornecedor}&descFornecedor=${descFornecedor}&CNPJFornecedor=${CNPJFornecedor}&descFornOrCnpj=${descFornecedorOuCNPJ}&page=${page}&pageSize=${pageSize}`
+            // const apiUrl = `${url}/api/compras/fornecedor.xsjs?id=${idFornecedor}&descFornecedor=${descFornecedor}&CNPJFornecedor=${CNPJFornecedor}&descFornOrCnpj=${descFornecedorOuCNPJ}&page=${page}&pageSize=${pageSize}`
             // const response = await getFornecedores(idFornecedor, descFornecedor, CNPJFornecedor,  page, pageSize)
             const response = await axios.get(apiUrl)
             
