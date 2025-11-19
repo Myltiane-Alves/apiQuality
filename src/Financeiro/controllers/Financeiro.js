@@ -1260,6 +1260,20 @@ class FinanceiroControllers {
     }
   }
 
+  async getListaContaBanco(req, res) {
+    let { } = req.query;
+
+    try {
+      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const response = await axios.get(apiUrl)
+
+      return res.json(response.data);
+    } catch (error) {
+      console.error("Error no FinanceiroControllers.getListaContaBanco:", error);
+      throw error;
+    }
+  }
+
 
   // async updateMotivoDevolucao(req, res) {
   //   let { IDMOTIVODEVOLUCAO, IDUSUARIO, DSMOTIVO, STATIVO } = req.body;
