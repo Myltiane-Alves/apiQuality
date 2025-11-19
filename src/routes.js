@@ -276,6 +276,7 @@ routes.get('/deposito-loja-consolidado', FinanceiroControllers.getListaConciliar
 routes.post('/motivoDevolucao', FinanceiroControllers.createMotivoDevolucao)
 // routes.get('/detalheFaturaFinanceiro', FinanceiroControllers.getListaDetalheFaturaFinanceiro)
 routes.get('/banco', FinanceiroControllers.getListaBanco)
+routes.get('/conta-banco', FinanceiroControllers.getListaContaBanco)
 
 routes.get('/primeira-venda', ExtratosControllers.getPrimeiraVenda)
 routes.get('/lista-extrato', ExtratosControllers.getListaExtratoDaLojaPeriodoFinanceiro)
