@@ -1356,6 +1356,49 @@ class FinanceiroControllers {
     }
   }
 
+  async putContaBanco(req, res) {
+    let { 
+      IDCONTABANCO,
+      IDBANCO,
+      DSCONTABANCO,
+      NUAGENCIA,
+      NUDIGITOAGENCIA,
+      NUCONTA,
+      NUDIGITOCONTA,
+      TPPESSOA,
+      STPADRAO,
+      STATIVO,
+      NUCONTASAP,
+      TPCONTA
+    } = req.body;
+
+    try {
+      if(!IDCONTABANCO) {
+        throw new Error("IDCONTABANCO é obrigatório");
+      }
+
+      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const response = await axios.put(apiUrl, {
+        IDCONTABANCO,
+        IDBANCO,
+        DSCONTABANCO,
+        NUAGENCIA,
+        NUDIGITOAGENCIA,
+        NUCONTA,
+        NUDIGITOCONTA,
+        TPPESSOA,
+        STPADRAO,
+        STATIVO,
+        NUCONTASAP,
+        TPCONTA
+      })
+
+      return res.json(response.data);
+    } catch (error) {
+      console.error("error no FinanceiroControllers.putContaBanco:", error);
+      throw error;
+    }
+  }
   // async updateFecharCaixaZerado(req, res) {
   //   let { ID } = req.body;
 
@@ -1401,6 +1444,45 @@ class FinanceiroControllers {
       throw error;
     }
   }
+
+  async postContaBanco(req, res) {
+    let { 
+      IDCONTABANCO,
+      IDBANCO,
+      DSCONTABANCO,
+      NUAGENCIA,
+      NUDIGITOAGENCIA,
+      NUCONTA,
+      NUDIGITOCONTA,
+      TPPESSOA,
+      NUCONTASAP
+    } = req.body;
+
+    try {
+      if(!IDBANCO) {
+        throw new Error("IDBANCO é obrigatório");
+      }
+
+      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const response = await axios.post(apiUrl, {
+        IDCONTABANCO,
+        IDBANCO,
+        DSCONTABANCO,
+        NUAGENCIA,
+        NUDIGITOAGENCIA,
+        NUCONTA,
+        NUDIGITOCONTA,
+        TPPESSOA,
+        NUCONTASAP
+      })
+
+      return res.json(response.data);
+    } catch (error) {
+      console.error("error no FinanceiroControllers.postContaBanco:", error);
+      throw error;
+    }
+  }
+
   // async createMovimentoSaldoBonificacao(req, res) {
   //   let { IDFUNCIONARIO, TIPOMOVIMENTO, VRMOVIMENTO, OBSERVACAO, IDFUNCIONARIORESP } = req.body;
 
