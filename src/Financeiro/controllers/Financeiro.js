@@ -1373,6 +1373,8 @@ class FinanceiroControllers {
     } = req.body;
 
     try {
+   
+   
       if(!IDCONTABANCO) {
         throw new Error("IDCONTABANCO é obrigatório");
       }

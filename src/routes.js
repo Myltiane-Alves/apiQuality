@@ -278,7 +278,7 @@ routes.post('/motivoDevolucao', FinanceiroControllers.createMotivoDevolucao)
 routes.get('/banco', FinanceiroControllers.getListaBanco)
 routes.get('/conta-banco', FinanceiroControllers.getListaContaBanco)
 routes.put('/conta-banco/:id', FinanceiroControllers.putContaBanco)
-routes.post('/criar-conta-banco', FinanceiroControllers.postContaBanco)
+routes.post('/cadastrar-conta-banco', FinanceiroControllers.postContaBanco)
 
 routes.get('/primeira-venda', ExtratosControllers.getPrimeiraVenda)
 routes.get('/lista-extrato', ExtratosControllers.getListaExtratoDaLojaPeriodoFinanceiro)
