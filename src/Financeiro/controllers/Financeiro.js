@@ -1377,7 +1377,7 @@ class FinanceiroControllers {
         throw new Error("IDCONTABANCO é obrigatório");
       }
 
-      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/conta-banco.xsjs`
       const response = await axios.put(apiUrl, {
         IDCONTABANCO,
         IDBANCO,
@@ -1463,7 +1463,7 @@ class FinanceiroControllers {
         throw new Error("IDBANCO é obrigatório");
       }
 
-      const apiUrl = `${url}/api/financeiro/conta-banco.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/conta-banco.xsjs`
       const response = await axios.post(apiUrl, {
         IDCONTABANCO,
         IDBANCO,
