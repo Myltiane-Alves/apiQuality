@@ -1347,7 +1347,7 @@ class FinanceiroControllers {
     }
 
     try {
-      const apiUrl = `${url}/api/financeiro/fatura-atualizacao-conferencia.xsjs`
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/fatura-atualizacao-conferencia.xsjs`
       const response = await axios.put(apiUrl, {
         IDS_FATURAS,
         STCONFERIDO,
