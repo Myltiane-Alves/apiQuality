@@ -340,6 +340,7 @@ routes.get('/venda-total-fatura-pix-empresa-compensada', FaturasControllers.getL
 routes.put('/atualizar-status-fatura-pix', FaturasControllers.putListaFaturaVendaPixStatusConferido)
 routes.put('/atualizar-recompra', FaturasControllers.putListaAtualizarRecompra)
 routes.put('/fatura-loja-atualizar', FaturasControllers.putListaAtualizarFatura)
+routes.put('/consolidacao-faturas/:id', FaturasControllers.putConsolidacaoFatura)
 
 
 //  Estabelecimento
