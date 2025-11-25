@@ -1359,7 +1359,7 @@ class FinanceiroControllers {
 
       return res.json(response.data);
     } catch (error) {
-      console.error("Erro no FinanceiroControllers.putFaturaFinanceiro:", error);
+      console.error("Erro no FinanceiroControllers.putFaturaConferencia:", error);
       throw error;
     }
   }
