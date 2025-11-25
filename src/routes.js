@@ -288,6 +288,7 @@ routes.post('/ajuste-extrato', ExtratosControllers.postListaAjusteExtrato)
 routes.get('/resumo-voucher', VoucherControllers.getListaResumoVoucherFinanceiro)
 // routes.put('/atualizacaoAdiantamentoStatus', FinanceiroControllers.updateAdiantamentoStatus)
 routes.put('/atualizarFatura/:id', FinanceiroControllers.putFaturaFinanceiro)
+routes.put('/conferencia-fatura/:id', FinanceiroControllers.putFaturaConferencia)
 
 
 // Início Vendas 
