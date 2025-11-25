@@ -333,6 +333,7 @@ routes.get('/fatura-pix-periodo-consolidado', FinanceiroControllers.getListaFatu
 routes.get('/fatura-pix-periodo', FaturasControllers.getListaFaturasPixPeriodo)
 routes.get('/detalhe-faturas', FaturasControllers.getDetalheFaturaFinanceiro)
 routes.get('/previa-consolidacao-faturas', FaturasControllers.getPreviaFaturasConsolidadas)
+routes.get('/consolidacao-faturas', FaturasControllers.getConsolidacaoFaturas)
 // routes.get('/faturaPixPeriodo', FaturasControllers.getListaVendaFaturaPixPeriodo)
 routes.get('/venda-total-fatura-pix-empresa', FaturasControllers.getListaVendaFaturaPixPeriodo)
 routes.get('/venda-total-fatura-pix-empresa-compensada', FaturasControllers.getListaVendaFaturaPixPeriodoCompensacao)

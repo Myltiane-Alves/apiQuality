@@ -92,17 +92,38 @@ class FaturasControllers {
     page = page ? page : '';
     pageSize = pageSize ? pageSize : '';
 
-    
     try {
                       
       // const apiUrl = `${url}/api/detalhe-fatura.xsjs?idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nuCodigoAutorizacao=${codigoFatura}&idDetalheFatura=${idDetalheFatura}&page=${page}&pageSize=${pageSize}`;
       const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/previa-consolidacao-faturas.xsjs?idEmpresa=${idEmpresa}&dtInicio=${dataPesquisaInicio}&dtFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`;
       const response = await axios.get(apiUrl);
-      // const response = await getDetalheFatura(idEmpresa, dataPesquisaInicio, dataPesquisaFim, codigoFatura, idDetalheFatura, page, pageSize);
 
       return res.json(response.data); 
     } catch (error) {
       console.error("Erro no FaturasController.getPreviaFaturasConsolidadas:", error);
+      throw error;
+    }
+    
+  }
+  
+  async getConsolidacaoFaturas(req, res) {
+    let { idEmpresa, dataPesquisaInicio, dataPesquisaFim, page, pageSize} = req.query;
+    
+    idEmpresa = idEmpresa ? idEmpresa : '';
+    dataPesquisaInicio = dataPesquisaInicio ? dataPesquisaInicio : '';
+    dataPesquisaFim = dataPesquisaFim ? dataPesquisaFim : '';
+    page = page ? page : '';
+    pageSize = pageSize ? pageSize : '';
+
+    try {
+                      
+      // const apiUrl = `${url}/api/detalhe-fatura.xsjs?idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nuCodigoAutorizacao=${codigoFatura}&idDetalheFatura=${idDetalheFatura}&page=${page}&pageSize=${pageSize}`;
+      const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/consolidacao-faturas.xsjs?idEmpresa=${idEmpresa}&dtInicio=${dataPesquisaInicio}&dtFim=${dataPesquisaFim}&page=${page}&pageSize=${pageSize}`;
+      const response = await axios.get(apiUrl);
+
+      return res.json(response.data); 
+    } catch (error) {
+      console.error("Erro no FaturasController.getConsolidacaoFaturas:", error);
       throw error;
     }
     
