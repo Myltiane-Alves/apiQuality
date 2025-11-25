@@ -1339,9 +1339,9 @@ class FinanceiroControllers {
   }
 
   async putFaturaConferencia(req, res) {
-    let { IDDETALHEFATURA, NUCODAUTORIZACAO, VRRECEBIDO, NUAUTORIZACAO, STPIX, STCANCELADO } = req.body;
+    let { IDS_FATURAS, STCONFERIDO, IDFUNCIONARIO } = req.body;
 
-    if (!IDDETALHEFATURA) {
+    if (!IDS_FATURAS) {
       console.error("Erro no FinanceiroControllers.putFaturaConferencia: Faltando Parametos obrigatórios");
       return res.status(400).json({ error: "Faltando Parametos obrigatórios" });
     }
@@ -1349,12 +1349,9 @@ class FinanceiroControllers {
     try {
       const apiUrl = `${url}/api/financeiro/fatura-atualizacao-conferencia.xsjs`
       const response = await axios.put(apiUrl, {
-        NUCODAUTORIZACAO,
-        VRRECEBIDO,
-        STCANCELADO,
-        STPIX,
-        NUAUTORIZACAO,
-        IDDETALHEFATURA,
+        IDS_FATURAS,
+        STCONFERIDO,
+        IDFUNCIONARIO,
       })
 
       return res.json(response.data);
