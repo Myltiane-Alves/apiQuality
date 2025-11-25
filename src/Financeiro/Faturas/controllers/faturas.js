@@ -224,7 +224,7 @@ class FaturasControllers {
     try {
       let { IDEMPRESA, DTPROCESSAMENTO, QTDTOTALFATURAS, VRTOTALRECEBIDO, IDFUNCIONARIO } = req.body; 
 
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/consolidacao-faturas.xsjs`, {
+      const response = await axios.post(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/consolidacao-faturas.xsjs`, {
         IDEMPRESA,
         DTPROCESSAMENTO,
         QTDTOTALFATURAS,
@@ -233,7 +233,7 @@ class FaturasControllers {
       });
       return res.status(200).json({ message: "Fatura atualizada com sucesso"});
     } catch (error) {
-        console.error("Erro no FaturasControllers.putConsolidacaoFatura:", error);
+        console.error("Erro no FaturasControllers.postConsolidacaoFatura:", error);
         return res.status(500).json({ error: error.message });
     }
   }
