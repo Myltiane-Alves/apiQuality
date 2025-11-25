@@ -1338,6 +1338,32 @@ class FinanceiroControllers {
     }
   }
 
+  async putFaturaConferencia(req, res) {
+    let { IDDETALHEFATURA, NUCODAUTORIZACAO, VRRECEBIDO, NUAUTORIZACAO, STPIX, STCANCELADO } = req.body;
+
+    if (!IDDETALHEFATURA) {
+      console.error("Erro no FinanceiroControllers.putFaturaConferencia: Faltando Parametos obrigatórios");
+      return res.status(400).json({ error: "Faltando Parametos obrigatórios" });
+    }
+
+    try {
+      const apiUrl = `${url}/api/financeiro/fatura-atualizacao-conferencia.xsjs`
+      const response = await axios.put(apiUrl, {
+        NUCODAUTORIZACAO,
+        VRRECEBIDO,
+        STCANCELADO,
+        STPIX,
+        NUAUTORIZACAO,
+        IDDETALHEFATURA,
+      })
+
+      return res.json(response.data);
+    } catch (error) {
+      console.error("Erro no FinanceiroControllers.putFaturaFinanceiro:", error);
+      throw error;
+    }
+  }
+
 
   async updateAdiantamentoStatus(req, res) {
     let { IDADIANTAMENTOSALARIO, STATIVO } = req.body;
