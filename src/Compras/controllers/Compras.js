@@ -46,7 +46,8 @@ class ComprasControllers {
         idPedido = idPedido ? idPedido : '';
 
         try {
-            const apiUrl = `${url}/api/compras/lista_detalhepedidos.xsjs?idpedido=${idPedido}`;
+            // const apiUrl = `${url}/api/compras/lista_detalhepedidos.xsjs?idpedido=${idPedido}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/lista_detalhepedidos.xsjs?idpedido=${idPedido}`;
             const response = await axios.get(apiUrl)
             return res.json(response.data); 
         } catch (error) {
@@ -136,7 +137,7 @@ class ComprasControllers {
         }
     }
 
-    async getListaDetalhePedidos(req, res) {
+    async getListaDetalhePedidosGrade(req, res) {
         let {idPedido, idDetalhePedido, dataPesquisaInicio, dataPesquisaFim,  page, pageSize } = req.query;
         idPedido = idPedido ? idPedido : '';
         idDetalhePedido = idDetalhePedido ? idDetalhePedido : '';

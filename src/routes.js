@@ -613,7 +613,7 @@ routes.get('/tamanhosPedidos', ComprasControllers.getListaTamanhosPedidos)
 routes.get('/vinculo-tamanho-categoria', ComprasControllers.getListaTamanhosCategoriaPedidos)
 routes.get('/fornecedor-produto', ComprasControllers.getListaFornecedorProduto)
 routes.get('/produtos-pedido', ComprasControllers.getListaProdutoPedido)
-routes.get('/listaDetalhePedidos', ComprasControllers.getListaDetalhePedidos)
+routes.get('/listaDetalhePedidos', ComprasControllers.getListaDetalhePedidosGrade)
 routes.get('/unidadeMedida', ComprasControllers.getListaUnidadeMedida)
 routes.get('/unidades-de-Medidas', ComprasControllers.getListaUnidadesMedidas)
 
