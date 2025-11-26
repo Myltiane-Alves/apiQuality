@@ -261,18 +261,15 @@ class FaturasControllers {
 
   async postConsolidacaoFaturaSAP(req, res) {
     try {
-      let { IDEMPRESA, DTPROCESSAMENTO, QTDTOTALFATURAS, VRTOTALRECEBIDO, IDFUNCIONARIO } = req.body; 
+      let { IDS_CONSOLIDACOES, IDFUNCIONARIO } = req.body; 
 
       const response = await axios.post(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/service-layer/fatura/jobs/consolidacao-faturas-integracao.xsjs`, {
-        IDEMPRESA,
-        DTPROCESSAMENTO,
-        QTDTOTALFATURAS,
-        VRTOTALRECEBIDO,
+        IDS_CONSOLIDACOES,
         IDFUNCIONARIO
       });
-      return res.status(200).json({ message: "Fatura atualizada com sucesso"});
+      return res.status(200).json({ message: "Fatura Integrada com SAP com sucesso"});
     } catch (error) {
-        console.error("Erro no FaturasControllers.postConsolidacaoFatura:", error);
+        console.error("Erro no FaturasControllers.postConsolidacaoFaturaSAP:", error);
         return res.status(500).json({ error: error.message });
     }
   }
