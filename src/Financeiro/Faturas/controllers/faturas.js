@@ -266,10 +266,10 @@ class FaturasControllers {
         IDS_CONSOLIDACOES,
         IDFUNCIONARIO
       });
-      return res.status(200).json({ message: "Fatura Integrada com SAP com sucesso"});
+      return response.data;
     } catch (error) {
-        console.error("Erro no FaturasControllers.postConsolidacaoFaturaSAP:", error);
-        return res.status(500).json({ error: error.message });
+      console.error("Erro no FaturasControllers.postConsolidacaoFaturaSAP:", error);
+      return res.status(500).json({ error: error.message });
     }
   }
 
