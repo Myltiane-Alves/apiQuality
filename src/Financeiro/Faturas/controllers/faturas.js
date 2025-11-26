@@ -225,13 +225,12 @@ class FaturasControllers {
 
   async putConsolidacaoFatura(req, res) {
     try {
-      let { IDEMPRESA, DTPROCESSAMENTO, QTDTOTALFATURAS, VRTOTALRECEBIDO, IDFUNCIONARIO } = req.body; 
+      let { IDCONSOLIDACAOFATURA, STCANCELADO, TXTMOTIVOCANCELAMENTO, IDFUNCIONARIO } = req.body; 
 
       const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/financeiro/consolidacao-faturas.xsjs`, {
-        IDEMPRESA,
-        DTPROCESSAMENTO,
-        QTDTOTALFATURAS,
-        VRTOTALRECEBIDO,
+        IDCONSOLIDACAOFATURA,
+        STCANCELADO,
+        TXTMOTIVOCANCELAMENTO,
         IDFUNCIONARIO
       });
       return res.status(200).json({ message: "Fatura atualizada com sucesso"});
