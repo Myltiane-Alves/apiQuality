@@ -266,7 +266,8 @@ class FaturasControllers {
         IDS_CONSOLIDACOES,
         IDFUNCIONARIO
       });
-      return response.data;
+  
+      return res.json(response.data);
     } catch (error) {
       console.error("Erro no FaturasControllers.postConsolidacaoFaturaSAP:", error);
       return res.status(500).json({ error: error.message });
