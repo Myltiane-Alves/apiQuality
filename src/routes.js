@@ -280,7 +280,6 @@ routes.get('/conta-banco', FinanceiroControllers.getListaContaBanco)
 routes.put('/conta-banco/:id', FinanceiroControllers.putContaBanco)
 routes.post('/cadastrar-conta-banco', FinanceiroControllers.postContaBanco)
 
-routes.get('/primeira-venda', ExtratosControllers.getPrimeiraVenda)
 routes.get('/lista-extrato', ExtratosControllers.getListaExtratoDaLojaPeriodoFinanceiro)
 routes.put('/ajuste-extrato/:id', ExtratosControllers.putListaAjusteExtrato)
 routes.post('/ajuste-extrato', ExtratosControllers.postListaAjusteExtrato)
