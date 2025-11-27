@@ -56,6 +56,21 @@ class ComprasControllers {
         }
     }
 
+    async getListaDetalhePedidoGrade(req, res) {
+        let { idDetalhePedido } = req.query;
+        idDetalhePedido = idDetalhePedido ? idDetalhePedido : '';
+
+        try {
+            // const apiUrl = `${url}/api/compras/lista_detalhepedidos.xsjs?idpedido=${idPedido}`;
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/compras/lista_detalhepedidogradeedit.xsjs?idDetPedido=${idDetalhePedido}&page=1`;
+            const response = await axios.get(apiUrl)
+            return res.json(response.data); 
+        } catch (error) {
+            console.error("Unable to connect to the database:", error);
+            throw error;
+        }
+    }
+
     async getListaPromocoes(req, res) {
         let { dataPesquisaInicio, dataPesquisaFim } = req.query;
         dataPesquisaInicio = dataFormatada(dataPesquisaInicio) ? dataPesquisaInicio : '';
