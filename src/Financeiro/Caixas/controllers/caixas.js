@@ -83,18 +83,17 @@ class CaixasControllers {
     
 
     async updateFecharCaixaZerado(req, res) {
-        let { ID } = req.body;
-    
-        try {
-          const despesas = Array.isArray(req.body) ? req.body : [req.body];
-
-          // const response = await putFecharCaixaZerados(ID)
-          const response = await axios.put(`${url}/api/financeiro/fecha-caixas-zerados.xsjs`, despesas);
-          return res.json(response.data);
-        } catch (error) {
-          console.error("Unable to connect to the database:", error);
-          throw error;
-        }
+      let { ID } = req.body;
+  
+      try {
+        const response = await axios.put(`${url}/api/financeiro/fecha-caixas-zerados.xsjs`, {
+          ID
+        });
+        return res.json(response.data);
+      } catch (error) {
+        console.error("Erro no CaixasControllers.updateFecharCaixaZerado:", error);
+        throw error;
+      }
     }
 }
 
