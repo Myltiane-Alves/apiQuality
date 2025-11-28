@@ -879,7 +879,7 @@ class FinanceiroControllers {
     dataMovimentoFim = dataMovimentoFim ? dataMovimentoFim : '';
 
     try {
-      const apiUrl = `${url}/api/financeiro/deposito-loja-consolidado.xsjs?page=${page}&pageSize=${pageSize}&dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dataCompInicio=${dataCompensacaoInicio}&dataCompFim=${dataCompensacaoFim}&datamovinicio=${dataMovimentoInicio}&datamovfim=${dataMovimentoFim}`
+      const apiUrl = `${url}/api/financeiro/deposito-loja-consolidado.xsjs?dataPesquisaInicio=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&dataCompInicio=${dataCompensacaoInicio}&dataCompFim=${dataCompensacaoFim}&datamovinicio=${dataMovimentoInicio}&datamovfim=${dataMovimentoFim}&page=${page}&pageSize=${pageSize}`
       const response = await axios.get(apiUrl)
 
       return res.json(response.data);
