@@ -180,11 +180,16 @@ class FaturasControllers {
   
   async putListaFaturaVendaPixStatusConferido(req, res) {
     try {
-        const vendas = Array.isArray(req.body) ? req.body : [req.body]; 
-        const response = await putVendaPixStatusConferido(vendas);
-        return res.json(response);
+        let { IDDETALHEFATURA, STCONFERIDO, DATA_COMPENSACAO} = req.body; 
+        // const response = await putVendaPixStatusConferido(vendas);
+        const response = await axios.put(`${url}/api/financeiro/fatura-pix-periodo-status-conferido.xsjs`, {
+          IDDETALHEFATURA,
+          STCONFERIDO,
+          DATA_COMPENSACAO
+        })
+        return res.json(response.data);
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        console.error("erro no FaturasControllers.putListaFaturaVendaPixStatusConferido", error);
         return res.status(500).json({ error: error.message });
     }
   }
@@ -192,7 +197,7 @@ class FaturasControllers {
   async putListaAtualizarRecompra(req, res) {
     try {
       let {IDDETALHEFATURA, STRECOMPRA} = req.body; 
-        // const response = await putAtualizarRecompra(detalhes);
+       
         if(!IDDETALHEFATURA) {
           return res.status(400).json({ error: "IDDETALHEFATURA is required" });
         }
