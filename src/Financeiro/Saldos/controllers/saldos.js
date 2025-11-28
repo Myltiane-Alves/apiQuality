@@ -26,7 +26,10 @@ class SaldosControllers {
 
   async getListaSaldoExtratoLoja(req, res) {
     let { idGrupoEmpresarial, dataPesquisa, pageSize, page } = req.query;
-    idGrupoEmpresarial = idGrupoEmpresarial ? idGrupoEmpresarial : '';
+      idGrupoEmpresarial = idGrupoEmpresarial ? idGrupoEmpresarial : '';
+      dataPesquisa = dataPesquisa ? dataPesquisa : '';
+      page = page ? page : '';
+      pageSize = pageSize ? pageSize : '';
     try {
       const apiUrl = `${url}/api/financeiro/saldo-loja-por-grupo.xsjs?idGrupoEmpresarial=${idGrupoEmpresarial}&dataPesquisa=${dataPesquisa}&pageSize=${pageSize}&page=${page}`
       const response = await axios.get(apiUrl)
