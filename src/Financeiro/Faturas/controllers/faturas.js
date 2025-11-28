@@ -180,17 +180,17 @@ class FaturasControllers {
   
   async putListaFaturaVendaPixStatusConferido(req, res) {
     try {
-        let { IDDETALHEFATURA, STCONFERIDO, DATA_COMPENSACAO} = req.body; 
-        // const response = await putVendaPixStatusConferido(vendas);
-        const response = await axios.put(`${url}/api/financeiro/fatura-pix-periodo-status-conferido.xsjs`, {
-          IDDETALHEFATURA,
-          STCONFERIDO,
-          DATA_COMPENSACAO
-        })
-        return res.json(response.data);
+      let { IDDETALHEFATURA, STCONFERIDO, DATA_COMPENSACAO} = req.body; 
+ 
+      const response = await axios.put(`${url}/api/financeiro/fatura-pix-periodo-status-conferido.xsjs`, {
+        IDDETALHEFATURA,
+        STCONFERIDO,
+        DATA_COMPENSACAO
+      })
+      return res.json(response.data);
     } catch (error) {
-        console.error("erro no FaturasControllers.putListaFaturaVendaPixStatusConferido", error);
-        return res.status(500).json({ error: error.message });
+      console.error("erro no FaturasControllers.putListaFaturaVendaPixStatusConferido", error);
+      return res.status(500).json({ error: error.message });
     }
   }
 
