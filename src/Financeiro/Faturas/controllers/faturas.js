@@ -181,7 +181,10 @@ class FaturasControllers {
   async putListaFaturaVendaPixStatusConferido(req, res) {
     try {
       let { IDDETALHEFATURA, STCONFERIDO, DATA_COMPENSACAO} = req.body; 
- 
+      console.log(req.body, 'req.body no controller');
+      // if(!IDDETALHEFATURA) {
+      //   return res.status(400).json({ error: "IDDETALHEFATURA is required" });
+      // }
       const response = await axios.put(`${url}/api/financeiro/fatura-pix-periodo-status-conferido.xsjs`, {
         IDDETALHEFATURA,
         STCONFERIDO,
