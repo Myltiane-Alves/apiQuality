@@ -415,7 +415,7 @@ routes.get('/adiantamento-funcionarios', DashBoardAdiantamentoSalarialController
 routes.get('/adiantamentos-salarial', DashBoardAdiantamentoSalarialControllers.getListaAdiantamentosSalarialDashBoard)
 
 routes.put('/atualizacao-adiantamento-status', DashBoardAdiantamentoSalarialControllers.updateAdiantamentoStatus)
-routes.post('/adiantamento-salarial', DashBoardAdiantamentoSalarialControllers.postAdiantamentoSalarial)
+routes.post('/cadastrar-adiantamento-salarial', DashBoardAdiantamentoSalarialControllers.postAdiantamentoSalarial)
 routes.put('/adiantamento-salarial/:id', DashBoardAdiantamentoSalarialControllers.putAdiantamentoSalarial)
 
 // routes.get('/resumoVendaConvenioDescontoFN', DashBoardControllers.getRetornoListaVendasConvenioDescontoFuncionario)
