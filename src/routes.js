@@ -428,6 +428,7 @@ routes.get('/venda-resumido', DashBoardVendasControllers.getListaVendasLojaResum
 routes.get('/venda-vendedor', DashBoardVendasControllers.getListaVendasVendedorPeriodoGerencia)
 routes.get('/vendas-recebimentos', DashBoardVendasControllers.getListaRecebimento)
 routes.get('/lista-caixas-movimento-gerencia', DashBoardVendasControllers.getListaCaixaMovimentosGerencia)
+routes.get('/lista-caixas-fechados-nao-conferido', DashBoardVendasControllers.getListaCaixasFechados)
 
 // routes.put('/atualizacaoStatus', DashBoardControllers.updateStatusQuebraCaixaLoja)
 

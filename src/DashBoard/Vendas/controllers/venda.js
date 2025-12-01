@@ -1,13 +1,5 @@
 
 import axios from "axios";
-import { dataFormatada } from "../../../utils/dataFormatada.js";
-import { getDetalheVendas } from "../repositories/detalheVenda.js";
-import { getResumoVendaCaixaDetalhado } from "../repositories/resumoVendaCaixaDetalhado.js";
-import { getResumoVendaConvenioDesconto } from "../repositories/resumoVendaConvenioDesconto.js";
-import { getVendasResumida } from "../repositories/vendaResumida.js";
-import { getVendaVendedor } from "../repositories/vendasVendedor.js";
-import { getRecebimento } from "../repositories/recebimentos.js";
-import { getCaixasMovimentos } from "../repositories/listaCaixaMovimentos.js";
 import 'dotenv/config';
 const url = process.env.API_URL;
 
@@ -195,6 +187,27 @@ class DashBoardVendasControllers {
             return res.json(response.data); // Retorna
         } catch (error) {
             console.error("erro no  DashBoardVendasControllers.getListaResumoVendasCaixas")
+            throw error;
+        }
+        
+    }
+
+    async getListaCaixasFechados(req, res) {
+        let { idVenda, idEmpresa, page, pageSize } = req.query;
+   
+        idVenda = idVenda ? idVenda : '';
+        idEmpresa = idEmpresa ? idEmpresa : '';
+        page = page ? page : '';
+        pageSize = pageSize ? pageSize : '';
+
+        try {
+            // const apiUrl = `${url}/api/dashboard/venda/lista-caixas-fechados-nao-conferidos.xsjs?idEmpresa=${idEmpresa}&page=${page}&pageSize=${pageSize}`
+            const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/dashboard/venda/lista-caixas-fechados-nao-conferidos.xsjs?idEmpresa=${idEmpresa}&page=${page}&pageSize=${pageSize}`
+            const response = await axios.get(apiUrl)
+            // console.log(apiUrl, 'apiUrlCaixasFechados')
+            return res.json(response.data); // Retorna
+        } catch (error) {
+            console.error("erro no  DashBoardVendasControllers.getListaCaixasFechados")
             throw error;
         }
         
