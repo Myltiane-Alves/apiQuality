@@ -1,14 +1,12 @@
 import Joi from "joi";
 
 const criarOTSchema = Joi.object({
-    IDEMPRESAORIGEM: Joi.number().required()
+    IDEMPRESAORIGEM: Joi.number().allow()
     .messages({
-        "any.required": "O ID da empresa de origem é obrigatório",
         "number.base": "O ID da empresa de origem deve ser um número"
     }),
-    IDEMPRESADESTINO: Joi.number().required()
+    IDEMPRESADESTINO: Joi.number().allow()
     .messages({
-        "any.required": "O ID da empresa de destino é obrigatório",
         "number.base": "O ID da empresa de destino deve ser um número"
     }),
     DATAEXPEDICAO: Joi.string().allow('')
@@ -80,7 +78,7 @@ const criarOTSchema = Joi.object({
     .messages({
         "string.base": "A observação de divergência deve ser uma string"
     }),
-    STEMISSAONFE: Joi.string().required('')
+    STEMISSAONFE: Joi.string().allow('')
     .messages({
         "string.base": "A descrição da emissão NFE deve ser uma string"
     }),

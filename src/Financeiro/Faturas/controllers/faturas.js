@@ -219,7 +219,7 @@ class FaturasControllers {
     try {
       let { IDDETALHEFATURA, NUCODAUTORIZACAO, VRRECEBIDO } = req.body; 
 
-      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/fatura-loja/atualizar.xsjs`, {
+      const response = await axios.put(`${url}/api/fatura-loja/atualizar.xsjs`, {
         IDDETALHEFATURA,
         NUCODAUTORIZACAO,
         VRRECEBIDO

@@ -32,14 +32,6 @@ export class OTService {
         QTDTOTALITENSAJUSTE,
         dadosdetalheot,
     ) {
-        if (!IDEMPRESAORIGEM) {
-            throw new Error("IDEMPRESAORIGEM is required, services");
-        }
-        console.log("IDEMPRESAORIGEM", IDEMPRESAORIGEM)
-
-        if (!IDEMPRESADESTINO) {
-            throw new Error("IDEMPRESADESTINO is required, services");
-        }
 
         const result = await this.client.criarOT(
             IDRESUMOOT,
@@ -106,13 +98,6 @@ export class OTService {
             throw new Error("IDRESUMOOT is required");
         }
 
-        if (!IDEMPRESAORIGEM) {
-            throw new Error("IDEMPRESAORIGEM is required");
-        }
-
-        if (!IDEMPRESADESTINO) {
-            throw new Error("IDEMPRESADESTINO is required");
-        }
 
         const result = await this.client.atualizarOT(
             IDRESUMOOT,

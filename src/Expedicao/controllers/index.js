@@ -382,14 +382,6 @@ class ExpedicaoControllers {
                     value.dadosdetalheot,
     
             );
-    
-            if(!value.IDEMPRESADESTINO) {
-                return res.status(400).json({message: 'IDEMPRESADESTINO é obrigatório.'});
-            }
-    
-            if(!value.IDEMPRESAORIGEM) {
-                return res.status(400).json({message: 'IDEMPRESAORIGEM é obrigatório.'});
-            }
            
             return res.status(200).json(response);
         } catch(error) {

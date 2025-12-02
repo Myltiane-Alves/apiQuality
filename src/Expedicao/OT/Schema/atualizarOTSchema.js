@@ -6,23 +6,20 @@ const atualizarOTSchema = Joi.object({
             "any.required": "O ID do resumo da OT é obrigatório",
             "number.base": "O ID do resumo da OT deve ser um número"
         }),
-    IDEMPRESAORIGEM: Joi.number().required()
+    IDEMPRESAORIGEM: Joi.number().allow()
         .messages({
-            "any.required": "O ID da empresa de origem é obrigatório",
             "number.base": "O ID da empresa de origem deve ser um número"
         }),
-    IDEMPRESADESTINO: Joi.number().required()
+    IDEMPRESADESTINO: Joi.number().allow()
         .messages({
-            "any.required": "O ID da empresa de destino é obrigatório",
             "number.base": "O ID da empresa de destino deve ser um número"
         }),
     DATAEXPEDICAO: Joi.string().allow('')
         .messages({
             "string.base": "A data de expedição deve ser uma string"
         }),
-    IDOPERADOREXPEDICAO: Joi.number().required()
+    IDOPERADOREXPEDICAO: Joi.number().allow()
         .messages({
-            "any.required": "O ID do operador de expedição é obrigatório",
             "number.base": "O ID do operador de expedição deve ser um número"
         }),
     NUTOTALITENS: Joi.number().allow()
@@ -85,7 +82,7 @@ const atualizarOTSchema = Joi.object({
         .messages({
             "string.base": "A observação de divergência deve ser uma string"
         }),
-    STEMISSAONFE: Joi.string().required('')
+    STEMISSAONFE: Joi.string().allow('')
         .messages({
             "string.base": "A descrição da emissão NFE deve ser uma string"
         }),
@@ -154,9 +151,8 @@ const atualizarOTSchema = Joi.object({
                     "string.base": "O status de sobra deve ser uma string"
                 })
         })
-    ).required()
+    ).allow()
         .messages({
-            "any.required": "Os detalhes da OT são obrigatórios",
             "array.base": "Os detalhes da OT devem ser um array"
         }),
     IDSTATUSOT: Joi.number().required()
