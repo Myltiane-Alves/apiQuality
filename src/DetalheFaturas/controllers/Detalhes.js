@@ -1,20 +1,19 @@
 import axios from "axios";
 import { dataFormatada } from "../../utils/dataFormatada.js";
-import { createDetalheFatura, getDetalheFaturaId, putDetalheFatura } from "../../Financeiro/Faturas/repositories/detalheFatura.js";
 import 'dotenv/config';
-const url = process.env.API_URL|| 'localhost:6001'
+const url = process.env.API_URL;
 
 class DetalheFaturasControllers {
 
   async getDetalheFatura(req, res) {
 
-    let { idEmpresa, pageNumber, dataPesquisaInicio, dataPesquisaFim, } = req.query;
+    let { idEmpresa, page, pageSize, dataPesquisaInicio, dataPesquisaFim, } = req.query;
     if (!isNaN(idEmpresa)) {
       idEmpresa = Number(idEmpresa);
-      const pageSize = 100;
-      const offset = (pageNumber - 1) * pageSize;
       dataPesquisaInicio = dataFormatada(dataPesquisaInicio) ? dataPesquisaInicio : '';
       dataPesquisaFim = dataFormatada(dataPesquisaFim) ? dataPesquisaFim : '';
+      page = page ? page : '';
+      pageSize = pageSize ? pageSize : '';
 
 
       try {

@@ -56,7 +56,7 @@ class FaturasControllers {
 
   }
 
-  async getDetalheFaturaFinanceiro(req, res) {
+  async  getDetalheFaturaFinanceiro(req, res) {
     let { idEmpresa, idDetalheFatura, dataPesquisaInicio, dataPesquisaFim, codigoFatura,  page, pageSize} = req.query;
     
     idEmpresa = idEmpresa ? idEmpresa : '';
@@ -70,7 +70,7 @@ class FaturasControllers {
     
     try {
                       
-      // const apiUrl = `${url}/api/detalhe-fatura.xsjs?idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nuCodigoAutorizacao=${codigoFatura}&idDetalheFatura=${idDetalheFatura}&page=${page}&pageSize=${pageSize}`;
+      // const apiUrl = `${url}/api/detalhe-fatura.xsjs?idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nuCodigoAutorizacao=${codigoFatura}&id=${idDetalheFatura}&page=${page}&pageSize=${pageSize}`;
       const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/detalhe-fatura.xsjs?idEmpresa=${idEmpresa}&dataPesquisaInic=${dataPesquisaInicio}&dataPesquisaFim=${dataPesquisaFim}&nuCodigoAutorizacao=${codigoFatura}&id=${idDetalheFatura}&page=${page}&pageSize=${pageSize}`;
       const response = await axios.get(apiUrl);
       // const response = await getDetalheFatura(idEmpresa, dataPesquisaInicio, dataPesquisaFim, codigoFatura, idDetalheFatura, page, pageSize);
@@ -219,7 +219,7 @@ class FaturasControllers {
     try {
       let { IDDETALHEFATURA, NUCODAUTORIZACAO, VRRECEBIDO } = req.body; 
 
-      const response = await axios.put(`${url}/api/fatura-loja/atualizar.xsjs`, {
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/fatura-loja/atualizar.xsjs`, {
         IDDETALHEFATURA,
         NUCODAUTORIZACAO,
         VRRECEBIDO
