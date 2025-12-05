@@ -37,7 +37,7 @@ class ProdutoControllers  {
         pageSize = pageSize ? pageSize : '';
         try {   
 
-            const apiUrl = `${url}/api/produto-sap/produto-quality.xsjs?page=${page}&pageSize${pageSize}&codeBarsOuNome=${descricaoProduto}&IdEmpresaLoja=${idEmpresa}&IdListaLoja=${idListaLoja}`;
+            const apiUrl = `${url}/api/produto-sap/produto-quality.xsjs?codeBarsOuNome=${codBarrasOuNome}&IdEmpresaLoja=${idEmpresa}&IdListaLoja=${idListaLoja}&page=${page}&pageSize=${pageSize}`;
             const response = await axios.get(apiUrl)
             // const response = await getProdutoQuality(idEmpresa, codBarrasOuNome, page, pageSize);
 
