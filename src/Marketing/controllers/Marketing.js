@@ -4,7 +4,7 @@ import { getPromocao } from "../Promocao/repositories/listaPromocao.js";
 import { createProdutoPromocao, getProdutoPromocao, updateProdutoPromocao } from "../../Produtos/repositories/produtoPromocao.js";
 import { createCampanhaCLiente, getCampanhaCliente, updateCampanhaCLiente } from "../Campanha/repositories/campanhaCliente.js";
 import { createCampanhaEmpresa, getCampanhaEmpresa, updateCampanhaEmpresa } from "../Campanha/repositories/todos.js";
-let url = `http://164.152.245.77:8000/quality/concentrador_react_node`;
+let url = `http://164.152.245.77:8000/quality/concentrador_node`;
 
 class MarketingControllers {
 
