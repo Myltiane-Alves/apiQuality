@@ -230,9 +230,14 @@ class AdmVendasControllers {
     
     async putVendaVendedor(req, res) {
         try {
-            const vendas = Array.isArray(req.body) ? req.body : [req.body]; 
-            // const response = await  updateVendaVendedor(vendas);
-            const response = await  axios.put(`${url}/api/administrativo/venda-vendedor.xsjs`, vendas);
+            let { IDVENDADETALHE, IDVENDEDOR} = req.body; 
+            if(!IDVENDADETALHE || !IDVENDEDOR) {
+                return res.status(400).json({ error: "IDVENDADETALHE and IDVENDEDOR are required" });
+            }
+            const response = await  axios.put(`${url}/api/administrativo/venda-vendedor.xsjs`, {
+                IDVENDADETALHE,
+                IDVENDEDOR
+            });
             return res.status(200).json(response.data);
         } catch (error) {
             console.error("Error no AdmVendasControllers.putVendaVendedor:", error);
