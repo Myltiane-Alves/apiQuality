@@ -390,6 +390,11 @@ async validarStatusSefaz(req, res) {
       const qCom = venda.detalhe?.det[0]?.prod?.QCOM || "1.0000";
       const vUnCom = venda.detalhe?.det[0]?.prod?.VUNCOM || "0.01";
       const vProd = venda.detalhe?.det[0]?.prod?.VPROD || "0.01";
+      const cEANTrib = venda.detalhe?.det[0]?.prod?.CEAN || "0000000000000";
+      const uTrib = venda.detalhe?.det[0]?.prod?.UTRIB || "UN";
+      const qTrib = venda.detalhe?.det[0]?.prod?.QTRIB || "1.0000";
+      const vUnTrib = venda.detalhe?.det[0]?.prod?.VUNTRIB || "0.01";
+      const indTot = venda.detalhe?.det[0]?.prod?.INDTOT || "1";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -450,6 +455,19 @@ async validarStatusSefaz(req, res) {
         det: {
           prod: {
             cProd: cprod,
+            cean: cean,
+            xProd: xprod,
+            NCM: ncm,
+            CFOP: CFOP,
+            uCom: uCom,
+            qCom: qCom,
+            vUnCom: vUnCom,
+            vProd: vProd,
+            cEANTrib: cEANTrib,
+            uTrib: uTrib,
+            qTrib: qTrib,
+            vUnTrib: vUnTrib,
+            indTot: indTot
           }
         },
         icms: {
