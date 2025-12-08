@@ -409,6 +409,8 @@ async validarStatusSefaz(req, res) {
       const COFINS_VBC = venda.detalhe?.det[0]?.COFINS_VBC || "0.00";
       const COFINS_PCOFINS = venda.detalhe?.det[0]?.COFINS_PCOFINS || "0.00";
       const VCOFINS_VCOFINS = venda.detalhe?.det[0]?.COFINS_VCOFINS || "0.00";
+      const CSTIS = venda.detalhe?.det[0]?.IS_CST || "41";
+      const cClassTribIS = venda.detalhe?.det[0]?.IS_CCLASSTRIBIS || "00000000";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -508,6 +510,25 @@ async validarStatusSefaz(req, res) {
                 vBC: COFINS_VBC,
                 pCOFINS: COFINS_PCOFINS,
                 vCOFINS: VCOFINS_VCOFINS
+              }
+            },
+            IS: {
+              CSTIS: CSTIS,
+              cClassTribIS: cClassTribIS,
+            },
+            IBSCBS: {
+              CST: "01",
+              cClassTrib: "00000000",
+              indDoacao: "0",
+              gIBSCBS: {
+                vBC: "0.00",
+                gIBSUF: {
+                  pIBSUF: "0.00",
+                  gRed: {
+                    pRedAliq: "0.00",
+                    pAliqEfet: "0.00",
+                  }
+                }
               }
             }
           }
