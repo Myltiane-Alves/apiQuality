@@ -360,12 +360,21 @@ async validarStatusSefaz(req, res) {
    function gerarXML(venda) {
     console.log('gerarXML venda:', idVenda);
      const uf = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-     const mod = venda.data[0].NFE_INFNFE_ID_MOD || "65" || "55";
+     const cnf = venda.data[0].NFE_INFNFE_IDE_CNF || "00000000";
+     const natOp = venda.data[0].NFE_INFNFE_IDE_NATOP || "VENDA";
+     const mod = venda.data[0].NFE_INFNFE_IDE_MOD || "65" || "55";
      const serie = venda.data[0].NFE_INFNFE_IDE_SERIE || "0";
+     const nnf = venda.data[0].NFE_INFNFE_IDE_NNF || "";
+     const dhEmi = venda.data[0].NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
       const chave = venda.data[0].CHAVE || "";
       const tpNF = venda.data[0].NFE_INFNFE_IDE_TPNF || "1";
       const idDest = venda.data[0].NFE_INFNFE_IDE_IDDEST || "1";
       const cMunFG = venda.data[0].NFE_INFNFE_IDE_CMUNFG || "3550308";
+      const tpImp = venda.data[0].NFE_INFNFE_IDE_TPIMP || "4";
+      const tpEmis = venda.data[0].NFE_INFNFE_IDE_TPEMIS || "1";
+      const cDV = venda.data[0].NFE_INFNFE_IDE_CDV || "0";
+      const tpAmb = venda.data[0].NFE_INFNFE_IDE_TPAMB || "2";
+      const finNFe = venda.data[0].NFE_INFNFE_IDE_FINNFE || "1";
       const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
       const nome = venda.data[0].NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
       const nomeFantasia = venda.data[0].NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
@@ -421,20 +430,20 @@ async validarStatusSefaz(req, res) {
       const payload = {
         ide: {
           cUF: ufToCodigo(uf),
-          cNF: chave.slice(-8),
-          natOp: "VENDA",
+          cNF: cnf,
+          natOp: natOp,
           mod: mod,
           serie: serie,
-          nNF: chave.slice(-9) || "1",
-          dhEmi: new Date().toISOString(),
+          nNF: nnf,
+          dhEmi: dhEmi,
           tpNF: tpNF,
           idDest: idDest,
           cMunFG: cMunFG,
-          cMunFGIBS: cMunFG,
-          tpImp: "4",
-          tpEmis: "1",
-          cDV: "0",
-          tpAmb: Number(process.env.TPAMBIENTE || 2),
+          cMunFGIBS: cMunFG, // conferirir este
+          tpImp: tpImp,
+          tpEmis: tpEmis,
+          cDV: cDV,
+          tpAmb: tpAmb,
           finNFe: "1",
           indFinal: "1",
           indPres: "1",
