@@ -411,6 +411,8 @@ async validarStatusSefaz(req, res) {
       const VCOFINS_VCOFINS = venda.detalhe?.det[0]?.COFINS_VCOFINS || "0.00";
       const CSTIS = venda.detalhe?.det[0]?.IS_CST || "41";
       const cClassTribIS = venda.detalhe?.det[0]?.IS_CCLASSTRIBIS || "00000000";
+      const icms_vicmsdeson = venda.detalhe?.det[0]?.ICMS_VICMSDESON || "0.00";
+      const vFrete = venda.data[0]?.detalhe?.VFRETE || "0.00";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -569,23 +571,23 @@ async validarStatusSefaz(req, res) {
         },
         total: {
           ICMSTot: {
-            vBC: "0.00",
-            vICMS: "0.00",
-            vICMSDeson: "0.00",
+            vBC: vBC,
+            vICMS: vICMS,
+            vICMSDeson: icms_vicmsdeson,
             vFCP: "0.00",
             vBCST: "0.00",
             vST: "0.00",
             vFCPST: "0.00",
             vFCPSTRet: "0.00",
             vProd: vProd,
-            vFrete: "0.00",
+            vFrete: vFrete,
             vSeg: "0.00",
             vDesc: "0.00",
             vII: "0.00",
             vIPI: "0.00",
             vIPIDevol: "0.00",
-            vPIS: "0.00",
-            vCOFINS: "0.00",
+            vPIS: VPIS_VPIS,
+            vCOFINS: VCOFINS_VCOFINS,
             vOutro: "0.00",
             vNF: vProd
           }
