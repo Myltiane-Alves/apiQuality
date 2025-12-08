@@ -446,6 +446,18 @@ async validarStatusSefaz(req, res) {
       const vPag = venda.data[0]?.pagamento[0]?.VALORRECEBIDO || '0';
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
+      /*
+        retornar com estas consultas e vendas amanhã. 2025-12-09
+        SELECT * FROM QUALITY_CONC_HML.VENDA WHERE IDVENDA = '6-1-359'
+
+        SELECT * FROM QUALITY_CONC_HML.VENDADETALHE WHERE IDVENDA = '6-1-359'
+
+        SELECT * FROM VENDADETALHE;
+
+        SELECT * FROM QUALITY_CONC_HML.VENDAPAGAMENTO WHERE IDVENDA = '118-5-19'
+
+        SELECT * FROM QUALITY_CONC.VENDA WHERE IDVENDA = '6-1-359'
+      */
       const payload = {
         ide: {
           cUF: ufToCodigo(uf),
