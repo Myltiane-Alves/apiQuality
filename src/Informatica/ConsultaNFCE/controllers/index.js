@@ -590,7 +590,17 @@ async validarStatusSefaz(req, res) {
             vCOFINS: VCOFINS_VCOFINS,
             vOutro: "0.00",
             vNF: vProd
-          }
+          },
+          IBSCBSTot: {
+            vBCIBSCBS: "0.00",
+            gIBS: {
+              gIBSUF: {
+                vDif: "0.00",
+                vDevTrib: "0.00",
+                vIBSUF: "0.05"
+              }
+            }
+          },
         },
         meta: {
           chaveVendaExterna: chave,
