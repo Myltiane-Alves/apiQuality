@@ -569,7 +569,10 @@ async validarStatusSefaz(req, res) {
         },
         total: {
           ICMSTot: {
-            
+            vBC: "0.00",
+            vICMS: "0.00",
+            vICMSDeson: "0.00",
+            vFCP: "0.00",
           }
         },
         meta: {
