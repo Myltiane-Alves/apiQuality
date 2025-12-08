@@ -609,7 +609,11 @@ async validarStatusSefaz(req, res) {
               vCredPresCondSus: "0.00"
             },
             gCBS: {
-
+              vDif: "0.00",
+              vDevTrib: "0.00",
+              vCBS: "0.00",
+              vCredPres: "0.00",
+              vCredPresCondSus: "0.00"
             },
           },
         },
