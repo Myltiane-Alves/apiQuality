@@ -598,8 +598,19 @@ async validarStatusSefaz(req, res) {
                 vDif: "0.00",
                 vDevTrib: "0.00",
                 vIBSUF: "0.05"
-              }
-            }
+              },
+              gIBSMun: {
+                vDif: "0.00",
+                vDevTrib: "0.00",
+                vIBSMun: "0.00"
+              },
+              vIBS: "0.05",
+              vCredPres: "0.00",
+              vCredPresCondSus: "0.00"
+            },
+            gCBS: {
+
+            },
           },
         },
         meta: {
