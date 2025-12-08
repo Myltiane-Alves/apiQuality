@@ -5,6 +5,7 @@ import path from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
+import { Sign } from 'crypto';
 
 
 function extrairCStat(xml) {
@@ -380,6 +381,7 @@ async validarStatusSefaz(req, res) {
       const xLgr = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
       const emit_IE = venda.data[0].NFE_INFNFE_EMIT_IE || "";
       const emit_CRT = venda.data[0].NFE_INFNFE_EMIT_CRT || "1";
+
       const cprod = venda.detalhe?.det[0]?.CPROD || "0001";
       const cean = venda.detalhe?.det[0]?.CEAN || "0000000000000";
       const xprod = venda.detalhe?.det[0]?.XPROD || "Produto Teste";
@@ -390,7 +392,7 @@ async validarStatusSefaz(req, res) {
       const qCom = venda.detalhe?.det[0]?.QCOM || "1.0000";
       const vUnCom = venda.detalhe?.det[0]?.VUNCOM || "0.01";
       const vProd = venda.detalhe?.det[0]?.VPROD || "0.01";
-      const cEANTrib = venda.detalhe?.det[0]?.CEAN || "0000000000000";
+      const cEANTrib = venda.detalhe?.det[0]?.CEANTRIB || "0000000000000";
       const uTrib = venda.detalhe?.det[0]?.UTRIB || "UN";
       const qTrib = venda.detalhe?.det[0]?.QTRIB || "1.0000";
       const vUnTrib = venda.detalhe?.det[0]?.VUNTRIB || "0.01";
@@ -413,6 +415,7 @@ async validarStatusSefaz(req, res) {
       const cClassTribIS = venda.detalhe?.det[0]?.IS_CCLASSTRIBIS || "00000000";
       const icms_vicmsdeson = venda.detalhe?.det[0]?.ICMS_VICMSDESON || "0.00";
       const vFrete = venda.data[0]?.detalhe?.VFRETE || "0.00";
+      const infCpl = venda.data[0]?.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -616,11 +619,54 @@ async validarStatusSefaz(req, res) {
               vCredPresCondSus: "0.00"
             },
           },
+          vNFTot: vProd
         },
-        meta: {
-          chaveVendaExterna: chave,
-          idVendaExterna: venda.IDVENDA
-        }
+        transp: {
+          modFrete: "9"
+        },
+        pag: {
+          detPag: {
+            tPag: "01",
+            vPag: vProd
+          },
+        },
+        infAdic: {
+          infCpl: infCpl
+        },
+        infNFeSupl: {
+          qrCode: "http://www.sefaz.rs.gov.br/NFCE/NFCE-COM.aspx?chNFe=" + chave + "&nVersao=100&tpAmb=" + (process.env.TPAMBIENTE || "2") + "&cDest=" + cnpj + "&dhEmi=" + new Date().toISOString() + "&vNF=" + vProd + "&vICMS=" + vICMS,
+          urlChave: "http://www.nfce.go.gov.br/post/ver" + chave + "/consulta-nfc-e-homologacao"
+        },
+        Signature: {
+          SignedInfo: {
+            CanonicalizationMethod: {
+              Algorithm: "http://www.w3.org/2000/09/xmldsig#"
+            },
+            SignatureMethod: {
+              Algorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+            },
+            Reference: {
+              Transforms: {
+                Transform: {
+                  Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+                },
+                Transform: {
+                  Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                }
+              },
+              DigestMethod: {
+                Algorithm: "http://www.w3.org/2000/09/xmldsig#sha1"
+              },
+              DigestValue: "DigestValuePlaceholder"
+            },
+          },
+          SignatureValue: "SignatureValuePlaceholder",
+          KeyInfo: {
+            X509Data: {
+              X509Certificate: "X509CertificatePlaceholder"
+            },
+          },
+        },
       };
 
       return payload;
