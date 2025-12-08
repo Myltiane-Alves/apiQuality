@@ -497,6 +497,14 @@ async validarStatusSefaz(req, res) {
                 pPIS: PIS_PPIS,
                 vPIS: VPIS_VPIS
               }
+            },
+            COFINS: {
+              COFINSAliq: {
+                CST: "01",
+                vBC: "0.00",
+                pCOFINS: "0.00",
+                vCOFINS: "0.00"
+              }
             }
           }
         },
