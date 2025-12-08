@@ -527,7 +527,31 @@ async validarStatusSefaz(req, res) {
                   gRed: {
                     pRedAliq: "0.00",
                     pAliqEfet: "0.00",
-                  }
+                  },
+                  vIBSUF: "0.05"
+                },
+                gIBSMun: {
+                  pIBSMun: "0.00",
+                  gRed: {
+                    pRedAliq: "0.00",
+                    pAliqEfet: "0.00",
+                  },
+                  vIBSMun: "0.00"
+                },
+                vIBS: "0.05",
+                gCBS: {
+                  pCBS: "0.00",
+                  gRed: {
+                    pRedAliq: "0.00",
+                    pAliqEfet: "0.00",
+                  },
+                  vCBS: "0.00"
+                },
+                gTribRegular: {
+                  CSTReg: "000",
+                  cClassTribReg: "00000001",
+                  pAliqEfetRegIBSUF: "0.00",
+                  vTribRegIBSUF: "0.00",
                 }
               }
             }
