@@ -576,6 +576,12 @@ async validarStatusSefaz(req, res) {
             vBCST: "0.00",
             vST: "0.00",
             vFCPST: "0.00",
+            vFCPSTRet: "0.00",
+            vProd: vProd,
+            vFrete: "0.00",
+            vSeg: "0.00",
+            vDesc: "0.00",
+            vII: "0.00",
           }
         },
         meta: {
