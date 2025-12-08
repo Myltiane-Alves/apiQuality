@@ -582,6 +582,12 @@ async validarStatusSefaz(req, res) {
             vSeg: "0.00",
             vDesc: "0.00",
             vII: "0.00",
+            vIPI: "0.00",
+            vIPIDevol: "0.00",
+            vPIS: "0.00",
+            vCOFINS: "0.00",
+            vOutro: "0.00",
+            vNF: vProd
           }
         },
         meta: {
