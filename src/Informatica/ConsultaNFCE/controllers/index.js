@@ -401,6 +401,10 @@ async validarStatusSefaz(req, res) {
       const vBC = venda.detalhe?.det[0]?.ICMS_VBC || "0.00";
       const pICMS = venda.detalhe?.det[0]?.ICMS_PICMS || "0.00";
       const vICMS = venda.detalhe?.det[0]?.ICMS_VICMS || "0.00";
+      const PIS_CST = venda.detalhe?.det[0]?.PIS_CST || "01";
+      const PIS_VBC = venda.detalhe?.det[0]?.PIS_VBC || "0.00";
+      const PIS_PPIS = venda.detalhe?.det[0]?.PIS_PPIS || "0.00";
+      const VPIS_VPIS = venda.detalhe?.det[0]?.PIS_VPIS || "0.00";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -484,9 +488,16 @@ async validarStatusSefaz(req, res) {
                 vBC: vBC,
                 pICMS: pICMS,
                 vICMS: vICMS
-              }
+              },
             },
-
+            PIS: {
+              PISAliq: {
+                CST: PIS_CST,
+                vBC: PIS_VBC,
+                pPIS: PIS_PPIS,
+                vPIS: VPIS_VPIS
+              }
+            }
           }
         },
         meta: {
