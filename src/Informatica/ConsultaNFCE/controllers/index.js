@@ -375,6 +375,8 @@ async validarStatusSefaz(req, res) {
       const cDV = venda.data[0].NFE_INFNFE_IDE_CDV || "0";
       const tpAmb = venda.data[0].NFE_INFNFE_IDE_TPAMB || "2";
       const finNFe = venda.data[0].NFE_INFNFE_IDE_FINNFE || "1";
+      const indFinal = venda.data[0].NFE_INFNFE_IDE_INDFINAL || "1";
+      const indPres = venda.data[0].NFE_INFNFE_IDE_INDPRES || "1";
       const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
       const nome = venda.data[0].NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
       const nomeFantasia = venda.data[0].NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
@@ -400,7 +402,6 @@ async validarStatusSefaz(req, res) {
       const uCom = venda.detalhe?.det[0]?.UCOM || "UN";
       const qCom = venda.detalhe?.det[0]?.QCOM || "1.0000";
       const vUnCom = venda.detalhe?.det[0]?.VUNCOM || "0.01";
-      const vProd = venda.detalhe?.det[0]?.VPROD || "0.01";
       const cEANTrib = venda.detalhe?.det[0]?.CEANTRIB || "0000000000000";
       const uTrib = venda.detalhe?.det[0]?.UTRIB || "UN";
       const qTrib = venda.detalhe?.det[0]?.QTRIB || "1.0000";
@@ -409,9 +410,9 @@ async validarStatusSefaz(req, res) {
       const orig = venda.detalhe?.det[0]?.ICMS_ORIG || "0";
       const CST = venda.detalhe?.det[0]?.ICMS_CST || "00";
       const modBC = venda.detalhe?.det[0]?.ICMS_MODBC || "3";
-      const vBC = venda.detalhe?.det[0]?.ICMS_VBC || "0.00";
+      const vBC = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBC || "0.00";
+      const vICMS = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMS || "0.00";
       const pICMS = venda.detalhe?.det[0]?.ICMS_PICMS || "0.00";
-      const vICMS = venda.detalhe?.det[0]?.ICMS_VICMS || "0.00";
       const PIS_CST = venda.detalhe?.det[0]?.PIS_CST || "01";
       const PIS_VBC = venda.detalhe?.det[0]?.PIS_VBC || "0.00";
       const PIS_PPIS = venda.detalhe?.det[0]?.PIS_PPIS || "0.00";
@@ -422,9 +423,27 @@ async validarStatusSefaz(req, res) {
       const VCOFINS_VCOFINS = venda.detalhe?.det[0]?.COFINS_VCOFINS || "0.00";
       const CSTIS = venda.detalhe?.det[0]?.IS_CST || "41";
       const cClassTribIS = venda.detalhe?.det[0]?.IS_CCLASSTRIBIS || "00000000";
-      const icms_vicmsdeson = venda.detalhe?.det[0]?.ICMS_VICMSDESON || "0.00";
+      const icms_vicmsdeson = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
       const vFrete = venda.data[0]?.detalhe?.VFRETE || "0.00";
       const infCpl = venda.data[0]?.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
+      const vOutro = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO|| "0.00";
+      const modFrete = venda.data[0]?.NFE_INFNFE_TRANSP_MODFRETE || "9";
+      const vIPIDevol = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
+      const vIPI = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
+      const vDesc = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
+      const vII = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
+      const vSeg = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
+      const vFCP = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
+      const vBCST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
+      const vST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
+      const vFCPST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
+      const vFCPSTRet = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
+      const vProd = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
+      const icmsVFrete = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
+      const qrCode = venda.data[0]?.NFE_INFNFE_INFNFESUPL_QRCODE || "";
+      const urlChave = venda.data[0]?.NFE_INFNFESUPL_URLCHAVE || "";
+      const tPag = venda.data[0]?.pagamento[0]?.TPAG || "01";
+      const vPag = venda.data[0]?.pagamento[0]?.VALORRECEBIDO || '0';
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -444,9 +463,9 @@ async validarStatusSefaz(req, res) {
           tpEmis: tpEmis,
           cDV: cDV,
           tpAmb: tpAmb,
-          finNFe: "1",
-          indFinal: "1",
-          indPres: "1",
+          finNFe: finNFe,
+          indFinal: indFinal,
+          indPres: indPres,
           indIntermed: "0",
           procEmi: "0",
           verProc: "1.0",
@@ -586,21 +605,21 @@ async validarStatusSefaz(req, res) {
             vBC: vBC,
             vICMS: vICMS,
             vICMSDeson: icms_vicmsdeson,
-            vFCP: "0.00",
-            vBCST: "0.00",
-            vST: "0.00",
-            vFCPST: "0.00",
-            vFCPSTRet: "0.00",
+            vFCP: vFCP,
+            vBCST: vBCST,
+            vST: vST,
+            vFCPST: vFCPST,
+            vFCPSTRet: vFCPSTRet,
             vProd: vProd,
-            vFrete: vFrete,
-            vSeg: "0.00",
-            vDesc: "0.00",
-            vII: "0.00",
-            vIPI: "0.00",
-            vIPIDevol: "0.00",
+            vFrete: icmsVFrete,
+            vSeg: vSeg,
+            vDesc: vDesc,
+            vII: vII,
+            vIPI: vIPI,
+            vIPIDevol: vIPIDevol,
             vPIS: VPIS_VPIS,
             vCOFINS: VCOFINS_VCOFINS,
-            vOutro: "0.00",
+            vOutro: vOutro,
             vNF: vProd
           },
           IBSCBSTot: {
@@ -631,20 +650,20 @@ async validarStatusSefaz(req, res) {
           vNFTot: vProd
         },
         transp: {
-          modFrete: "9"
+          modFrete: modFrete
         },
         pag: {
           detPag: {
-            tPag: "01",
-            vPag: vProd
+            tPag: tPag,
+            vPag: vPag
           },
         },
         infAdic: {
           infCpl: infCpl
         },
         infNFeSupl: {
-          qrCode: "http://www.sefaz.rs.gov.br/NFCE/NFCE-COM.aspx?chNFe=" + chave + "&nVersao=100&tpAmb=" + (process.env.TPAMBIENTE || "2") + "&cDest=" + cnpj + "&dhEmi=" + new Date().toISOString() + "&vNF=" + vProd + "&vICMS=" + vICMS,
-          urlChave: "http://www.nfce.go.gov.br/post/ver" + chave + "/consulta-nfc-e-homologacao"
+            qrCode: qrCode,
+            urlChave: urlChave
         },
         Signature: {
           SignedInfo: {
