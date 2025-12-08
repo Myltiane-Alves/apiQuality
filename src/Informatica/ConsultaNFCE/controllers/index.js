@@ -552,8 +552,17 @@ async validarStatusSefaz(req, res) {
                   cClassTribReg: "00000001",
                   pAliqEfetRegIBSUF: "0.00",
                   vTribRegIBSUF: "0.00",
+                  pAliqEfetRegIBSMun: "0.00",
+                  vTribRegIBSMun: "0.00",
+                  pAliqEfetRegCBS: "0.00",
+                  vTribRegCBS: "0.00"
                 }
-              }
+              },
+              gCredPresIBSZFM: {
+                competApur: "2025-10",
+                tpCredPresIBSZFM: "1",
+                vCredPresIBSZFM: "0.00"
+              },
             }
           }
         },
