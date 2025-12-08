@@ -396,6 +396,11 @@ async validarStatusSefaz(req, res) {
       const vUnTrib = venda.detalhe?.det[0]?.VUNTRIB || "0.01";
       const indTot = venda.detalhe?.det[0]?.INDTOT || "1";
       const orig = venda.detalhe?.det[0]?.ICMS_ORIG || "0";
+      const CST = venda.detalhe?.det[0]?.ICMS_CST || "00";
+      const modBC = venda.detalhe?.det[0]?.ICMS_MODBC || "3";
+      const vBC = venda.detalhe?.det[0]?.ICMS_VBC || "0.00";
+      const pICMS = venda.detalhe?.det[0]?.ICMS_PICMS || "0.00";
+      const vICMS = venda.detalhe?.det[0]?.ICMS_VICMS || "0.00";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -473,13 +478,12 @@ async validarStatusSefaz(req, res) {
           imposto: {
             ICMS: {
               ICMS00: {
-                orig: "0",
-                cStat: cStat,
-                modBC: "3",
-                vBC: "0.00",
-                pICMS: "0.00",
-                vICMS: "0.00"
-
+                orig: orig,
+                CST: CST,
+                modBC: modBC,
+                vBC: vBC,
+                pICMS: pICMS,
+                vICMS: vICMS
               }
             },
 
