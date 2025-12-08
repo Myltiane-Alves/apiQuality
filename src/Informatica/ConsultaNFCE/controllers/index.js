@@ -564,6 +564,12 @@ async validarStatusSefaz(req, res) {
                 vCredPresIBSZFM: "0.00"
               },
             }
+          },
+          vItem: "0.01"
+        },
+        total: {
+          ICMSTot: {
+            
           }
         },
         meta: {
