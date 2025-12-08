@@ -380,21 +380,22 @@ async validarStatusSefaz(req, res) {
       const xLgr = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
       const emit_IE = venda.data[0].NFE_INFNFE_EMIT_IE || "";
       const emit_CRT = venda.data[0].NFE_INFNFE_EMIT_CRT || "1";
-      const cprod = venda.detalhe?.det[0]?.prod?.CPROD || "0001";
-      const cean = venda.detalhe?.det[0]?.prod?.CEAN || "0000000000000";
-      const xprod = venda.detalhe?.det[0]?.prod?.XPROD || "Produto Teste";
-      const ncm = venda.detalhe?.det[0]?.prod?.NCM || "00000000";
+      const cprod = venda.detalhe?.det[0]?.CPROD || "0001";
+      const cean = venda.detalhe?.det[0]?.CEAN || "0000000000000";
+      const xprod = venda.detalhe?.det[0]?.XPROD || "Produto Teste";
+      const ncm = venda.detalhe?.det[0]?.NCM || "00000000";
       // const tpCredPresIBSZFM 
-      const CFOP = venda.detalhe?.det[0]?.prod?.CFOP || "5102";
-      const uCom = venda.detalhe?.det[0]?.prod?.UCOM || "UN";
-      const qCom = venda.detalhe?.det[0]?.prod?.QCOM || "1.0000";
-      const vUnCom = venda.detalhe?.det[0]?.prod?.VUNCOM || "0.01";
-      const vProd = venda.detalhe?.det[0]?.prod?.VPROD || "0.01";
-      const cEANTrib = venda.detalhe?.det[0]?.prod?.CEAN || "0000000000000";
-      const uTrib = venda.detalhe?.det[0]?.prod?.UTRIB || "UN";
-      const qTrib = venda.detalhe?.det[0]?.prod?.QTRIB || "1.0000";
-      const vUnTrib = venda.detalhe?.det[0]?.prod?.VUNTRIB || "0.01";
-      const indTot = venda.detalhe?.det[0]?.prod?.INDTOT || "1";
+      const CFOP = venda.detalhe?.det[0]?.CFOP || "5102";
+      const uCom = venda.detalhe?.det[0]?.UCOM || "UN";
+      const qCom = venda.detalhe?.det[0]?.QCOM || "1.0000";
+      const vUnCom = venda.detalhe?.det[0]?.VUNCOM || "0.01";
+      const vProd = venda.detalhe?.det[0]?.VPROD || "0.01";
+      const cEANTrib = venda.detalhe?.det[0]?.CEAN || "0000000000000";
+      const uTrib = venda.detalhe?.det[0]?.UTRIB || "UN";
+      const qTrib = venda.detalhe?.det[0]?.QTRIB || "1.0000";
+      const vUnTrib = venda.detalhe?.det[0]?.VUNTRIB || "0.01";
+      const indTot = venda.detalhe?.det[0]?.INDTOT || "1";
+      const orig = venda.detalhe?.det[0]?.ICMS_ORIG || "0";
       // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
       // console.log(chave, 'chave')
       const payload = {
@@ -468,15 +469,21 @@ async validarStatusSefaz(req, res) {
             qTrib: qTrib,
             vUnTrib: vUnTrib,
             indTot: indTot
+          },
+          imposto: {
+            ICMS: {
+              ICMS00: {
+                orig: "0",
+                cStat: cStat,
+                modBC: "3",
+                vBC: "0.00",
+                pICMS: "0.00",
+                vICMS: "0.00"
+
+              }
+            },
+
           }
-        },
-        icms: {
-          orig: "0",
-          cStat: cStat,
-          modBC: "3",
-          vBC: "0.00",
-          pICMS: "0.00",
-          vICMS: "0.00"
         },
         meta: {
           chaveVendaExterna: chave,
