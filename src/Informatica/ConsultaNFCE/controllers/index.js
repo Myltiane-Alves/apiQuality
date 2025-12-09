@@ -530,15 +530,30 @@ class ConsultaNfeController {
     //   console.log('Consulta NFe:', res);
     // });
 
-        // tools.xmlSign(NFe.xml()).then(async xmlSigned => {
-        //   fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, {encoding: 'utf8'});
-        //   tools.sefazEnviaLote(xmlSigned, {indSinc: 1}).then(res => {
-        //     console.log('Resposta SEFAZ:', res);
-        //   })
-        // })
+    tools.xmlSign(NFe.xml()).then(async xmlSigned => {
+      fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, {encoding: 'utf8'});
+      tools.sefazEnviaLote(xmlSigned, {indSinc: 1}).then(res => {
+        console.log('Resposta SEFAZ:', res);
+      })
+    })
         // console.log('Tools inicializado:', tools);
 
+        /* 
         
+SELECT * FROM QUALITY_CONC_HML.VENDA WHERE IDVENDA = '2-1-15'
+
+SELECT * FROM QUALITY_CONC_HML.VENDADETALHE WHERE IDVENDA = '6-1-359'
+
+SELECT * FROM VENDADETALHE;
+
+SELECT * FROM QUALITY_CONC_HML.VENDAPAGAMENTO WHERE IDVENDA = '2-1-15'
+
+SELECT * FROM QUALITY_CONC_TST.VENDA WHERE IDVENDA = '6-1-359'
+
+SELECT * FROM QUALITY_CONC.VENDA WHERE DTHORAABERTURA >= '2025-12-09';
+
+
+        */
 
       return res.json(result);
     } catch (error) {
