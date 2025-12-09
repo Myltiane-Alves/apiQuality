@@ -1,4 +1,4 @@
-import { Tools } from 'node-sped-nfe';
+import { Tools, docZip } from 'node-sped-nfe';
 import fs from 'fs';
 import xlsx from 'xlsx';
 import path from 'path';
@@ -358,7 +358,7 @@ async validarStatusSefaz(req, res) {
     */ 
   //  console.log('Iniciando consulta de venda para idVenda:', idVenda);
    function gerarXML(venda) {
-    console.log('gerarXML venda:', idVenda);
+   
      const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
      const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
      const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
@@ -447,10 +447,11 @@ async validarStatusSefaz(req, res) {
 
       const tPag = venda.data[0]?.pagamento?.map(item => item.TPAG) || "01";
       const vPag = venda.data[0]?.pagamento?.map(item => item.VALORRECEBIDO) || '0';
-      console.log(venda.data[0], 'venda')
+      
 
       const payload = {
         ide: {
+          chave: chave,
           cUF: ufToCodigo(uf),
           cNF: cnf,
           natOp: natOp,
@@ -716,6 +717,41 @@ async validarStatusSefaz(req, res) {
       payload,
     };
 
+    const CERTIFICADO_BASE64 =
+      process.env.CERTIFICADO_BASE64 ||
+    fs.readFileSync("./cert_base64.txt", "utf-8").trim();
+
+    const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
+
+    // Salva o arquivo temporário do certificado (PFX)
+    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
+    fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
+
+
+    const certOptions = {
+      pfx: fs.readFileSync(tempPfxPath),
+      senha: SENHA,
+    };
+    const tools = new Tools({
+      mod: payload.ide.mod,
+      tpAmb: parseInt(payload.ide.tpAmb),
+      UF: vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP",
+      versao: "4.00",
+      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+    }, certOptions);
+    
+    console.log( 'tools:', tools);
+    await tools.sefazDistDFe({chNFe: payload.ide.chave}).then(res =>  {
+      console.log('sefazDistDFe resposta:', res);
+      docZip(res).then(res => {
+        console.log('Conteúdo do ZIP retornado pela sefazDistDFe:', res);
+      
+      })
+
+    }).catch(err => {
+      console.error('Erro ao consultar sefazDistDFe:', err);
+    })
+  
     return res.json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });
