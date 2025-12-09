@@ -120,9 +120,9 @@ class ConsultaNfeController {
       const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
       const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
       const dhEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
-      const chaveRaw = venda.data[0]?.venda.CHVAVE || "";
+      const chaveRaw = venda.data[0]?.venda.CHAVE || "";
       const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-      // console.log('Chave da NFe:', venda.data[0]);
+      // console.log('Chave da NFe:', venda.data[0]?.venda);
       const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
       const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
       const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
@@ -459,8 +459,7 @@ class ConsultaNfeController {
       return payload;
     } 
     const payload = gerarXML(vendaData);
-    // console.log(payload, 'dados da venda');
-
+    
     // Usa getCertOptions para carregar o certificado
     const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
     const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -470,9 +469,8 @@ class ConsultaNfeController {
         error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
       });
     }
-
-
-      
+    
+    
     const tools = new Tools({
       mod: payload.ide.mod,
       tpAmb: parseInt(payload.ide.tpAmb),
@@ -481,48 +479,56 @@ class ConsultaNfeController {
       versao: "4.00",
       xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
     }, certOptions);
+    
 
     let NFe = new Make()
     NFe.tagInfNFe({
       Id: `NFe${payload.ide.chave}`,
       versao: "4.00"
     });
-
+    
     NFe.tagIde({
       cUF: ufToCodigo(payload.ide.cUF),
     })
-
+    
     NFe.tagEmit({
       CNPJ: payload.emit.CNPJ,
     })
-  
+    
     // console.log(ufToCodigo(payload.emit.enderEmit.UF), 'ender emit');
     // NFe.tagEnderEmit({
     //   UF: ufToCodigo(payload.emit.enderEmit?.UF),
     // })
 
-  NFe.tagProd({
-    cProd: "0001",
-  })
+    NFe.tagProd({
+      cProd: "0001",
+    })
+    
+    // NFe.tagImposto({
+    //   vTotTrib: "0.00",
+    // })
+    
+    
+    
+    // console.log('Payload gerado:', payload);
+    if (payload?.ide.mod == "65") {
+      // NFC-e - Usa consultarNFe
+      await tools.consultarNFe(payload.ide.chave).then(res => {
+        console.log('Protocolo NFC-e:', res);
+      });
+    } else if (payload?.ide.mod == "55") {
+      // NF-e - Usa sefazDistDFe
+      await tools.sefazDistDFe({ chNFe: payload.ide.chave }).then(res => {
+        console.log('XML NF-e:', res);
+      });
+    }
+    // await tools.sefazStatus().then(res => {
+    //   console.log('Status SEFAZ:', res);
+    // });
 
-  NFe.tagImposto({
-    vTotTrib: "0.00",
-  })
-    
-    
-    console.log('Payload gerado:', payload);
-  if (mod === "65") {
-    // NFC-e - Usa consultarNFe
-    await tools.consultarNFe(chave).then(res => {
-      console.log('Protocolo NFC-e:', res);
-    });
-  } else if (mod === "55") {
-    // NF-e - Usa sefazDistDFe
-    await tools.sefazDistDFe({ chNFe: chave }).then(res => {
-      console.log('XML NF-e:', res);
-    });
-  }
-    // await tools.sefazStatus()
+    // await tools.consultarNFe(payload.ide.chave).then(res => {
+    //   console.log('Consulta NFe:', res);
+    // });
 
         // tools.xmlSign(NFe.xml()).then(async xmlSigned => {
         //   fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, {encoding: 'utf8'});
