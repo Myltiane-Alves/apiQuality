@@ -358,7 +358,7 @@ async validarStatusSefaz(req, res) {
     se a tag do imposto 0.10 e não for maior que 1 centavos, deve ser preenchida com 0.00
     */ 
   //  console.log('Iniciando consulta de venda para idVenda:', idVenda);
-   function gerarXML(venda) {
+  function gerarXML(venda) {
    
      const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
      const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
@@ -703,7 +703,7 @@ async validarStatusSefaz(req, res) {
       };
 
       return payload;
-    }
+  }
 
     // Fazer requisição para obter dados da venda
     // console.log('Fazendo requisição para venda idVenda:', idVenda);
