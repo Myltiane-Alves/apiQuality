@@ -737,8 +737,11 @@ async validarStatusSefaz(req, res) {
       tpAmb: parseInt(payload.ide.tpAmb),
       UF: vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP",
       versao: "4.00",
-      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-    }, certOptions);
+      xmllint: "../../../../libs/libxml/bin/xmllint.exe",
+    }, {
+      pfx: "../GTO COMERCIO 2025-2026.pfx",
+      senha: "#senhagto2024#",
+    });
     
     console.log( 'tools:', tools);
     await tools.sefazDistDFe({chNFe: payload.ide.chave}).then(res =>  {
