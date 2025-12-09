@@ -6,7 +6,7 @@ import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
 import { Sign } from 'crypto';
-
+import 'dotenv/config';
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
@@ -28,15 +28,16 @@ async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026
     try {
       const pfxBuf = Buffer.from(pfxBase64, 'base64');
       // tenta gravar em um tmp para compatibilidade com bibliotecas que pedem caminho
+      let tmpPath = null;
       try {
-        const tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+        tmpPath = path.join(os.tmpdir(), fallbackPfxPath.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
         fs.writeFileSync(tmpPath, pfxBuf, { flag: 'w' });
         process.env.CERT_PFX_PATH = tmpPath;
       } catch (e) {
         // se não gravar, não é crítico — ainda temos o buffer
         console.warn('getCertOptions: não foi possível gravar PFX em tmp:', e?.message || e);
       }
-      return { pfx: pfxBuf, senha };
+      return { pfx: pfxBuf, senha, pfxPath: tmpPath };
     } catch (e) {
       console.error('getCertOptions: falha ao decodificar CERT_PFX_BASE64:', e?.message || e);
     }
@@ -47,7 +48,7 @@ async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026
     try {
       const pfxBuf = fs.readFileSync(fallbackPfxPath);
       process.env.CERT_PFX_PATH = fallbackPfxPath;
-      return { pfx: pfxBuf, senha };
+      return { pfx: pfxBuf, senha, pfxPath: fallbackPfxPath };
     } catch (e) {
       console.warn('getCertOptions: falha ao ler PFX local:', e?.message || e);
     }
@@ -366,7 +367,9 @@ async validarStatusSefaz(req, res) {
      const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
      const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
      const dhEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
-      const chave = venda.data[0]?.venda.CHAVE || "";
+      // Remove prefixo "NFe" da chave se existir (deve ter exatamente 44 dígitos)
+      const chaveRaw = venda.data[0]?.venda.CHAVE || "";
+      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
       const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
       const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
       const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
@@ -664,40 +667,40 @@ async validarStatusSefaz(req, res) {
         infAdic: {
           infCpl: infCpl
         },
-        infNFeSupl: {
-            qrCode: qrCode,
-            urlChave: urlChave
-        },
-        Signature: {
-          SignedInfo: {
-            CanonicalizationMethod: {
-              Algorithm: "http://www.w3.org/2000/09/xmldsig#"
-            },
-            SignatureMethod: {
-              Algorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-            },
-            Reference: {
-              Transforms: {
-                Transform: {
-                  Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-                },
-                Transform: {
-                  Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-                }
-              },
-              DigestMethod: {
-                Algorithm: "http://www.w3.org/2000/09/xmldsig#sha1"
-              },
-              DigestValue: "DigestValuePlaceholder"
-            },
-          },
-          SignatureValue: "SignatureValuePlaceholder",
-          KeyInfo: {
-            X509Data: {
-              X509Certificate: "X509CertificatePlaceholder"
-            },
-          },
-        },
+        // infNFeSupl: {
+        //     qrCode: qrCode,
+        //     urlChave: urlChave
+        // },
+        // Signature: {
+        //   SignedInfo: {
+        //     CanonicalizationMethod: {
+        //       Algorithm: "http://www.w3.org/2000/09/xmldsig#"
+        //     },
+        //     SignatureMethod: {
+        //       Algorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+        //     },
+        //     Reference: {
+        //       Transforms: {
+        //         Transform: {
+        //           Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+        //         },
+        //         Transform: {
+        //           Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+        //         }
+        //       },
+        //       DigestMethod: {
+        //         Algorithm: "http://www.w3.org/2000/09/xmldsig#sha1"
+        //       },
+        //       DigestValue: "DigestValuePlaceholder"
+        //     },
+        //   },
+        //   SignatureValue: "SignatureValuePlaceholder",
+        //   KeyInfo: {
+        //     X509Data: {
+        //       X509Certificate: "X509CertificatePlaceholder"
+        //     },
+        //   },
+        // },
       };
 
       return payload;
@@ -708,53 +711,72 @@ async validarStatusSefaz(req, res) {
     const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
     // console.log('venda:', response);
     const vendaData = response.data;
-//     console.log('vendaData completo:', JSON.stringify(vendaData, null, 2));
-// console.log('vendaData.data existe?', !!vendaData.data);
-// console.log('vendaData.data[0]:', vendaData.data?.[0]);
     const payload = gerarXML(vendaData);
     const result = {
       venda: vendaData,
       payload,
     };
 
-    const CERTIFICADO_BASE64 =
-      process.env.CERTIFICADO_BASE64 ||
-    fs.readFileSync("./cert_base64.txt", "utf-8").trim();
+    // Usa getCertOptions para carregar o certificado
+    const SENHA = process.env.CERT_SENHA || "#senhagto2024#";
+    const certOptions = await getCertOptions(SENHA, './GTO COMERCIO 2025-2026.pfx');
+    
+    if (!certOptions) {
+      return res.status(500).json({ 
+        error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.' 
+      });
+    }
 
-    const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
+    console.log('Certificado carregado:', {
+      tipo: certOptions.pfx ? 'PFX' : 'PEM',
+      tamanho: certOptions.pfx?.length,
+      temCaminho: !!certOptions.pfxPath,
+      caminho: certOptions.pfxPath
+    });
 
-    // Salva o arquivo temporário do certificado (PFX)
-    const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
-    fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
-
-
-    const certOptions = {
-      pfx: fs.readFileSync(tempPfxPath),
-      senha: SENHA,
-    };
-    const tools = new Tools({
+    console.log('Params Tools:', {
       mod: payload.ide.mod,
       tpAmb: parseInt(payload.ide.tpAmb),
       UF: vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP",
-      versao: "4.00",
-      xmllint: "../../../../libs/libxml/bin/xmllint.exe",
-    }, {
-      pfx: "../GTO COMERCIO 2025-2026.pfx",
-      senha: "#senhagto2024#",
     });
-    
-    console.log( 'tools:', tools);
-    await tools.sefazDistDFe({chNFe: payload.ide.chave}).then(res =>  {
-      console.log('sefazDistDFe resposta:', res);
-      docZip(res).then(res => {
-        console.log('Conteúdo do ZIP retornado pela sefazDistDFe:', res);
-      
-      })
 
-    }).catch(err => {
-      console.error('Erro ao consultar sefazDistDFe:', err);
-    })
+    // Tenta primeiro com o caminho do arquivo (algumas versões da lib precisam)
+    const certOptionsForTools = certOptions.pfxPath 
+      ? { pfx: certOptions.pfxPath, senha: certOptions.senha }
+      : certOptions;
+
+    try {
+      const tools = new Tools({
+        mod: payload.ide.mod,
+        tpAmb: parseInt(payload.ide.tpAmb),
+        UF: vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP",
+        CNPJ: payload.emit.CNPJ,
+        versao: "4.00",
+        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      }, certOptionsForTools);
+      
+      console.log('Tools inicializado:', tools);
+      await tools.sefazDistDFe({chNFe: payload.ide.chave}).then(res =>  {
+        console.log('sefazDistDFe resposta:', res);
+        docZip(res).then(res => {
+          console.log('Conteúdo do ZIP retornado pela sefazDistDFe:', res);
+        
+        })
   
+      }).catch(err => {
+        console.error('Erro ao consultar sefazDistDFe:', err);
+      })
+    
+
+    } catch (e) {
+      console.error('Erro ao inicializar Tools:', e.message);
+      console.error('Stack:', e.stack);
+      return res.status(500).json({ 
+        error: 'Erro ao inicializar Tools: ' + e.message,
+        stack: e.stack 
+      });
+    }
+    
     return res.json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });
