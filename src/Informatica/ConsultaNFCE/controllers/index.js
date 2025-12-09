@@ -359,105 +359,96 @@ async validarStatusSefaz(req, res) {
   //  console.log('Iniciando consulta de venda para idVenda:', idVenda);
    function gerarXML(venda) {
     console.log('gerarXML venda:', idVenda);
-     const uf = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-     const cnf = venda.data[0].NFE_INFNFE_IDE_CNF || "00000000";
-     const natOp = venda.data[0].NFE_INFNFE_IDE_NATOP || "VENDA";
-     const mod = venda.data[0].NFE_INFNFE_IDE_MOD || "65" || "55";
-     const serie = venda.data[0].NFE_INFNFE_IDE_SERIE || "0";
-     const nnf = venda.data[0].NFE_INFNFE_IDE_NNF || "";
-     const dhEmi = venda.data[0].NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
-      const chave = venda.data[0].CHAVE || "";
-      const tpNF = venda.data[0].NFE_INFNFE_IDE_TPNF || "1";
-      const idDest = venda.data[0].NFE_INFNFE_IDE_IDDEST || "1";
-      const cMunFG = venda.data[0].NFE_INFNFE_IDE_CMUNFG || "3550308";
-      const tpImp = venda.data[0].NFE_INFNFE_IDE_TPIMP || "4";
-      const tpEmis = venda.data[0].NFE_INFNFE_IDE_TPEMIS || "1";
-      const cDV = venda.data[0].NFE_INFNFE_IDE_CDV || "0";
-      const tpAmb = venda.data[0].NFE_INFNFE_IDE_TPAMB || "2";
-      const finNFe = venda.data[0].NFE_INFNFE_IDE_FINNFE || "1";
-      const indFinal = venda.data[0].NFE_INFNFE_IDE_INDFINAL || "1";
-      const indPres = venda.data[0].NFE_INFNFE_IDE_INDPRES || "1";
+     const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+     const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
+     const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
+     const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65" || "55";
+     const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
+     const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
+     const dhEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
+      const chave = venda.data[0]?.venda.CHAVE || "";
+      const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
+      const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
+      const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
+      const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "4";
+      const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
+      const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
+      const tpAmb = venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2";
+      const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
+      const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
+      const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
       const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
-      const nome = venda.data[0].NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
-      const nomeFantasia = venda.data[0].NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
-      const cStat = venda.data[0].PROTNFE_INFPROT_CSTAT || "100";
-      const cep = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
-      const xPais = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
-      const cPais = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
-      const fone = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
-      const cMun = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
-      const xMun = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
-      const xBairro = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
-      const nro = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_NRO || "0";
-      const xLgr = venda.data[0].NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
-      const emit_IE = venda.data[0].NFE_INFNFE_EMIT_IE || "";
-      const emit_CRT = venda.data[0].NFE_INFNFE_EMIT_CRT || "1";
-
-      const cprod = venda.detalhe?.det[0]?.CPROD || "0001";
-      const cean = venda.detalhe?.det[0]?.CEAN || "0000000000000";
-      const xprod = venda.detalhe?.det[0]?.XPROD || "Produto Teste";
-      const ncm = venda.detalhe?.det[0]?.NCM || "00000000";
+      const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
+      const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
+      const cStat = venda.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
+      const cep = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
+      const xPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
+      const cPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
+      const fone = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
+      const cMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
+      const xMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
+      const xBairro = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
+      const nro = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO || "0";
+      const xLgr = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
+      const emit_IE = venda.data[0]?.venda.NFE_INFNFE_EMIT_IE || "";
+      const emit_CRT = venda.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
+      const infCpl = venda.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
+      const vOutro = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO || "0.00";
+      const modFrete = venda.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
+      const vIPIDevol = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
+      const vIPI = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
+      const vDesc = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
+      const vII = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
+      const vSeg = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
+      const vFCP = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
+      const vBCST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
+      const vST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
+      const vFCPST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
+      const vFCPSTRet = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
+      const vProd = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
+      const icmsVFrete = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
+      const qrCode = venda.data[0]?.venda.NFE_INFNFE_INFNFESUPL_QRCODE || "";
+      const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
+      const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
+      const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "";
+      
+      const cprod = venda.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
+      const cean = venda.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
+      const xprod = venda.data[0]?.detalhe?.map(item => item.det.XPROD) || "Produto Teste";
+     
+      const ncm = venda.data[0]?.detalhe?.map(item => item.det.NCM) || "00000000";
       // const tpCredPresIBSZFM 
-      const CFOP = venda.detalhe?.det[0]?.CFOP || "5102";
-      const uCom = venda.detalhe?.det[0]?.UCOM || "UN";
-      const qCom = venda.detalhe?.det[0]?.QCOM || "1.0000";
-      const vUnCom = venda.detalhe?.det[0]?.VUNCOM || "0.01";
-      const cEANTrib = venda.detalhe?.det[0]?.CEANTRIB || "0000000000000";
-      const uTrib = venda.detalhe?.det[0]?.UTRIB || "UN";
-      const qTrib = venda.detalhe?.det[0]?.QTRIB || "1.0000";
-      const vUnTrib = venda.detalhe?.det[0]?.VUNTRIB || "0.01";
-      const indTot = venda.detalhe?.det[0]?.INDTOT || "1";
-      const orig = venda.detalhe?.det[0]?.ICMS_ORIG || "0";
-      const CST = venda.detalhe?.det[0]?.ICMS_CST || "00";
-      const modBC = venda.detalhe?.det[0]?.ICMS_MODBC || "3";
+      const CFOP = venda.data[0]?.detalhe?.map(item => item.det.CFOP) || "5102";
+      const uCom = venda.data[0]?.detalhe?.map(item => item.det.UCOM) || "UN";
+      const qCom = venda.data[0]?.detalhe?.map(item => item.det.QCOM) || "1.0000";
+      const vUnCom = venda.data[0]?.detalhe?.map(item => item.det.VUNCOM) || "0.01";
+      const cEANTrib = venda.data[0]?.detalhe?.map(item => item.det.CEANTRIB) || "0000000000000";
+      const uTrib = venda.data[0]?.detalhe?.map(item => item.det.UTRIB) || "UN";
+      const qTrib = venda.data[0]?.detalhe?.map(item => item.det.QTRIB) || "1.0000";
+      const vUnTrib = venda.data[0]?.detalhe?.map(item => item.det.VUNTRIB) || "0.01";
+      const indTot = venda.data[0]?.detalhe?.map(item => item.det.INDTOT) || "1";
+      const orig = venda.data[0]?.detalhe?.map(item => item.det.ICMS_ORIG) || "0";
+      const CST = venda.data[0]?.detalhe?.map(item => item.det.ICMS_CST) || "00";
+      const modBC = venda.data[0]?.detalhe?.map(item => item.det.ICMS_MODBC) || "3";
       const vBC = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBC || "0.00";
       const vICMS = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMS || "0.00";
-      const pICMS = venda.detalhe?.det[0]?.ICMS_PICMS || "0.00";
-      const PIS_CST = venda.detalhe?.det[0]?.PIS_CST || "01";
-      const PIS_VBC = venda.detalhe?.det[0]?.PIS_VBC || "0.00";
-      const PIS_PPIS = venda.detalhe?.det[0]?.PIS_PPIS || "0.00";
-      const VPIS_VPIS = venda.detalhe?.det[0]?.PIS_VPIS || "0.00";
-      const COFINS_CST = venda.detalhe?.det[0]?.COFINS_CST || "01";
-      const COFINS_VBC = venda.detalhe?.det[0]?.COFINS_VBC || "0.00";
-      const COFINS_PCOFINS = venda.detalhe?.det[0]?.COFINS_PCOFINS || "0.00";
-      const VCOFINS_VCOFINS = venda.detalhe?.det[0]?.COFINS_VCOFINS || "0.00";
-      const CSTIS = venda.detalhe?.det[0]?.IS_CST || "41";
-      const cClassTribIS = venda.detalhe?.det[0]?.IS_CCLASSTRIBIS || "00000000";
-      const icms_vicmsdeson = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
-      const vFrete = venda.data[0]?.detalhe?.VFRETE || "0.00";
-      const infCpl = venda.data[0]?.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
-      const vOutro = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO|| "0.00";
-      const modFrete = venda.data[0]?.NFE_INFNFE_TRANSP_MODFRETE || "9";
-      const vIPIDevol = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
-      const vIPI = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
-      const vDesc = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
-      const vII = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
-      const vSeg = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
-      const vFCP = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
-      const vBCST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
-      const vST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
-      const vFCPST = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
-      const vFCPSTRet = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
-      const vProd = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
-      const icmsVFrete = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
-      const qrCode = venda.data[0]?.NFE_INFNFE_INFNFESUPL_QRCODE || "";
-      const urlChave = venda.data[0]?.NFE_INFNFESUPL_URLCHAVE || "";
-      const tPag = venda.data[0]?.pagamento[0]?.TPAG || "01";
-      const vPag = venda.data[0]?.pagamento[0]?.VALORRECEBIDO || '0';
-      // console.log(venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ, 'venda.produtos')
-      // console.log(chave, 'chave')
-      /*
-        retornar com estas consultas e vendas amanhã. 2025-12-09
-        SELECT * FROM QUALITY_CONC_HML.VENDA WHERE IDVENDA = '6-1-359'
+      const pICMS = venda.data[0]?.detalhe?.map(item => item.det.ICMS_PICMS) || "0.00";
+      const PIS_CST = venda.data[0]?.detalhe?.map(item => item.det.PIS_CST) || "01";
+      const PIS_VBC = venda.data[0]?.detalhe?.map(item => item.det.PIS_VBC) || "0.00";
+      const PIS_PPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_PPIS) || "0.00";
+      const VPIS_VPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_VPIS) || "0.00";
+      const COFINS_CST = venda.data[0]?.detalhe?.map(item => item.det.COFINS_CST) || "01";
+      const COFINS_VBC = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VBC) || "0.00";
+      const COFINS_PCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_PCOFINS) || "0.00";
+      const VCOFINS_VCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VCOFINS) || "0.00";
+      const CSTIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
+      const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
+      const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
 
-        SELECT * FROM QUALITY_CONC_HML.VENDADETALHE WHERE IDVENDA = '6-1-359'
+      const tPag = venda.data[0]?.pagamento?.map(item => item.TPAG) || "01";
+      const vPag = venda.data[0]?.pagamento?.map(item => item.VALORRECEBIDO) || '0';
+      console.log(venda.data[0], 'venda')
 
-        SELECT * FROM VENDADETALHE;
-
-        SELECT * FROM QUALITY_CONC_HML.VENDAPAGAMENTO WHERE IDVENDA = '118-5-19'
-
-        SELECT * FROM QUALITY_CONC.VENDA WHERE IDVENDA = '6-1-359'
-      */
       const payload = {
         ide: {
           cUF: ufToCodigo(uf),
@@ -478,8 +469,7 @@ async validarStatusSefaz(req, res) {
           finNFe: finNFe,
           indFinal: indFinal,
           indPres: indPres,
-          indIntermed: "0",
-          procEmi: "0",
+          procEmi: procEmi,
           verProc: "1.0",
           gCompraGov: {
             tpEnteGov: "0",
