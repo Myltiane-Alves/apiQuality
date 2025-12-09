@@ -367,7 +367,6 @@ async validarStatusSefaz(req, res) {
      const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
      const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
      const dhEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI || new Date().toISOString(); 
-      // Remove prefixo "NFe" da chave se existir (deve ter exatamente 44 dígitos)
       const chaveRaw = venda.data[0]?.venda.CHAVE || "";
       const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
       const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
@@ -664,9 +663,9 @@ async validarStatusSefaz(req, res) {
             vPag: vPag
           },
         },
-        infAdic: {
-          infCpl: infCpl
-        },
+        // infAdic: {
+        //   infCpl: infCpl
+        // },
         // infNFeSupl: {
         //     qrCode: qrCode,
         //     urlChave: urlChave
@@ -719,7 +718,7 @@ async validarStatusSefaz(req, res) {
 
     // Usa getCertOptions para carregar o certificado
     const SENHA = process.env.CERT_SENHA || "#senhagto2024#";
-    const certOptions = await getCertOptions(SENHA, './GTO COMERCIO 2025-2026.pfx');
+    const certOptions = await getCertOptions(SENHA, 'GTO COMERCIO 2025-2026.pfx');
     
     if (!certOptions) {
       return res.status(500).json({ 
