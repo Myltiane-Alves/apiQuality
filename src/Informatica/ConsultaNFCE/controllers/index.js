@@ -489,6 +489,25 @@ class ConsultaNfeController {
     
     NFe.tagIde({
       cUF: ufToCodigo(payload.ide.cUF),
+      cNF: payload.ide.cNF,
+      natOp: payload.ide.natOp,
+      mod: payload.ide.mod,
+      serie: payload.ide.serie,
+      nNF: payload.ide.nNF,
+      dhEmi: payload.ide.dhEmi,
+      tpNF: payload.ide.tpNF,
+      idDest: payload.ide.idDest,
+      cMunFG: payload.ide.cMunFG,
+      tpImp: payload.ide.tpImp,
+      tpEmis: payload.ide.tpEmis,
+      cDV: payload.ide.cDV,
+      tpAmb: payload.ide.tpAmb,
+      finNFe: payload.ide.finNFe,
+      indFinal: payload.ide.indFinal,
+      indPres: payload.ide.indPres,
+      procEmi: payload.ide.procEmi,
+      verProc: payload.ide.verProc,
+      
     })
     
     NFe.tagEmit({
@@ -552,7 +571,8 @@ SELECT * FROM QUALITY_CONC_TST.VENDA WHERE IDVENDA = '6-1-359'
 
 SELECT * FROM QUALITY_CONC.VENDA WHERE DTHORAABERTURA >= '2025-12-09';
 
-
+QUADRA QR 608 CONJUNTO 7-A
+407
         */
 
       return res.json(result);
