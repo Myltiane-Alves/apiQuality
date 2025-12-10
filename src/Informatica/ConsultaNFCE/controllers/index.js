@@ -549,9 +549,34 @@ class ConsultaNfeController {
       indTot: payload.det.prod.indTot,
     })
     
-    // NFe.tagImposto({
-    //   vTotTrib: "0.00",
-    // })
+    [0, 1, 2, 3].map((value, index) => {
+      NFe.tagProdICMSSN(index, {
+        orig: payload.det.imposto.ICMS.ICMS00.orig[index],
+        CSOSN: payload.det.imposto.ICMS.ICMS00.CST[index],
+      })
+      NFe.tagProdPIS(index, {
+        CST: payload.det.imposto.PIS.PISAliq.CST[index],
+        vAliqProd: payload.det.imposto.PIS.PISAliq.pPIS[index],
+        vPIS: payload.det.imposto.PIS.PISAliq.vPIS[index],
+      })
+      NFe.tagProdCOFINS(index, {
+        CST: payload.det.imposto.COFINS.COFINSAliq.CST[index],
+        qBCProd: payload.det.imposto.COFINS.COFINSAliq.vBC[index],
+        vAliqProd: payload.det.imposto.COFINS.COFINSAliq.pCOFINS[index],
+        vCOFINS: payload.det.imposto.COFINS.COFINSAliq.vCOFINS[index],
+      })
+    })
+
+    NFe.tagTotal()
+    
+    NFe.tagTransp({
+      modFrete: payload.transp.modFrete
+    })
+
+    NFe.tagDetPag({
+      tPag: payload.pag.detPag.tPag,
+      vPag: payload.pag.detPag.vPag
+    })
     
     
     

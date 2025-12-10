@@ -41,7 +41,19 @@
             <CRT>3</CRT>
         </emit>
         <det>
-            <cProd>0001</cProd>
+            <cProd>118773</cProd>
+            <cean>SEM GTIN</cean>
+            <xProd>T Shirt 42929 Algodao Silk Merci Bco Aguia Tex P</xProd>
+            <NCM>61091000</NCM>
+            <CFOP>5102</CFOP>
+            <uCom>PÇ</uCom>
+            <vUnCom>1</vUnCom>
+            <vProd>35.99</vProd>
+            <cEANTrib>SEM GTIN</cEANTrib>
+            <uTrib>PÇ</uTrib>
+            <qTrib>1</qTrib>
+            <vUnTrib>35.99000000000000198951966012828052</vUnTrib>
+            <indTot>1</indTot>
         </det>
     </infNFe>
     <infNFeSupl>
@@ -59,11 +71,11 @@
                     <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></Transform>
                 </Transforms>
                 <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></DigestMethod>
-                <DigestValue>7rsRsV26uswiJTeV5PCC1XNHYME=</DigestValue>
+                <DigestValue>ydGg3ZdN3wYjYexF5WB6XYGeimI=</DigestValue>
             </Reference>
         </SignedInfo>
         <SignatureValue>
-            ABPgl3rprstFRGmUdDSQJ+i5tzv84EdPuaCjIu/mhDPUckc/UurY73F/kTwLVbP/dmeVxoGdX1ptyJZvp58yD2Iuou/Y4jNtzTjXYdZFu24mqRsnioHviLf13doJeMgYVAWKn0CUt0I8VkLlBoIAdIR5IxkNGJczr02pa4o3t9ch5IZvkumDzz3ZuYozVAFtflIf0KKPrCZaXC4VsHi9a6S9srUr3ht7ZZBn1G8vkfL8JydFPN+jTlwZtAYxJyv0xZU9ya6cV8XXlJJUmot+CZBGxs5Vz4vgQahanC2khnoOREra2v3b2ETAWmNBV6gkgPrZP8rXXoUuCfjvFuPOIw==</SignatureValue>
+            UIuvUbyFaeahGjFi/yx+vXn2ixCMdQJ56DYHHBorqyvqd9D/4AhrKoTcqLHsdoc5hbutzDHsbwPLk52LKim0EsMKdBigau9bYOdPiU0ubqdBzzYIYUy3teGO+vWPaq4r85akz0iYjiA7fqL+cfee0uOdU1g5G89ra74wA027BKpTsIIiH5D42r61+7eJJZt4qtyG0y+e0vQx8XSyYznsGwbY4KiNTS6u/ANkOcvMRKyii8k4iuIfp00YZJEhJDpFgoWINm8CKeb4IKfbkfcusD9k9/lObJzZVLiT7ccLHTWmJD/2ZHE9FpOmLf6YYyPUCT/lip3DYkB6huZUmgVTlA==</SignatureValue>
         <KeyInfo>
             <X509Data>
                 <X509Certificate>
