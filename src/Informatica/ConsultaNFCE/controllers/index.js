@@ -486,7 +486,36 @@ class ConsultaNfeController {
 
       // Processar cada item do detalhe
     
-      const itens = vendaData.data[0]?.detalhe;;
+      const itens = vendaData.data[0]?.detalhe || [];
+      
+      // Primeiro: construir array de produtos para passar ao tagProd
+      const produtosArray = itens.map((item, index) => {
+        const det = item.det;
+        const vrUnit = parseFloat(det.VUNCOM) || 0;
+        const qtd = parseFloat(det.QCOM) || 0;
+        
+        return {
+          cProd: det.CPROD,
+          cEAN: det.CEAN || "SEM GTIN",
+          xProd: det.XPROD,
+          NCM: det.NCM,
+          CFOP: det.CFOP,
+          uCom: det.UCOM,
+          qCom: det.QCOM,
+          vUnCom: det.VUNCOM,
+          vProd: roundTo(vrUnit * qtd, 2),
+          cEANTrib: det.CEANTRIB || "SEM GTIN",
+          uTrib: det.UTRIB,
+          qTrib: det.QTRIB,
+          vUnTrib: det.VUNTRIB,
+          indTot: det.INDTOT
+        };
+      });
+
+      // Passar array completo de produtos de uma vez
+      NFe.tagProd(produtosArray);
+
+      // Segundo: calcular impostos e aplicar para cada produto
       itens.forEach((item, index) => {
         const det = item.det; 
 
@@ -584,50 +613,239 @@ class ConsultaNfeController {
             // Produto normal: 1.65%
             const vPIS = roundTo(VrCalculado * 0.0165, 2);
 
+            pisData = {
+              CST: "01",  // Operação tributável
+              vBC: VrCalculado,
+              pPIS: 1.65,
+              vPIS: vPIS
+            }
+
+            // Acumular total de PIS
+            v_TotPis += vPIS;
           }
         }
 
-        // Produto
-        NFe.tagProd([{
+        // 5.Calcular COFINS
+        let cofinsData = {}
+
+        if(crt == "1") {
+          // Simples Nacional: COFINS não aplicável na nota
+          cofinsData = { CST: "49", vBC: 0, pCOFINS: 0, vCOFINS: 0 };
+        } else {
+          if (ncm === "38089429") {
+            // Produto não tributável
+            cofinsData = {
+              CST: "04",  // Operação não tributável
+              vBC: 0,
+              pCOFINS: 0,
+              vCOFINS: 0
+            };
+          } else {
+            // Produto normal: 7.60%
+            const vCOFINS = roundTo(VrCalculado * 0.076, 2);
+
+            cofinsData = {
+              CST: "01",  // Operação tributável
+              vBC: VrCalculado,
+              pCOFINS: 7.60,
+              vCOFINS: vCOFINS
+            }
+
+            // Acumular total de COFINS
+            v_TotCofins += vCOFINS;
+          }
+        }
+
+        // ===== 6. CALCULAR IBS/CBS (REFORMA TRIBUTÁRIA) =====
+        let ibscbsData = {};
+
+        if(crt !== "1") {
+          // Regime Normal
+
+          // IBS Estadual UF: 0.10%
+          const vIBSUF = roundTo(VrCalculado * 0.001, 2); 
+        
+          //  CBS Federal: 0,90%
+          const vCBS = roundTo(VrCalculado * 0.009, 2);
+
+          ibscbsData = {
+            CST: "000",
+            cClassTrib: "000001",
+            gIBSCBS: {
+              vBC: VrCalculado,
+              vIBS: vIBSUF + 0,  // IBS UF + IBS Mun
+              gIBSUF: {
+                pIBSUF: 0.10,
+                vIBSUF: vIBSUF
+              },
+              gIBSMun: {
+                pIBSMun: 0,
+                vIBSMun: 0
+              },
+              gCBS: {
+                pCBS: 0.90,
+                vCBS: vCBS
+              }
+            }
+          };
+          
+          // Acumular totais IBS/CBS
+          v_TotIBSUF += vIBSUF;
+          v_TotCBS += vCBS;
+        } 
+
+        // ===== 7. MONTAR OBJETO DO ITEM COM IMPOSTOS =====
+        const itemComImposto = {
+          nItem: index + 1,
+          prod: {
             cProd: det.CPROD,
-            cEAN: det.CEAN,
+            cEAN: det.CEAN || "SEM GTIN",
             xProd: det.XPROD,
             NCM: det.NCM,
             CFOP: det.CFOP,
             uCom: det.UCOM,
-            qCom: det.QTRIB,
-            vUnCom: det.VUNTRIB,
-            vProd: det.VPROD,
+            qCom: det.QCOM,
+            vUnCom: det.VUNCOM,
+            vProd: roundTo(vrUnit * qtd, 2),
+            vDesc: vrDesconto,
+            cEANTrib: det.CEANTRIB || "SEM GTIN",
+            uTrib: det.UTRIB,
+            qTrib: det.QTRIB,
+            vUnTrib: det.VUNTRIB,
             indTot: det.INDTOT
-        }]);
+          },
+          imposto: {
+            vTotTrib: 0,  // Lei da Transparência
+            ICMS: icmsData,
+            PIS: pisData,
+            COFINS: cofinsData,
+            IBSCBS: ibscbsData
+          }
+        };
+        
+        // Guardar para usar depois na geração do XML
+        console.log(`Item ${index + 1} processado:`, itemComImposto);
+
+        // ===== TOTAIS DA NOTA =====
+        const totais = {
+          ICMSTot: {
+            vBC: (crt === "1") ? 0 : V_ICMSTot_vNF,
+            vICMS: v_TotICMS,
+            vICMSDeson: 0,
+            vFCP: 0,
+            vBCST: 0,
+            vST: 0,
+            vFCPST: 0,
+            vFCPSTRet: 0,
+            vProd: V_ICMSTot_vNF + V_Tot_Desconto,  // Valor bruto dos produtos
+            vFrete: 0,
+            vSeg: 0,
+            vDesc: V_Tot_Desconto,
+            vII: 0,
+            vIPI: 0,
+            vIPIDevol: 0,
+            vPIS: v_TotPis,
+            vCOFINS: v_TotCofins,
+            vOutro: 0,
+            vNF: V_ICMSTot_vNF  // Valor líquido da nota
+          },
+          
+          IBSCBSTot: {
+            vBCIBSCBS: V_ICMSTot_vNF,
+            gIBS: {
+              vIBS: v_TotIBSUF,
+              vCredPres: 0,
+              vCredPresCondSus: 0,
+              gIBSUF: {
+                vDif: 0,
+                vDevTrib: 0,
+                vIBSUF: v_TotIBSUF
+              },
+              gIBSMun: {
+                vDif: 0,
+                vDevTrib: 0,
+                vIBSMun: 0
+              }
+            },
+            gCBS: {
+              vDif: 0,
+              vDevTrib: 0,
+              vCBS: v_TotCBS,
+              vCredPres: 0,
+              vCredPresCondSus: 0
+            }
+          },
+          
+          vNFTot: V_ICMSTot_vNF  // Valor total da NF com impostos
+        };
+
+        console.log('Totais calculados:', totais);
+
+        // ===== LEI DA TRANSPARÊNCIA (IBPT) =====
+        const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
+        const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
+
+        const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
+                      `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
+                      `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS`;
+
+        console.log('Informações complementares:', infCpl);
+
+        // Aplicar impostos para este produto específico
+        NFe.tagImposto(index, { vTotTrib: "0.00" });
+        NFe.tagProdICMS(index, icmsData);
+        NFe.tagProdPIS(index, pisData);
+        NFe.tagProdCOFINS(index, cofinsData);
+        
+        // NFe.tagProd([{
+        //     cProd: det.CPROD,
+        //     cEAN: det.CEAN,
+        //     xProd: det.XPROD,
+        //     NCM: det.NCM,
+        //     CFOP: det.CFOP,
+        //     uCom: det.UCOM,
+        //     qCom: det.QTRIB,
+        //     vUnCom: det.VUNTRIB,
+        //     vProd: det.VPROD,
+        //     indTot: det.INDTOT
+        // }]);
 
         // ICMS
-        NFe.tagProdICMS(index, {
-            orig: det.ICMS_ORIG,
-            CST: det.ICMS_CST,
-            modBC: det.ICMS_MODBC,
-            vBC: det.ICMS_VBC,
-            pICMS: det.ICMS_PICMS,
-            vICMS: det.ICMS_VICMS
-        });
+        // NFe.tagProdICMS(index, {
+        //     orig: det.ICMS_ORIG,
+        //     CST: det.ICMS_CST,
+        //     modBC: det.ICMS_MODBC,
+        //     vBC: det.ICMS_VBC,
+        //     pICMS: det.ICMS_PICMS,
+        //     vICMS: det.ICMS_VICMS
+        // });
 
         // PIS
-        NFe.tagProdPIS(index, {
-            CST: det.PIS_CST,
-            vBC: det.PIS_VBC,
-            pPIS: det.PIS_PPIS,
-            vPIS: det.PIS_VPIS
-        });
+        // NFe.tagProdPIS(index, {
+        //     CST: det.PIS_CST,
+        //     vBC: det.PIS_VBC,
+        //     pPIS: det.PIS_PPIS,
+        //     vPIS: det.PIS_VPIS
+        // });
 
         // COFINS
-        NFe.tagProdCOFINS(index, {
-            CST: det.COFINS_CST,
-            vBC: det.COFINS_VBC,
-            pCOFINS: det.COFINS_PCOFINS,
-            vCOFINS: det.COFINS_VCOFINS
-        });
+        // NFe.tagProdCOFINS(index, {
+        //     CST: det.COFINS_CST,
+        //     vBC: det.COFINS_VBC,
+        //     pCOFINS: det.COFINS_PCOFINS,
+        //     vCOFINS: det.COFINS_VCOFINS
+        // });
       });
 
+      // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
+      const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
+      const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
+
+      const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
+                    `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
+                    `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS`;
+
+      console.log('Informações complementares:', infCpl);
 
       // NFe.tagTotal()
        
@@ -667,7 +885,7 @@ class ConsultaNfeController {
       })
     
       NFe.tagInfAdic({
-        infCpl: payload.infAdic?.infCpl || ""
+        infCpl: infCpl || payload.infAdic?.infCpl || ""
       })
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
@@ -710,8 +928,9 @@ SELECT * FROM QUALITY_CONC_TST.VENDA WHERE IDVENDA = '6-1-359'
 
 SELECT * FROM QUALITY_CONC.VENDA WHERE DTHORAABERTURA >= '2025-12-09';
 
-QUADRA QR 608 CONJUNTO 7-A
-407
+SELECT * FROM VENDA WHERE IDVENDA = '36-2-46749'
+
+SELECT * FROM VENDA WHERE DTHORAABERTURA >= '2025-01-01' AND NFE_INFNFE_IDE_MOD = 55
         */
 
       return res.json(result);
