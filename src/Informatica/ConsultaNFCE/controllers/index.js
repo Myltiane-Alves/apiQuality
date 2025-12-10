@@ -83,6 +83,10 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
   return null;
 }
 
+export function roundTo(valor, casasDecimais) {
+  const multiplicador = Math.pow(10, Math.abs(casasDecimais));
+  return Math.round(valor * multiplicador) / multiplicador;
+}
 class ConsultaNfeController {
   async consultaNFce(req, res) {
     try {
