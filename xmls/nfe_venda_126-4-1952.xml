@@ -26,9 +26,18 @@
             <xNome>Gto Comercio Atacadista De Confec E Calçados Ltda</xNome>
             <xFant>0124 - TO - Paracatu</xFant>
             <enderEmit>
+                <xLgr>AV OLEGARIO MACIEL</xLgr>
+                <nro>0</nro>
+                <xBairro>CENTRO</xBairro>
+                <cMun>3147006</cMun>
+                <xMun>PARACATU</xMun>
+                <CEP>38600208</CEP>
                 <UF>31</UF>
+                <cPais>1058</cPais>
+                <xPais>BRASIL</xPais>
+                <fone>0000000000</fone>
             </enderEmit>
-            <IE></IE>
+            <IE>52925040039</IE>
             <CRT>3</CRT>
         </emit>
         <det>
@@ -50,11 +59,11 @@
                     <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></Transform>
                 </Transforms>
                 <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></DigestMethod>
-                <DigestValue>wK31kUTWccJ/sp0gP+kHlAXjhPY=</DigestValue>
+                <DigestValue>7rsRsV26uswiJTeV5PCC1XNHYME=</DigestValue>
             </Reference>
         </SignedInfo>
         <SignatureValue>
-            I4VOg8v79N34tjcvq8zOpyGnqt1GNxJJFJ9l0WIMC5pIwhUOjS6IroBwLkB2hvlCUYI+kSsoRvNQfaJUQ7GJ/saNZGYVDZY6XhkuU+cjPRzLr6fCLzU1732BOHzmN7K9GGjTuvI+L1FbJsp5h7yLzZfvb8u8DFsOGXGlNKPLhL9jEjD7X5hEoUXi22zubPfxCABnTZ0NjZNKDCPKtgcSj/87Q3ypFe4ar2FfTl1s30r4U9ejBLw8gZwW3tw14BRe7W9Yq6OxnZ8Phc4KDwCEVbVbop7ZvchQiyBlJjs83e3wjyu/VtyM/Y+xR1ByPLpVQlEUqD2BmPUi6fmrs43qrQ==</SignatureValue>
+            ABPgl3rprstFRGmUdDSQJ+i5tzv84EdPuaCjIu/mhDPUckc/UurY73F/kTwLVbP/dmeVxoGdX1ptyJZvp58yD2Iuou/Y4jNtzTjXYdZFu24mqRsnioHviLf13doJeMgYVAWKn0CUt0I8VkLlBoIAdIR5IxkNGJczr02pa4o3t9ch5IZvkumDzz3ZuYozVAFtflIf0KKPrCZaXC4VsHi9a6S9srUr3ht7ZZBn1G8vkfL8JydFPN+jTlwZtAYxJyv0xZU9ya6cV8XXlJJUmot+CZBGxs5Vz4vgQahanC2khnoOREra2v3b2ETAWmNBV6gkgPrZP8rXXoUuCfjvFuPOIw==</SignatureValue>
         <KeyInfo>
             <X509Data>
                 <X509Certificate>
