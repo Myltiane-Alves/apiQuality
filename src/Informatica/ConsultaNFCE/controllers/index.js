@@ -534,15 +534,7 @@ class ConsultaNfeController {
 
     // NFe.tagTotal()
     
-    NFe.tagTransp({
-      modFrete: payload.transp.modFrete
-    })
-
-    NFe.tagDetPag({
-      tPag: payload.pag.detPag.tPag,
-      vPag: payload.pag.detPag.vPag
-    })
-    
+   
     NFe.tagAutXML({
       CNPJ: payload.autXML.CNPJ
     })
@@ -568,6 +560,16 @@ class ConsultaNfeController {
       vOutro: payload.total.ICMSTot.vOutro,
       vNF: payload.total.ICMSTot.vNF
     })
+    
+    NFe.tagTransp({
+      modFrete: payload.transp.modFrete
+    })
+
+    NFe.tagDetPag({
+      tPag: payload.pag.detPag.tPag,
+      vPag: payload.pag.detPag.vPag
+    })
+    
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
       await tools.consultarNFe(payload.ide.chave).then(res => {
