@@ -179,7 +179,7 @@ class ConsultaNfeController {
           {
             mod: "55",
             tpAmb: 1,
-            UF,
+            UF: UF,
             versao: "4.00",
       
             xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),

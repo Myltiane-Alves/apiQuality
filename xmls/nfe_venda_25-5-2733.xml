@@ -1,0 +1,139 @@
+<NFe xmlns="http://www.portalfiscal.inf.br/nfe">
+    <infNFe Id="NFe53210136769602002522650050000027331104815420" versao="4.00">
+        <ide>
+            <cUF>35</cUF>
+            <cNF>10481542</cNF>
+            <natOp>VENDA</natOp>
+            <mod>55</mod>
+            <serie>5</serie>
+            <nNF>2733</nNF>
+            <dhEmi>2021-01-12</dhEmi>
+            <tpNF>1</tpNF>
+            <idDest>1</idDest>
+            <cMunFG>5300108</cMunFG>
+            <tpImp>4</tpImp>
+            <tpEmis>1</tpEmis>
+            <cDV>0</cDV>
+            <tpAmb>1</tpAmb>
+            <finNFe>1</finNFe>
+            <indFinal>1</indFinal>
+            <indPres>1</indPres>
+            <procEmi>0</procEmi>
+            <verProc>1.0</verProc>
+            <NFref>
+                <refNFe>
+                    <refNFe></refNFe>
+                </refNFe>
+            </NFref>
+        </ide>
+        <emit>
+            <CNPJ>36769602002522</CNPJ>
+            <xNome>Gto Comercio Atacadista De Confec E Calcados Ltda</xNome>
+            <xFant>0025 - TO - Planaltina Df 1</xFant>
+            <enderEmit>
+                <xLgr>Shd Bl K Lt 01/03/05</xLgr>
+                <nro>0</nro>
+                <xBairro>Planaltina</xBairro>
+                <cMun>5300108</cMun>
+                <xMun>Brasilia</xMun>
+                <CEP>73310400</CEP>
+                <UF>53</UF>
+                <cPais>1058</cPais>
+                <xPais>BRASIL</xPais>
+                <fone>0000000000</fone>
+            </enderEmit>
+            <IE>0733785502395</IE>
+            <CRT>3</CRT>
+        </emit>
+        <autXML>
+            <CNPJ>36769602002522</CNPJ>
+        </autXML>
+        <total>
+            <ICMSTot>
+                <vBC>0.00</vBC>
+                <vICMS>0.00</vICMS>
+                <vICMSDeson>0.00</vICMSDeson>
+                <vFCPUFDest>0.00</vFCPUFDest>
+                <vICMSUFDest>0.00</vICMSUFDest>
+                <vICMSUFRemet>0.00</vICMSUFRemet>
+                <vFCP>0.00</vFCP>
+                <vBCST>0.00</vBCST>
+                <vST>0.00</vST>
+                <vFCPST>0.00</vFCPST>
+                <vFCPSTRet>0.00</vFCPSTRet>
+                <vProd>399.94</vProd>
+                <vFrete>0.00</vFrete>
+                <vSeg>0.00</vSeg>
+                <vDesc>0.00</vDesc>
+                <vII>0.00</vII>
+                <vIPI>0.00</vIPI>
+                <vIPIDevol>0.00</vIPIDevol>
+                <vPIS>0.9899999999999999911182158029987477</vPIS>
+                <vPIS>1.479999999999999982236431605997495</vPIS>
+                <vPIS>0.9899999999999999911182158029987477</vPIS>
+                <vPIS>1.320000000000000062172489379008766</vPIS>
+                <vPIS>0.9899999999999999911182158029987477</vPIS>
+                <vPIS>0.8199999999999999511501869164931122</vPIS>
+                <vCOFINS>4.559999999999999609201495331944898</vCOFINS>
+                <vCOFINS>6.839999999999999857891452847979963</vCOFINS>
+                <vCOFINS>4.559999999999999609201495331944898</vCOFINS>
+                <vCOFINS>6.080000000000000071054273576010019</vCOFINS>
+                <vCOFINS>4.559999999999999609201495331944898</vCOFINS>
+                <vCOFINS>3.799999999999999822364316059974954</vCOFINS>
+                <vOutro>0.00</vOutro>
+                <vNF>399.94</vNF>
+                <vTotTrib>0.00</vTotTrib>
+            </ICMSTot>
+        </total>
+        <transp>
+            <modFrete>9</modFrete>
+        </transp>
+        <pag>
+            <detPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <tPag>028</tPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>49.99</vPag>
+                <vPag>50.01</vPag>
+            </detPag>
+        </pag>
+        <infAdic>
+            <infCpl>Voce pagou aproximadamente;R$ 100,94 tributos federais;R$ 77,63 tributos
+                estaduais;Fonte: IBPT/FECOMERCIO RS Xe67Eq;PROCON - DF - 151;SCS Venancio 2000 bl.
+                B- 60 sala 240;Operador(a):96;N Cx: 78 N Venda Local:2874;</infCpl>
+        </infAdic>
+    </infNFe>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+            <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></CanonicalizationMethod>
+            <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></SignatureMethod>
+            <Reference URI="#NFe53210136769602002522650050000027331104815420">
+                <Transforms>
+                    <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></Transform>
+                    <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></Transform>
+                </Transforms>
+                <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></DigestMethod>
+                <DigestValue>Urf8LWJdas8KBG9DTKFtBnNbqxE=</DigestValue>
+            </Reference>
+        </SignedInfo>
+        <SignatureValue>
+            AIWTuNeRWj/2WE4CBatUYXxXEfDyDpfwMYlb4tihpCgsPc9PmPXC0ZBSH4cNojE8gGJqFJGUeJJxMTrK1qFC3HF63+W0grYjUx/m3SEUVxukYbaAO/+tf1k1hjJeKHNiSE3i+AmFPtLU98MPpNei5/DhF1nT2XKZU9UHiAkh2Y7DgysvEcCwl3j/JUvyKP3rSiajfiYc9f/EqeBhhHHblcfQP96gQm4hAh/zo6oZ4dAZNwJXvWGz8BfHhVE6Bk5dxcTrMAMb/ytJ3jkCAV3ThoMhetjoUyLBVF6Ekh03FGBFYMLYcDZ64KGJPtqM7e+ZYYvko8uav1gMG0o9VVx4gA==</SignatureValue>
+        <KeyInfo>
+            <X509Data>
+                <X509Certificate>
+                    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</X509Certificate>
+            </X509Data>
+        </KeyInfo>
+    </Signature>
+</NFe>
