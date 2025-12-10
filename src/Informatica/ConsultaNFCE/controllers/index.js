@@ -518,7 +518,7 @@ class ConsultaNfeController {
       CRT: payload.emit.CRT,
     })
     
-    console.log(ufToCodigo(payload.emit.enderEmit.UF), 'ender emit');
+    
     NFe.tagEnderEmit({
       xLgr: payload.emit.enderEmit.xLgr,
       nro: payload.emit.enderEmit.nro,
@@ -533,7 +533,20 @@ class ConsultaNfeController {
     })
 
     NFe.tagProd({
-      cProd: "0001",
+      cProd: payload.det.prod.cProd,
+      cean: payload.det.prod.cean,
+      xProd: payload.det.prod.xProd,
+      NCM: payload.det.prod.NCM,
+      CFOP: payload.det.prod.CFOP,
+      uCom: payload.det.prod.uCom,
+      qCom: payload.det.prod.qCom,
+      vUnCom: payload.det.prod.vUnCom,
+      vProd: payload.det.prod.vProd,
+      cEANTrib: payload.det.prod.cEANTrib,
+      uTrib: payload.det.prod.uTrib,
+      qTrib: payload.det.prod.qTrib,
+      vUnTrib: payload.det.prod.vUnTrib,
+      indTot: payload.det.prod.indTot,
     })
     
     // NFe.tagImposto({
