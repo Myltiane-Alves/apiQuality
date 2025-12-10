@@ -494,6 +494,15 @@ class ConsultaNfeController {
         const vrUnit = parseFloat(det.VUNCOM) || 0;
         const qtd = parseFloat(det.QCOM) || 0;
         const vrDesconto = parseFloat(det.VDESC) || 0;
+
+        // Fórmula: VrCalculado = (VrUnit * qtd) - VrDesconto
+        const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
+
+        // Acumular total da nota e descontos
+        V_ICMSTot_vNF += VrCalculado;
+        V_Tot_Desconto += vrDesconto;
+
+        
         // Produto
         NFe.tagProd([{
             cProd: det.CPROD,
