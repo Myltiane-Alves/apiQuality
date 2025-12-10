@@ -523,6 +523,9 @@ class ConsultaNfeController {
       xLgr: payload.emit.enderEmit.xLgr,
       nro: payload.emit.enderEmit.nro,
       xBairro: payload.emit.enderEmit.xBairro,
+      cMun: payload.emit.enderEmit.cMun,
+      xMun: payload.emit.enderEmit.xMun,
+      CEP: payload.emit.enderEmit.CEP,
       UF: ufToCodigo(payload.emit.enderEmit?.UF),
     })
 
