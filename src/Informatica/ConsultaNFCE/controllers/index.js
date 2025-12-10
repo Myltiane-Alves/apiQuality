@@ -558,6 +558,9 @@ class ConsultaNfeController {
       vFCPSTRet: payload.total.ICMSTot.vFCPSTRet,
       vProd: payload.total.ICMSTot.vProd,
       vFrete: payload.total.ICMSTot.vFrete,
+      vSeg: payload.total.ICMSTot.vSeg,
+      vDesc: payload.total.ICMSTot.vDesc,
+      vII: payload.total.ICMSTot.vII,
     })
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
