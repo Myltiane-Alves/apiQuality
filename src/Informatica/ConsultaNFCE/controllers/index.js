@@ -527,6 +527,7 @@ class ConsultaNfeController {
       xMun: payload.emit.enderEmit.xMun,
       CEP: payload.emit.enderEmit.CEP,
       UF: ufToCodigo(payload.emit.enderEmit?.UF),
+      cPais: payload.emit.enderEmit.cPais,
     })
 
     NFe.tagProd({
