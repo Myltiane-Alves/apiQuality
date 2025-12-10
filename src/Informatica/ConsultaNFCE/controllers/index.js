@@ -502,7 +502,72 @@ class ConsultaNfeController {
         V_ICMSTot_vNF += VrCalculado;
         V_Tot_Desconto += vrDesconto;
 
-        
+
+        // 2.vERIFICAR REGIME TRIBUTÁRIO
+        const crt = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3";
+        const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+        const ncm = det.NCM || "";
+
+        // Calcular ICMS
+        let  icmsData = {}
+
+        if(crt == "1") {
+          // Simples Nacional
+          icmsData = {
+            CSOSN: "102",
+            orig: "0",
+            vBC: 0,
+            pICMS: 0,
+            vICMS: 0
+          };
+          // Simples Nacional: NÃO acumula v_TotICMS
+          // icmsData = {
+          //   CSOSN: det.ICMS_CST,
+          //   orig: det.ICMS_ORIG,
+          //   vBC: det.ICMS_VBC,
+          //   pICMS: det.ICMS_PICMS,
+          //   vICMS: det.ICMS_VICMS
+          // }
+        } else {
+          // Regime Normal
+          if((ncm === "38089429" || ncm === "22072019") && uf === "DF") {
+            icmsData = {
+              CST: "40", // ISENTO
+              orig: "0",
+              vBC: 0,
+              pICMS: 0,
+              vICMS: 0
+            };
+            // Não acumula ICMS
+          } else {
+            // Caso 2: Outros Produtos
+            let pICMS = 19.00;
+
+            if(uf === "DF") {
+              // DF: usa % do produto se >= 12, senão 20%
+              const percProduto = parseFloat(det.ICMS_PICMS) || 0;
+              pICMS = (percProduto >= 12) ? percProduto : 20.00;
+            }
+
+            const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
+
+            icmsData = {
+              CST: "00", // TRIBUTADO INTEGRALMENTE
+              orig: "0", // Nacional
+              modBC: "3", // Valor da Operação
+              vBC: VrCalculado, 
+              pICMS: pICMS,
+              vICMS: vICMS
+            };
+    
+            // Acumular total de ICMS
+            v_TotICMS += vICMS;
+          }
+        }
+
+        // 4.Calcular PIS
+        let pisData = {}
+
         // Produto
         NFe.tagProd([{
             cProd: det.CPROD,
