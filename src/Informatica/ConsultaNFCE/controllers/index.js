@@ -528,6 +528,8 @@ class ConsultaNfeController {
       CEP: payload.emit.enderEmit.CEP,
       UF: ufToCodigo(payload.emit.enderEmit?.UF),
       cPais: payload.emit.enderEmit.cPais,
+      xPais: payload.emit.enderEmit.xPais,
+      fone: payload.emit.enderEmit.fone,
     })
 
     NFe.tagProd({
