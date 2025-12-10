@@ -568,6 +568,13 @@ class ConsultaNfeController {
         // 4.Calcular PIS
         let pisData = {}
 
+        if(crt == "1") {
+          // Simples Nacional: PIS não aplicável na nota
+          pisData = { CST: "49", vBC: 0, pPIS: 0, vPIS: 0 };
+        } else {
+          
+        }
+
         // Produto
         NFe.tagProd([{
             cProd: det.CPROD,
