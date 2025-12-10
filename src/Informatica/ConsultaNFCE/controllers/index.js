@@ -520,6 +520,9 @@ class ConsultaNfeController {
     
     console.log(ufToCodigo(payload.emit.enderEmit.UF), 'ender emit');
     NFe.tagEnderEmit({
+      xLgr: payload.emit.enderEmit.xLgr,
+      nro: payload.emit.enderEmit.nro,
+      xBairro: payload.emit.enderEmit.xBairro,
       UF: ufToCodigo(payload.emit.enderEmit?.UF),
     })
 
