@@ -572,7 +572,19 @@ class ConsultaNfeController {
           // Simples Nacional: PIS não aplicável na nota
           pisData = { CST: "49", vBC: 0, pPIS: 0, vPIS: 0 };
         } else {
-          
+          if(ncm === "38089429") {
+            // Produto não tributável
+            pisData = {
+              CST: "04",  // Operação não tributável
+              vBC: 0,
+              pPIS: 0,
+              vPIS: 0
+            };
+          } else {
+            // Produto normal: 1.65%
+            const vPIS = roundTo(VrCalculado * 0.0165, 2);
+
+          }
         }
 
         // Produto
