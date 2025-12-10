@@ -1,7 +1,7 @@
 import { Make, Tools, docZip } from 'node-sped-nfe';
 import fs from 'fs';
 import xlsx from 'xlsx';
-import path from 'path';
+import path, { parse } from 'path';
 import archiver from 'archiver';
 import axios from 'axios';
 import os from 'os';
@@ -489,8 +489,11 @@ class ConsultaNfeController {
       const itens = vendaData.data[0]?.detalhe;;
       itens.forEach((item, index) => {
         const det = item.det; 
-        
 
+        //1. Calcular valor base do Item
+        const vrUnit = parseFloat(det.VUNCOM) || 0;
+        const qtd = parseFloat(det.QCOM) || 0;
+        const vrDesconto = parseFloat(det.VDESC) || 0;
         // Produto
         NFe.tagProd([{
             cProd: det.CPROD,
