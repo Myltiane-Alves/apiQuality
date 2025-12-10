@@ -201,9 +201,79 @@ class ConsultaNfeController {
       const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
       const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
 
-      const tPag = venda.data[0]?.pagamento?.map(item => item.TPAG) || "01";
-      const vPag = venda.data[0]?.pagamento?.map(item => item.VALORRECEBIDO) || '0';
-      
+      const tPag = venda.data[0]?.pagamento?.map(item => item.pag.TPAG) || "01";
+      const vPag = venda.data[0]?.pagamento?.map(item => item.pag.VALORRECEBIDO) || '0';
+ 
+    function montarItens(venda) {
+      const itens = venda.data[0]?.detalhe || [];
+
+      return itens.map((item, index) => {
+        const det = item.det;
+
+        return {
+          nItem: index + 1,
+          prod: {
+            cProd: det.CPROD,
+            cEAN: det.CEAN,
+            xProd: det.XPROD,
+            NCM: det.NCM,
+            CFOP: det.CFOP,
+            uCom: det.UCOM,
+            qCom: det.QCOM,
+            vUnCom: det.VUNCOM,
+            vProd: det.VPROD,
+            cEANTrib: det.CEANTRIB,
+            uTrib: det.UTRIB,
+            qTrib: det.QTRIB,
+            vUnTrib: det.VUNTRIB,
+            indTot: det.INDTOT
+          },
+
+          imposto: {
+            ICMS: {
+              ICMS00: {
+                orig: det.ICMS_ORIG || "0",
+                CST: det.ICMS_CST || "00",
+                modBC: det.ICMS_MODBC || "3",
+                vBC: det.ICMS_VBC || "0.00",
+                pICMS: det.ICMS_PICMS || "0.00",
+                vICMS: det.ICMS_VICMS || "0.00"
+              }
+            },
+
+            PIS: {
+              PISAliq: {
+                CST: det.PIS_CST || "01",
+                vBC: det.PIS_VBC || "0.00",
+                pPIS: det.PIS_PPIS || "0.00",
+                vPIS: det.PIS_VPIS || "0.00"
+              }
+            },
+
+            COFINS: {
+              COFINSAliq: {
+                CST: det.COFINS_CST || "01",
+                vBC: det.COFINS_VBC || "0.00",
+                pCOFINS: det.COFINS_PCOFINS || "0.00",
+                vCOFINS: det.COFINS_VCOFINS || "0.00"
+              }
+            },
+
+            ISSQN: det.IS_CST
+              ? {
+                  ISSQN: {
+                    cSitTrib: det.IS_CST || "N",
+                    cListServ: det.IS_CCLASSTRIBIS || "0000",
+                    vBC: det.IS_VBC || "0.00",
+                    vAliq: det.IS_VALIQ || "0.00",
+                    vISSQN: det.IS_VISSQN || "0.00"
+                  }
+                }
+              : undefined
+          }
+        };
+      });
+    }
 
       const payload = {
         ide: {
@@ -260,105 +330,7 @@ class ConsultaNfeController {
         autXML: {
           CNPJ: cnpj,
         },
-        det: {
-          prod: {
-            cProd: cprod,
-            cean: cean,
-            xProd: xprod,
-            NCM: ncm,
-            CFOP: CFOP,
-            uCom: uCom,
-            qCom: qCom,
-            vUnCom: vUnCom,
-            vProd: vProd,
-            cEANTrib: cEANTrib,
-            uTrib: uTrib,
-            qTrib: qTrib,
-            vUnTrib: vUnTrib,
-            indTot: indTot
-          },
-          imposto: {
-            ICMS: {
-              ICMS00: {
-                orig: orig,
-                CST: CST,
-                modBC: modBC,
-                vBC: vBC,
-                pICMS: pICMS,
-                vICMS: vICMS
-              },
-            },
-            PIS: {
-              PISAliq: {
-                CST: PIS_CST,
-                vBC: PIS_VBC,
-                pPIS: PIS_PPIS,
-                vPIS: VPIS_VPIS
-              }
-            },
-            COFINS: {
-              COFINSAliq: {
-                CST: COFINS_CST,
-                vBC: COFINS_VBC,
-                pCOFINS: COFINS_PCOFINS,
-                vCOFINS: VCOFINS_VCOFINS
-              }
-            },
-            IS: {
-              CSTIS: CSTIS,
-              cClassTribIS: cClassTribIS,
-            },
-            IBSCBS: {
-              CST: "01",
-              cClassTrib: "00000000",
-              indDoacao: "0",
-              gIBSCBS: {
-                vBC: "0.00",
-                gIBSUF: {
-                  pIBSUF: "0.00",
-                  gRed: {
-                    pRedAliq: "0.00",
-                    pAliqEfet: "0.00",
-                  },
-                  vIBSUF: "0.05"
-                },
-                gIBSMun: {
-                  pIBSMun: "0.00",
-                  gRed: {
-                    pRedAliq: "0.00",
-                    pAliqEfet: "0.00",
-                  },
-                  vIBSMun: "0.00"
-                },
-                vIBS: "0.05",
-                gCBS: {
-                  pCBS: "0.00",
-                  gRed: {
-                    pRedAliq: "0.00",
-                    pAliqEfet: "0.00",
-                  },
-                  vCBS: "0.00"
-                },
-                gTribRegular: {
-                  CSTReg: "000",
-                  cClassTribReg: "00000001",
-                  pAliqEfetRegIBSUF: "0.00",
-                  vTribRegIBSUF: "0.00",
-                  pAliqEfetRegIBSMun: "0.00",
-                  vTribRegIBSMun: "0.00",
-                  pAliqEfetRegCBS: "0.00",
-                  vTribRegCBS: "0.00"
-                }
-              },
-              gCredPresIBSZFM: {
-                competApur: "2025-10",
-                tpCredPresIBSZFM: "1",
-                vCredPresIBSZFM: "0.00"
-              },
-            }
-          },
-          vItem: "0.01"
-        },
+        det: montarItens(venda),
         total: {
           ICMSTot: {
             vBC: vBC,
@@ -417,43 +389,6 @@ class ConsultaNfeController {
             vPag: vPag
           },
         },
-        // infAdic: {
-        //   infCpl: infCpl
-        // },
-        // infNFeSupl: {
-        //     qrCode: qrCode,
-        //     urlChave: urlChave
-        // },
-        // Signature: {
-        //   SignedInfo: {
-        //     CanonicalizationMethod: {
-        //       Algorithm: "http://www.w3.org/2000/09/xmldsig#"
-        //     },
-        //     SignatureMethod: {
-        //       Algorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-        //     },
-        //     Reference: {
-        //       Transforms: {
-        //         Transform: {
-        //           Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-        //         },
-        //         Transform: {
-        //           Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-        //         }
-        //       },
-        //       DigestMethod: {
-        //         Algorithm: "http://www.w3.org/2000/09/xmldsig#sha1"
-        //       },
-        //       DigestValue: "DigestValuePlaceholder"
-        //     },
-        //   },
-        //   SignatureValue: "SignatureValuePlaceholder",
-        //   KeyInfo: {
-        //     X509Data: {
-        //       X509Certificate: "X509CertificatePlaceholder"
-        //     },
-        //   },
-        // },
       };
 
       return payload;
@@ -510,6 +445,9 @@ class ConsultaNfeController {
 
     })
     
+    NFe.tagRefNFe({
+      refNFe: payload.ide.gPagAntecipado.refNFe,  
+    })
     NFe.tagEmit({
       CNPJ: payload.emit.CNPJ,
       xNome: payload.emit.xNome,
@@ -532,42 +470,69 @@ class ConsultaNfeController {
       fone: payload.emit.enderEmit.fone,
     })
 
-    NFe.tagProd({
-      cProd: payload.det.prod.cProd,
-      cean: payload.det.prod.cean,
-      xProd: payload.det.prod.xProd,
-      NCM: payload.det.prod.NCM,
-      CFOP: payload.det.prod.CFOP,
-      uCom: payload.det.prod.uCom,
-      qCom: payload.det.prod.qCom,
-      vUnCom: payload.det.prod.vUnCom,
-      vProd: payload.det.prod.vProd,
-      cEANTrib: payload.det.prod.cEANTrib,
-      uTrib: payload.det.prod.uTrib,
-      qTrib: payload.det.prod.qTrib,
-      vUnTrib: payload.det.prod.vUnTrib,
-      indTot: payload.det.prod.indTot,
-    })
+    // Processar cada item do detalhe
     
-    [0, 1, 2, 3].map((value, index) => {
-      NFe.tagProdICMSSN(index, {
-        orig: payload.det.imposto.ICMS.ICMS00.orig[index],
-        CSOSN: payload.det.imposto.ICMS.ICMS00.CST[index],
-      })
-      NFe.tagProdPIS(index, {
-        CST: payload.det.imposto.PIS.PISAliq.CST[index],
-        vAliqProd: payload.det.imposto.PIS.PISAliq.pPIS[index],
-        vPIS: payload.det.imposto.PIS.PISAliq.vPIS[index],
-      })
-      NFe.tagProdCOFINS(index, {
-        CST: payload.det.imposto.COFINS.COFINSAliq.CST[index],
-        qBCProd: payload.det.imposto.COFINS.COFINSAliq.vBC[index],
-        vAliqProd: payload.det.imposto.COFINS.COFINSAliq.pCOFINS[index],
-        vCOFINS: payload.det.imposto.COFINS.COFINSAliq.vCOFINS[index],
-      })
-    })
+    const itens = vendaData.data[0]?.detalhe;;
+    itens.forEach((item, index) => {
+      
+        const det = item.det;
 
-    NFe.tagTotal()
+        // Produto
+        NFe.tagProd([{
+            cProd: det.CPROD,
+            cEAN: det.CEAN,
+            xProd: det.XPROD,
+            NCM: det.NCM,
+            CFOP: det.CFOP,
+            uCom: det.UCOM,
+            qCom: det.QTRIB,
+            vUnCom: det.VUNTRIB,
+            vProd: det.VPROD,
+            indTot: det.INDTOT
+        }]);
+
+        // ICMS
+        NFe.tagProdICMS(index, {
+            orig: det.ICMS_ORIG,
+            CST: det.ICMS_CST,
+            modBC: det.ICMS_MODBC,
+            vBC: det.ICMS_VBC,
+            pICMS: det.ICMS_PICMS,
+            vICMS: det.ICMS_VICMS
+        });
+
+        // PIS
+        NFe.tagProdPIS(index, {
+            CST: det.PIS_CST,
+            vBC: det.PIS_VBC,
+            pPIS: det.PIS_PPIS,
+            vPIS: det.PIS_VPIS
+        });
+
+        // COFINS
+        NFe.tagProdCOFINS(index, {
+            CST: det.COFINS_CST,
+            vBC: det.COFINS_VBC,
+            pCOFINS: det.COFINS_PCOFINS,
+            vCOFINS: det.COFINS_VCOFINS
+        });
+    });
+
+    // [payload.det.imposto].map((value, index) => {
+    //   NFe.tagProdPIS(index, {
+    //     CST: payload.det.imposto.PIS.PISAliq.CST[index],
+    //     vAliqProd: payload.det.imposto.PIS.PISAliq.pPIS[index],
+    //     vPIS: payload.det.imposto.PIS.PISAliq.vPIS[index],
+    //   })
+    //   NFe.tagProdCOFINS(index, {
+    //     CST: payload.det.imposto.COFINS.COFINSAliq.CST[index],
+    //     qBCProd: payload.det.imposto.COFINS.COFINSAliq.vBC[index],
+    //     vAliqProd: payload.det.imposto.COFINS.COFINSAliq.pCOFINS[index],
+    //     vCOFINS: payload.det.imposto.COFINS.COFINSAliq.vCOFINS[index],
+    //   })
+    // })
+
+    // NFe.tagTotal()
     
     NFe.tagTransp({
       modFrete: payload.transp.modFrete
@@ -578,18 +543,24 @@ class ConsultaNfeController {
       vPag: payload.pag.detPag.vPag
     })
     
+    NFe.tagAutXML({
+      CNPJ: payload.autXML.CNPJ
+    })
     
-    
-    // console.log('Payload gerado:', payload);
+    NFe.tagICMSTot({
+      vBC: payload.total.ICMSTot.vBC,
+      vICMS: payload.total.ICMSTot.vICMS,
+      vICMSDeson: payload.total.ICMSTot.vICMSDeson,
+    })
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
       await tools.consultarNFe(payload.ide.chave).then(res => {
-        console.log('Protocolo NFC-e:', res);
+        // console.log('Protocolo NFC-e:', res);
       });
     } else if (payload?.ide.mod == "55") {
       // NF-e - Usa sefazDistDFe
       await tools.sefazDistDFe({ chNFe: payload.ide.chave }).then(res => {
-        console.log('XML NF-e:', res);
+        // console.log('XML NF-e:', res);
       });
     }
     // await tools.sefazStatus().then(res => {
@@ -603,7 +574,7 @@ class ConsultaNfeController {
     tools.xmlSign(NFe.xml()).then(async xmlSigned => {
       fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, {encoding: 'utf8'});
       tools.sefazEnviaLote(xmlSigned, {indSinc: 1}).then(res => {
-        console.log('Resposta SEFAZ:', res);
+        // console.log('Resposta SEFAZ:', res);
       })
     })
         // console.log('Tools inicializado:', tools);
