@@ -507,17 +507,21 @@ class ConsultaNfeController {
       indPres: payload.ide.indPres,
       procEmi: payload.ide.procEmi,
       verProc: payload.ide.verProc,
-      
+
     })
     
     NFe.tagEmit({
       CNPJ: payload.emit.CNPJ,
+      xNome: payload.emit.xNome,
+      xFant: payload.emit.xFant,
+      IE: payload.emit.IE,
+      CRT: payload.emit.CRT,
     })
     
-    // console.log(ufToCodigo(payload.emit.enderEmit.UF), 'ender emit');
-    // NFe.tagEnderEmit({
-    //   UF: ufToCodigo(payload.emit.enderEmit?.UF),
-    // })
+    console.log(ufToCodigo(payload.emit.enderEmit.UF), 'ender emit');
+    NFe.tagEnderEmit({
+      UF: ufToCodigo(payload.emit.enderEmit?.UF),
+    })
 
     NFe.tagProd({
       cProd: "0001",
