@@ -570,6 +570,9 @@ class ConsultaNfeController {
       vPag: payload.pag.detPag.vPag
     })
     
+    NFe.tagInfAdic({
+      infCpl: payload.infAdic?.infCpl || ""
+    })
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
       await tools.consultarNFe(payload.ide.chave).then(res => {
