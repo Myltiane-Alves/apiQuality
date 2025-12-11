@@ -1,12 +1,12 @@
-import { Make, Tools, docZip } from 'node-sped-nfe';
+import { Make, Tools } from 'node-sped-nfe';
 import fs from 'fs';
-import xlsx from 'xlsx';
-import path, { parse } from 'path';
-import archiver from 'archiver';
+import path from 'path';
 import axios from 'axios';
-import os from 'os';
-import { Sign } from 'crypto';
 import 'dotenv/config';
+import Decimal from 'decimal.js';
+
+// Configure precisão global
+Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP });
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
@@ -464,6 +464,9 @@ class ConsultaNfeController {
       
       NFe.tagRefNFe({
         refNFe: payload.ide.gPagAntecipado.refNFe,  
+        tpEnteGov: payload.ide.gCompraGov.tpEnteGov,
+        pRedutor: payload.ide.gCompraGov.pRedutor,
+        tpOperGov: payload.ide.gCompraGov.tpOperGov,
       })
 
       NFe.tagEmit({
@@ -482,12 +485,15 @@ class ConsultaNfeController {
         cMun: payload.emit.enderEmit.cMun,
         xMun: payload.emit.enderEmit.xMun,
         CEP: payload.emit.enderEmit.CEP,
-        UF: ufToCodigo(payload.emit.enderEmit?.UF),
+        UF: payload.emit.enderEmit?.UF,
         cPais: payload.emit.enderEmit.cPais,
         xPais: payload.emit.enderEmit.xPais,
         fone: payload.emit.enderEmit.fone,
       })
 
+      NFe.tagAutXML({
+        CNPJ: payload.autXML.CNPJ
+      })
       // Processar cada item do detalhe
     
       const itens = vendaData.data[0]?.detalhe || [];
@@ -529,7 +535,11 @@ class ConsultaNfeController {
         const vrDesconto = parseFloat(det.VDESC) || 0;
 
         // Fórmula: VrCalculado = (VrUnit * qtd) - VrDesconto
-        const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
+        // const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
+        const VrCalculado = new Decimal(vrUnit)
+          .times(qtd)
+          .minus(vrDesconto)
+          .toDecimalPlaces(2)
 
         // Acumular total da nota e descontos
         V_ICMSTot_vNF += VrCalculado;
@@ -554,13 +564,6 @@ class ConsultaNfeController {
             vICMS: 0
           };
           // Simples Nacional: NÃO acumula v_TotICMS
-          // icmsData = {
-          //   CSOSN: det.ICMS_CST,
-          //   orig: det.ICMS_ORIG,
-          //   vBC: det.ICMS_VBC,
-          //   pICMS: det.ICMS_PICMS,
-          //   vICMS: det.ICMS_VICMS
-          // }
         } else {
           // Regime Normal
           if((ncm === "38089429" || ncm === "22072019") && uf === "DF") {
@@ -582,7 +585,11 @@ class ConsultaNfeController {
               pICMS = (percProduto >= 12) ? percProduto : 20.00;
             }
 
-            const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
+            // const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
+            const vICMS = VrCalculado
+              .times(pICMS)
+              .dividedBy(100)
+              .toDecimalPlaces(2);
 
             icmsData = {
               CST: "00", // TRIBUTADO INTEGRALMENTE
@@ -594,7 +601,8 @@ class ConsultaNfeController {
             };
     
             // Acumular total de ICMS
-            v_TotICMS += vICMS;
+            // v_TotICMS += vICMS;
+            v_TotICMS = v_TotICMS.plus(vICMS);
           }
         }
 
@@ -727,9 +735,6 @@ class ConsultaNfeController {
           }
         };
         
-        // Guardar para usar depois na geração do XML
-        console.log(`Item ${index + 1} processado:`, itemComImposto);
-
         // ===== TOTAIS DA NOTA =====
         const totais = {
           ICMSTot: {
@@ -783,8 +788,6 @@ class ConsultaNfeController {
           vNFTot: V_ICMSTot_vNF  // Valor total da NF com impostos
         };
 
-        console.log('Totais calculados:', totais);
-
         // ===== LEI DA TRANSPARÊNCIA (IBPT) =====
         const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
         const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
@@ -801,44 +804,56 @@ class ConsultaNfeController {
         NFe.tagProdPIS(index, pisData);
         NFe.tagProdCOFINS(index, cofinsData);
         NFe.tagProdIBSCBS(index, ibscbsData);
-        // NFe.tagProd([{
-        //     cProd: det.CPROD,
-        //     cEAN: det.CEAN,
-        //     xProd: det.XPROD,
-        //     NCM: det.NCM,
-        //     CFOP: det.CFOP,
-        //     uCom: det.UCOM,
-        //     qCom: det.QTRIB,
-        //     vUnCom: det.VUNTRIB,
-        //     vProd: det.VPROD,
-        //     indTot: det.INDTOT
-        // }]);
-
-        // ICMS
-        // NFe.tagProdICMS(index, {
-        //     orig: det.ICMS_ORIG,
-        //     CST: det.ICMS_CST,
-        //     modBC: det.ICMS_MODBC,
-        //     vBC: det.ICMS_VBC,
-        //     pICMS: det.ICMS_PICMS,
-        //     vICMS: det.ICMS_VICMS
-        // });
-
-        // PIS
-        // NFe.tagProdPIS(index, {
-        //     CST: det.PIS_CST,
-        //     vBC: det.PIS_VBC,
-        //     pPIS: det.PIS_PPIS,
-        //     vPIS: det.PIS_VPIS
-        // });
-
-        // COFINS
-        // NFe.tagProdCOFINS(index, {
-        //     CST: det.COFINS_CST,
-        //     vBC: det.COFINS_VBC,
-        //     pCOFINS: det.COFINS_PCOFINS,
-        //     vCOFINS: det.COFINS_VCOFINS
-        // });
+           
+        NFe.tagTotal({
+          ICMSTot: {
+            vBC: totais.ICMSTot.vBC,
+            vICMS: totais.ICMSTot.vICMS,
+            vICMSDeson: totais.ICMSTot.vICMSDeson,
+            vFCP: totais.ICMSTot.vFCP,
+            vBCST: totais.ICMSTot.vBCST,
+            vST: totais.ICMSTot.vST,
+            vFCPST: totais.ICMSTot.vFCPST,
+            vFCPSTRet: totais.ICMSTot.vFCPSTRet,
+            vProd: totais.ICMSTot.vProd,
+            vFrete: totais.ICMSTot.vFrete,
+            vSeg: totais.ICMSTot.vSeg,
+            vDesc: totais.ICMSTot.vDesc,
+            vII: totais.ICMSTot.vII,
+            vIPI: totais.ICMSTot.vIPI,
+            vIPIDevol: totais.ICMSTot.vIPIDevol,
+            vPIS: totais.ICMSTot.vPIS,
+            vCOFINS: totais.ICMSTot.vCOFINS,
+            vOutro: totais.ICMSTot.vOutro,
+            vNF: totais.ICMSTot.vNF
+          },
+          IBSCBSTot: {
+            vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
+            gIBS: {
+              vIBS: totais.IBSCBSTot.gIBS.vIBS,
+              vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
+              vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
+              gIBSUF: {
+                vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
+                vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
+                vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
+              },
+              gIBSMun: {
+                vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
+                vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
+                vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
+              }
+            },
+            gCBS: {
+              vDif: totais.IBSCBSTot.gCBS.vDif,
+              vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
+              vCBS: totais.IBSCBSTot.gCBS.vCBS,
+              vCredPres: totais.IBSCBSTot.gCBS.vCredPres,
+              vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
+            }
+          },
+          vNFTot: totais.vNFTot
+        })
       });
 
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
@@ -848,86 +863,7 @@ class ConsultaNfeController {
       const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
                     `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
                     `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS`;
-
-      console.log('Informações complementares:', infCpl);
-
-      // NFe.tagTotal()
-       
-      NFe.tagAutXML({
-        CNPJ: payload.autXML.CNPJ
-      })
-    
-      // NFe.tagICMSTot({
-      //   vBC: payload.total.ICMSTot.vBC,
-      //   vICMS: payload.total.ICMSTot.vICMS,
-      //   vICMSDeson: payload.total.ICMSTot.vICMSDeson,
-      //   vFCP: payload.total.ICMSTot.vFCP,
-      //   vBCST: payload.total.ICMSTot.vBCST,
-      //   vST: payload.total.ICMSTot.vST,
-      //   vFCPST: payload.total.ICMSTot.vFCPST,
-      //   vFCPSTRet: payload.total.ICMSTot.vFCPSTRet,
-      //   vProd: payload.total.ICMSTot.vProd,
-      //   vFrete: payload.total.ICMSTot.vFrete,
-      //   vSeg: payload.total.ICMSTot.vSeg,
-      //   vDesc: payload.total.ICMSTot.vDesc,
-      //   vII: payload.total.ICMSTot.vII,
-      //   vIPI: payload.total.ICMSTot.vIPI,
-      //   vIPIDevol: payload.total.ICMSTot.vIPIDevol,
-      //   vPIS: payload.total.ICMSTot.vPIS,
-      //   vCOFINS: payload.total.ICMSTot.vCOFINS,
-      //   vOutro: payload.total.ICMSTot.vOutro,
-      //   vNF: payload.total.ICMSTot.vNF
-      // })
-      
-      NFe.tagTotal({
-        ICMSTot: {
-          vBC: totais.ICMSTot.vBC,
-          vICMS: totais.ICMSTot.vICMS,
-          vICMSDeson: totais.ICMSTot.vICMSDeson,
-          vFCP: totais.ICMSTot.vFCP,
-          vBCST: totais.ICMSTot.vBCST,
-          vST: totais.ICMSTot.vST,
-          vFCPST: totais.ICMSTot.vFCPST,
-          vFCPSTRet: totais.ICMSTot.vFCPSTRet,
-          vProd: totais.ICMSTot.vProd,
-          vFrete: totais.ICMSTot.vFrete,
-          vSeg: totais.ICMSTot.vSeg,
-          vDesc: totais.ICMSTot.vDesc,
-          vII: totais.ICMSTot.vII,
-          vIPI: totais.ICMSTot.vIPI,
-          vIPIDevol: totais.ICMSTot.vIPIDevol,
-          vPIS: totais.ICMSTot.vPIS,
-          vCOFINS: totais.ICMSTot.vCOFINS,
-          vOutro: totais.ICMSTot.vOutro,
-          vNF: totais.ICMSTot.vNF
-        },
-        IBSCBSTot: {
-          vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
-          gIBS: {
-            vIBS: totais.IBSCBSTot.gIBS.vIBS,
-            vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
-            vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
-            gIBSUF: {
-              vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
-              vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
-              vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
-            },
-            gIBSMun: {
-              vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
-              vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
-              vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
-            }
-          },
-          gCBS: {
-            vDif: totais.IBSCBSTot.gCBS.vDif,
-            vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
-            vCBS: totais.IBSCBSTot.gCBS.vCBS,
-            vCredPres: totais.IBSCBSTot.gCBS.vCredPres,
-            vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
-          }
-        },
-        vNFTot: totais.vNFTot
-      })
+   
       NFe.tagTransp({
         modFrete: payload.transp.modFrete
       })
@@ -954,13 +890,6 @@ class ConsultaNfeController {
         // console.log('XML NF-e:', res);
       });
     }
-    // await tools.sefazStatus().then(res => {
-    //   console.log('Status SEFAZ:', res);
-    // });
-
-    // await tools.consultarNFe(payload.ide.chave).then(res => {
-    //   console.log('Consulta NFe:', res);
-    // });
 
     tools.xmlSign(NFe.xml()).then(async xmlSigned => {
       fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, {encoding: 'utf8'});
@@ -968,26 +897,6 @@ class ConsultaNfeController {
         // console.log('Resposta SEFAZ:', res);
       })
     })
-        // console.log('Tools inicializado:', tools);
-
-        /* 
-        
-SELECT * FROM QUALITY_CONC_HML.VENDA WHERE IDVENDA = '2-1-15'
-
-SELECT * FROM QUALITY_CONC_HML.VENDADETALHE WHERE IDVENDA = '6-1-359'
-
-SELECT * FROM VENDADETALHE;
-
-SELECT * FROM QUALITY_CONC_HML.VENDAPAGAMENTO WHERE IDVENDA = '2-1-15'
-
-SELECT * FROM QUALITY_CONC_TST.VENDA WHERE IDVENDA = '6-1-359'
-
-SELECT * FROM QUALITY_CONC.VENDA WHERE DTHORAABERTURA >= '2025-12-09';
-
-SELECT * FROM VENDA WHERE IDVENDA = '36-2-46749'
-
-SELECT * FROM VENDA WHERE DTHORAABERTURA >= '2025-01-01' AND NFE_INFNFE_IDE_MOD = 55
-        */
 
       return res.json(result);
     } catch (error) {
