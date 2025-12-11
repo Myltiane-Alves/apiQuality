@@ -174,7 +174,7 @@ class ConsultaNfeController {
         const vFCPSTRet = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
         const vProd = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
         const icmsVFrete = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
-        const qrCode = venda.data[0]?.venda.NFE_INFNFE_INFNFESUPL_QRCODE || "";
+        const qrCode = venda.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
         const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
         const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
         const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "";
@@ -402,6 +402,10 @@ class ConsultaNfeController {
           },
           infAdic: {
             infCpl: infCpl
+          },
+          infNFeSupl: {
+            qrCode: qrCode,
+            urlChave: urlChave
           },
         };
 
@@ -792,11 +796,11 @@ class ConsultaNfeController {
         console.log('Informações complementares:', infCpl);
 
         // Aplicar impostos para este produto específico
-        NFe.tagImposto(index, { vTotTrib: "0.00" });
+        // NFe.tagImposto(index, { vTotTrib: "0.00" });
         NFe.tagProdICMS(index, icmsData);
         NFe.tagProdPIS(index, pisData);
         NFe.tagProdCOFINS(index, cofinsData);
-        
+        NFe.tagProdIBSCBS(index, ibscbsData);
         // NFe.tagProd([{
         //     cProd: det.CPROD,
         //     cEAN: det.CEAN,
@@ -853,28 +857,62 @@ class ConsultaNfeController {
         CNPJ: payload.autXML.CNPJ
       })
     
-      NFe.tagICMSTot({
-        vBC: payload.total.ICMSTot.vBC,
-        vICMS: payload.total.ICMSTot.vICMS,
-        vICMSDeson: payload.total.ICMSTot.vICMSDeson,
-        vFCP: payload.total.ICMSTot.vFCP,
-        vBCST: payload.total.ICMSTot.vBCST,
-        vST: payload.total.ICMSTot.vST,
-        vFCPST: payload.total.ICMSTot.vFCPST,
-        vFCPSTRet: payload.total.ICMSTot.vFCPSTRet,
-        vProd: payload.total.ICMSTot.vProd,
-        vFrete: payload.total.ICMSTot.vFrete,
-        vSeg: payload.total.ICMSTot.vSeg,
-        vDesc: payload.total.ICMSTot.vDesc,
-        vII: payload.total.ICMSTot.vII,
-        vIPI: payload.total.ICMSTot.vIPI,
-        vIPIDevol: payload.total.ICMSTot.vIPIDevol,
-        vPIS: payload.total.ICMSTot.vPIS,
-        vCOFINS: payload.total.ICMSTot.vCOFINS,
-        vOutro: payload.total.ICMSTot.vOutro,
-        vNF: payload.total.ICMSTot.vNF
+      // NFe.tagICMSTot({
+      //   vBC: payload.total.ICMSTot.vBC,
+      //   vICMS: payload.total.ICMSTot.vICMS,
+      //   vICMSDeson: payload.total.ICMSTot.vICMSDeson,
+      //   vFCP: payload.total.ICMSTot.vFCP,
+      //   vBCST: payload.total.ICMSTot.vBCST,
+      //   vST: payload.total.ICMSTot.vST,
+      //   vFCPST: payload.total.ICMSTot.vFCPST,
+      //   vFCPSTRet: payload.total.ICMSTot.vFCPSTRet,
+      //   vProd: payload.total.ICMSTot.vProd,
+      //   vFrete: payload.total.ICMSTot.vFrete,
+      //   vSeg: payload.total.ICMSTot.vSeg,
+      //   vDesc: payload.total.ICMSTot.vDesc,
+      //   vII: payload.total.ICMSTot.vII,
+      //   vIPI: payload.total.ICMSTot.vIPI,
+      //   vIPIDevol: payload.total.ICMSTot.vIPIDevol,
+      //   vPIS: payload.total.ICMSTot.vPIS,
+      //   vCOFINS: payload.total.ICMSTot.vCOFINS,
+      //   vOutro: payload.total.ICMSTot.vOutro,
+      //   vNF: payload.total.ICMSTot.vNF
+      // })
+      
+      NFe.tagTotal({
+        ICMSTot: {
+          vBC: totais.ICMSTot.vBC,
+          vICMS: totais.ICMSTot.vICMS,
+          vICMSDeson: totais.ICMSTot.vICMSDeson,
+          vFCP: totais.ICMSTot.vFCP,
+          vBCST: totais.ICMSTot.vBCST,
+          vST: totais.ICMSTot.vST,
+          vFCPST: totais.ICMSTot.vFCPST,
+          vFCPSTRet: totais.ICMSTot.vFCPSTRet,
+          vProd: totais.ICMSTot.vProd,
+          vFrete: totais.ICMSTot.vFrete,
+          vSeg: totais.ICMSTot.vSeg,
+          vDesc: totais.ICMSTot.vDesc,
+          vII: totais.ICMSTot.vII,
+          vIPI: totais.ICMSTot.vIPI,
+          vIPIDevol: totais.ICMSTot.vIPIDevol,
+          vPIS: totais.ICMSTot.vPIS,
+          vCOFINS: totais.ICMSTot.vCOFINS,
+          vOutro: totais.ICMSTot.vOutro,
+          vNF: totais.ICMSTot.vNF
+        },
+        IBSCBSTot: {
+          vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
+          gIBS: {
+            vIBS: totais.IBSCBSTot.gIBS.vIBS,
+            vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
+            vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
+            gIBSUF: {
+              vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
+              vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
+              vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
+            },
       })
-    
       NFe.tagTransp({
         modFrete: payload.transp.modFrete
       })
@@ -887,6 +925,9 @@ class ConsultaNfeController {
       NFe.tagInfAdic({
         infCpl: infCpl || payload.infAdic?.infCpl || ""
       })
+
+    
+      NFe.taginfNFeSupl()
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
       await tools.consultarNFe(payload.ide.chave).then(res => {
@@ -935,7 +976,8 @@ SELECT * FROM VENDA WHERE DTHORAABERTURA >= '2025-01-01' AND NFE_INFNFE_IDE_MOD 
 
       return res.json(result);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      console.error('Erro ao consultar venda ou gerar XML:', error);
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
 }
