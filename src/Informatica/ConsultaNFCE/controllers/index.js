@@ -145,6 +145,7 @@ class ConsultaNfeController {
         const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
         const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
         const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
+        const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
         const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
         const cStat = venda.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
@@ -178,6 +179,8 @@ class ConsultaNfeController {
         const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
         const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
         const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "";
+        const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
+        const nProt = nProtRaw.replace(/^ID/i, '');
         
         const cprod = venda.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
         const cean = venda.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
@@ -208,6 +211,7 @@ class ConsultaNfeController {
         const COFINS_VBC = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VBC) || "0.00";
         const COFINS_PCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_PCOFINS) || "0.00";
         const VCOFINS_VCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VCOFINS) || "0.00";
+        const xMotivo = venda.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
         const CSTIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
         const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
         const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
@@ -289,7 +293,7 @@ class ConsultaNfeController {
         const payload = {
           ide: {
             chave: chave,
-            cUF: ufToCodigo(uf),
+            cUF: uf,
             cNF: cnf,
             natOp: natOp,
             mod: mod,
@@ -339,7 +343,7 @@ class ConsultaNfeController {
             CRT: emit_CRT
           },
           autXML: {
-            CNPJ: cnpj,
+            CNPJ: cnpjAutxml,
           },
           det: montarItens(venda),
           total: {
@@ -407,6 +411,16 @@ class ConsultaNfeController {
             qrCode: qrCode,
             urlChave: urlChave
           },
+          infProt: {
+            tbAmb: tpAmb,
+            verAplic: "1.0",
+            chNFe: chave,
+            dhRecbto: new Date().toISOString(),
+            nProt: nProt,
+            digVal: "",
+            cStat: cStat,
+            xMotivo: xMotivo
+          }
         };
 
         return payload;
@@ -535,11 +549,7 @@ class ConsultaNfeController {
         const vrDesconto = parseFloat(det.VDESC) || 0;
 
         // Fórmula: VrCalculado = (VrUnit * qtd) - VrDesconto
-        // const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
-        const VrCalculado = new Decimal(vrUnit)
-          .times(qtd)
-          .minus(vrDesconto)
-          .toDecimalPlaces(2)
+        const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
 
         // Acumular total da nota e descontos
         V_ICMSTot_vNF += VrCalculado;
@@ -585,11 +595,7 @@ class ConsultaNfeController {
               pICMS = (percProduto >= 12) ? percProduto : 20.00;
             }
 
-            // const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
-            const vICMS = VrCalculado
-              .times(pICMS)
-              .dividedBy(100)
-              .toDecimalPlaces(2);
+            const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
 
             icmsData = {
               CST: "00", // TRIBUTADO INTEGRALMENTE
@@ -601,8 +607,7 @@ class ConsultaNfeController {
             };
     
             // Acumular total de ICMS
-            // v_TotICMS += vICMS;
-            v_TotICMS = v_TotICMS.plus(vICMS);
+            v_TotICMS += vICMS;
           }
         }
 
@@ -805,55 +810,55 @@ class ConsultaNfeController {
         NFe.tagProdCOFINS(index, cofinsData);
         NFe.tagProdIBSCBS(index, ibscbsData);
            
-        NFe.tagTotal({
-          ICMSTot: {
-            vBC: totais.ICMSTot.vBC,
-            vICMS: totais.ICMSTot.vICMS,
-            vICMSDeson: totais.ICMSTot.vICMSDeson,
-            vFCP: totais.ICMSTot.vFCP,
-            vBCST: totais.ICMSTot.vBCST,
-            vST: totais.ICMSTot.vST,
-            vFCPST: totais.ICMSTot.vFCPST,
-            vFCPSTRet: totais.ICMSTot.vFCPSTRet,
-            vProd: totais.ICMSTot.vProd,
-            vFrete: totais.ICMSTot.vFrete,
-            vSeg: totais.ICMSTot.vSeg,
-            vDesc: totais.ICMSTot.vDesc,
-            vII: totais.ICMSTot.vII,
-            vIPI: totais.ICMSTot.vIPI,
-            vIPIDevol: totais.ICMSTot.vIPIDevol,
-            vPIS: totais.ICMSTot.vPIS,
-            vCOFINS: totais.ICMSTot.vCOFINS,
-            vOutro: totais.ICMSTot.vOutro,
-            vNF: totais.ICMSTot.vNF
-          },
-          IBSCBSTot: {
-            vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
-            gIBS: {
-              vIBS: totais.IBSCBSTot.gIBS.vIBS,
-              vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
-              vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
-              gIBSUF: {
-                vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
-                vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
-                vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
-              },
-              gIBSMun: {
-                vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
-                vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
-                vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
-              }
+      NFe.tagTotal({
+        ICMSTot: {
+          vBC: totais.ICMSTot.vBC,
+          vICMS: totais.ICMSTot.vICMS,
+          vICMSDeson: totais.ICMSTot.vICMSDeson,
+          vFCP: totais.ICMSTot.vFCP,
+          vBCST: totais.ICMSTot.vBCST,
+          vST: totais.ICMSTot.vST,
+          vFCPST: totais.ICMSTot.vFCPST,
+          vFCPSTRet: totais.ICMSTot.vFCPSTRet,
+          vProd: totais.ICMSTot.vProd,
+          vFrete: totais.ICMSTot.vFrete,
+          vSeg: totais.ICMSTot.vSeg,
+          vDesc: totais.ICMSTot.vDesc,
+          vII: totais.ICMSTot.vII,
+          vIPI: totais.ICMSTot.vIPI,
+          vIPIDevol: totais.ICMSTot.vIPIDevol,
+          vPIS: totais.ICMSTot.vPIS,
+          vCOFINS: totais.ICMSTot.vCOFINS,
+          vOutro: totais.ICMSTot.vOutro,
+          vNF: totais.ICMSTot.vNF
+        },
+        IBSCBSTot: {
+          vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
+          gIBS: {
+            vIBS: totais.IBSCBSTot.gIBS.vIBS,
+            vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
+            vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
+            gIBSUF: {
+              vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
+              vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
+              vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
             },
-            gCBS: {
-              vDif: totais.IBSCBSTot.gCBS.vDif,
-              vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
-              vCBS: totais.IBSCBSTot.gCBS.vCBS,
-              vCredPres: totais.IBSCBSTot.gCBS.vCredPres,
-              vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
+            gIBSMun: {
+              vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
+              vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
+              vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
             }
           },
-          vNFTot: totais.vNFTot
-        })
+          gCBS: {
+            vDif: totais.IBSCBSTot.gCBS.vDif,
+            vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
+            vCBS: totais.IBSCBSTot.gCBS.vCBS,
+            vCredPres: totais.IBSCBSTot.gCBS.vCredPres,
+            vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
+          }
+        },
+        vNFTot: totais.vNFTot
+      })
       });
 
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
@@ -874,11 +879,22 @@ class ConsultaNfeController {
       })
     
       NFe.tagInfAdic({
-        infCpl: infCpl || payload.infAdic?.infCpl || ""
+        infCpl: payload.infAdic?.infCpl,
+        tpAmb: payload.infProt.tbAmb,
+        verAplic: payload.infProt.verAplic,
+        chNFe: payload.infProt.chNFe,
+        cMotivo: payload.infProt.xMotivo,
       })
 
     
-      NFe.taginfNFeSupl()
+      NFe.tagInfNFe({
+        cMotivo: payload.infProt.xMotivo,
+      })
+      NFe.taginfNFeSupl({
+        qrCode: payload.infNFeSupl.qrCode,
+        urlChave: payload.infNFeSupl.urlChave,
+
+      })
     if (payload?.ide.mod == "65") {
       // NFC-e - Usa consultarNFe
       await tools.consultarNFe(payload.ide.chave).then(res => {
