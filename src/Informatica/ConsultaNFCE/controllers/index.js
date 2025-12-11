@@ -181,7 +181,7 @@ class ConsultaNfeController {
         const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "";
         const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
         const nProt = nProtRaw.replace(/^ID/i, '');
-        
+        const digVal = venda.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
         const cprod = venda.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
         const cean = venda.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
         const xprod = venda.data[0]?.detalhe?.map(item => item.det.XPROD) || "Produto Teste";
@@ -417,7 +417,7 @@ class ConsultaNfeController {
             chNFe: chave,
             dhRecbto: new Date().toISOString(),
             nProt: nProt,
-            digVal: "",
+            digVal: digVal,
             cStat: cStat,
             xMotivo: xMotivo
           }
@@ -857,17 +857,26 @@ class ConsultaNfeController {
             vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
           }
         },
-        vNFTot: totais.vNFTot
+        vNFTot: ' totais.vNFTot'
       })
       });
 
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
       const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
       const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
-
+      const enderecoProconDF = `PROCON - DF - 151;SCS, QD. 08, BL. B-60, SALA 240, VENANCIO 2000`;
+      const enderecoProconGO = `PROCON - 151;Rua 8, N . 242 QD. 5, LT. 36, St. Central, Goiania - GO`;
+      
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+      const enderecoProcon = uf === "GO" ? enderecoProconGO : uf === "DF" ? enderecoProconDF : "";
+      
       const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
-                    `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
-                    `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS`;
+            `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
+            `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS Xe67Eq` +
+            (enderecoProcon ? ` ${enderecoProcon}` : '') +
+            `Nº VENDA: ${vendaData.data[0]?.venda.IDVENDA} ` +
+            `PRAZO DE TROCA: VALIDO POR 30 DIAS;` 
+            ;
    
       NFe.tagTransp({
         modFrete: payload.transp.modFrete
@@ -879,7 +888,7 @@ class ConsultaNfeController {
       })
     
       NFe.tagInfAdic({
-        infCpl: payload.infAdic?.infCpl,
+        infCpl: infCpl,
         tpAmb: payload.infProt.tbAmb,
         verAplic: payload.infProt.verAplic,
         chNFe: payload.infProt.chNFe,
@@ -891,9 +900,7 @@ class ConsultaNfeController {
       })
 
     
-      NFe.tagInfNFe({
-        cMotivo: payload.infProt.xMotivo,
-      })
+
       NFe.taginfNFeSupl({
         qrCode: payload.infNFeSupl.qrCode,
         urlChave: payload.infNFeSupl.urlChave,
