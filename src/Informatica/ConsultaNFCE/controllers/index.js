@@ -912,6 +912,16 @@ class ConsultaNfeController {
               vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
               vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
             },
+            gIBSMun: {
+              vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
+              vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
+              vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
+            }
+          },
+          gCBS: {
+            vDif: totais.IBSCBSTot.gCBS.vDif,
+            vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
+            vCBS: totais.IBSCBSTot.gCBS.vCBS,
       })
       NFe.tagTransp({
         modFrete: payload.transp.modFrete
