@@ -883,6 +883,7 @@ class ConsultaNfeController {
         tpAmb: payload.infProt.tbAmb,
         verAplic: payload.infProt.verAplic,
         chNFe: payload.infProt.chNFe,
+        dhRecbto: payload.infProt.dhRecbto,
         cMotivo: payload.infProt.xMotivo,
       })
 
