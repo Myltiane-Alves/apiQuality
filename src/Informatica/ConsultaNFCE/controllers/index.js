@@ -109,13 +109,16 @@ class ConsultaNfeController {
 
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
-
-      const result = {
-        venda: vendaData,
-      };
+      
+      console.log('\n════════════ DADOS DA VENDA ════════════');
+      console.log('IDVENDA:', vendaData.data[0]?.venda.IDVENDA);
+      console.log('Itens:', vendaData.data[0]?.detalhe?.length);
+      console.log('Pagamentos:', vendaData.data[0]?.pagamento?.length);
+      console.log('═══════════════════════════════════════\n');
 
       let v_TotICMS = 0;
-      let v_TotPis = 0;
+      let v_TotPis = 0;clear
+      
       let v_TotCofins = 0;
       let v_TotIBSUF = 0;
       let v_TotCBS = 0;
@@ -130,7 +133,8 @@ class ConsultaNfeController {
         const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65" || "55";
         const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
-        const dhEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI || new Date().toISOString();
+        const dhEmiRaw = venda.data[0]?.venda.NFE_INFNFE_IDE_DHEMI;
+        const dhEmi = dhEmiRaw ? (dhEmiRaw.includes('T') ? dhEmiRaw : new Date(dhEmiRaw + 'T09:00:00-03:00').toISOString()) : new Date().toISOString();
         const chaveRaw = venda.data[0]?.venda.CHAVE || "";
         const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
         // console.log('Chave da NFe:', venda.data[0]?.venda);
@@ -140,7 +144,7 @@ class ConsultaNfeController {
         const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "2";
         const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
         const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
-        const tpAmb = venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || 2 || 1;
+        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "1");
         const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
         const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
         const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
@@ -148,7 +152,6 @@ class ConsultaNfeController {
         const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
         const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
-        const cStat = venda.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
         const cep = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
         const xPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
         const cPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
@@ -178,7 +181,7 @@ class ConsultaNfeController {
         const qrCode = venda.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
         const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
         const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
-        const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "";
+        const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
         const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
         const nProt = nProtRaw.replace(/^ID/i, '');
         const digVal = venda.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
@@ -211,10 +214,33 @@ class ConsultaNfeController {
         const COFINS_VBC = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VBC) || "0.00";
         const COFINS_PCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_PCOFINS) || "0.00";
         const VCOFINS_VCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VCOFINS) || "0.00";
-        const xMotivo = venda.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
         const CSTIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
         const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
         const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
+
+        // MAPEAMENTO: Códigos do banco → Códigos SEFAZ
+        function mapearTipoPagamento(tPagBanco) {
+          const mapeamento = {
+            '001': '01',  // Dinheiro
+            '002': '02',  // Cheque
+            '003': '03',  // Cartão Crédito
+            '004': '04',  // Cartão Débito
+            '005': '05',  // Crédito Loja
+            '009': '03',  // Credsystem → Cartão Crédito
+            '010': '10',  // Vale Alimentação
+            '011': '11',  // Vale Refeição
+            '012': '12',  // Vale Presente
+            '013': '13',  // Vale Combustível
+            '015': '15',  // Boleto
+            '016': '16',  // Depósito
+            '017': '17',  // PIX
+            '018': '18',  // Transferência
+            '031': '03',  // Outros cartões → Cartão Crédito
+            '090': '90',  // Sem pagamento
+            '099': '99'   // Outros
+          };
+          return mapeamento[tPagBanco] || '99';
+        }
 
         // AGRUPAR PAGAMENTOS POR tPag (soma valores do mesmo tipo)
         function agruparPagamentos(pagamentos) {
@@ -225,14 +251,15 @@ class ConsultaNfeController {
           const agrupados = {};
 
           pagamentos.forEach(p => {
-            const tPag = p.pag.TPAG || "01";
+            const tPagBanco = p.pag.TPAG || "01";
+            const tPagSefaz = mapearTipoPagamento(tPagBanco);
             const valor = parseFloat(p.pag.VALORRECEBIDO || 0);
 
-            if (!agrupados[tPag]) {
-              agrupados[tPag] = 0;
+            if (!agrupados[tPagSefaz]) {
+              agrupados[tPagSefaz] = 0;
             }
 
-            agrupados[tPag] += valor;
+            agrupados[tPagSefaz] += valor;
           });
 
           // Converter objeto em array
@@ -243,6 +270,12 @@ class ConsultaNfeController {
         }
 
         const pagamentosAgrupados = agruparPagamentos(venda.data[0]?.pagamento);
+        
+        console.log('\n─── PAGAMENTOS AGRUPADOS ───');
+        pagamentosAgrupados.forEach((p, idx) => {
+          console.log(`  ${idx + 1}. tPag: ${p.tPag} | Valor: R$ ${p.vPag}`);
+        });
+        console.log('────────────────────────────\n');
 
         function montarItens(venda) {
           const itens = venda.data[0]?.detalhe || [];
@@ -317,7 +350,7 @@ class ConsultaNfeController {
 
         const payload = {
           ide: {
-            chave: chave,
+            chave: chave, 
             cUF: uf,
             cNF: cnf,
             natOp: natOp,
@@ -328,7 +361,6 @@ class ConsultaNfeController {
             tpNF: tpNF,
             idDest: idDest,
             cMunFG: cMunFG,
-            cMunFGIBS: cMunFG, // conferirir este
             tpImp: tpImp,
             tpEmis: tpEmis,
             cDV: cDV,
@@ -338,15 +370,6 @@ class ConsultaNfeController {
             indPres: indPres,
             procEmi: procEmi,
             verProc: "1.0",
-            gCompraGov: {
-              tpEnteGov: "0",
-              pRedutor: "0",
-              tpOperGov: "0"
-            },
-            gPagAntecipado: {
-              refNFe: "",
-              refNFe: "",
-            }
           },
           emit: {
             CNPJ: cnpj,
@@ -362,7 +385,6 @@ class ConsultaNfeController {
               CEP: cep,
               cPais: cPais,
               xPais: xPais,
-              fone: fone
             },
             IE: emit_IE,
             CRT: emit_CRT
@@ -371,55 +393,6 @@ class ConsultaNfeController {
             CNPJ: cnpjAutxml,
           },
           det: montarItens(venda),
-          total: {
-            ICMSTot: {
-              vBC: vBC,
-              vICMS: vICMS,
-              vICMSDeson: icms_vicmsdeson,
-              vFCP: vFCP,
-              vBCST: vBCST,
-              vST: vST,
-              vFCPST: vFCPST,
-              vFCPSTRet: vFCPSTRet,
-              vProd: vProd,
-              vFrete: icmsVFrete,
-              vSeg: vSeg,
-              vDesc: vDesc,
-              vII: vII,
-              vIPI: vIPI,
-              vIPIDevol: vIPIDevol,
-              vPIS: VPIS_VPIS,
-              vCOFINS: VCOFINS_VCOFINS,
-              vOutro: vOutro,
-              vNF: vProd
-            },
-            IBSCBSTot: {
-              vBCIBSCBS: "0.00",
-              gIBS: {
-                gIBSUF: {
-                  vDif: "0.00",
-                  vDevTrib: "0.00",
-                  vIBSUF: "0.05"
-                },
-                gIBSMun: {
-                  vDif: "0.00",
-                  vDevTrib: "0.00",
-                  vIBSMun: "0.00"
-                },
-                vIBS: "0.05",
-                vCredPres: "0.00",
-                vCredPresCondSus: "0.00"
-              },
-              gCBS: {
-                vDif: "0.00",
-                vDevTrib: "0.00",
-                vCBS: "0.00",
-                vCredPres: "0.00",
-                vCredPresCondSus: "0.00"
-              },
-            },
-            vNFTot: vProd
-          },
           transp: {
             modFrete: modFrete
           },
@@ -432,22 +405,19 @@ class ConsultaNfeController {
           infNFeSupl: {
             qrCode: qrCode,
             urlChave: urlChave
-          },
-          infProt: {
-            tbAmb: tpAmb,
-            verAplic: "1.0",
-            chNFe: chave,
-            dhRecbto: new Date().toISOString(),
-            nProt: nProt,
-            digVal: digVal,
-            cStat: cStat,
-            xMotivo: xMotivo
           }
         };
 
         return payload;
       }
-      const payload = gerarXML(vendaData);
+      const payload = gerarXML(response.data);
+
+      // Extrair variáveis de protocolo para usar no tagInfAdic
+      const nProtRaw = response.data.data[0]?.venda.PROTNFE_INFPROT_ID || "";
+      const nProt = nProtRaw.replace(/^ID/i, '');
+      const digVal = response.data.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
+      const cStat = response.data.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
+      const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
 
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
@@ -474,7 +444,7 @@ class ConsultaNfeController {
         Id: `NFe${payload.ide.chave}`,
         versao: "4.00"
       });
-
+      console.log(payload.ide.chave, 'chave da NFe');
       NFe.tagIde({
         cUF: ufToCodigo(payload.ide.cUF),
         cNF: payload.ide.cNF,
@@ -498,12 +468,11 @@ class ConsultaNfeController {
 
       })
 
-      NFe.tagRefNFe({
-        refNFe: payload.ide.gPagAntecipado.refNFe,
-        tpEnteGov: payload.ide.gCompraGov.tpEnteGov,
-        pRedutor: payload.ide.gCompraGov.pRedutor,
-        tpOperGov: payload.ide.gCompraGov.tpOperGov,
-      })
+      // NFe.tagRefNFe({
+      //   tpEnteGov: payload.ide.gCompraGov.tpEnteGov,
+      //   pRedutor: payload.ide.gCompraGov.pRedutor,
+      //   tpOperGov: payload.ide.gCompraGov.tpOperGov,
+      // })
 
       NFe.tagEmit({
         CNPJ: payload.emit.CNPJ,
@@ -520,11 +489,10 @@ class ConsultaNfeController {
         xBairro: payload.emit.enderEmit.xBairro,
         cMun: payload.emit.enderEmit.cMun,
         xMun: payload.emit.enderEmit.xMun,
-        CEP: payload.emit.enderEmit.CEP,
         UF: payload.emit.enderEmit?.UF,
+        CEP: payload.emit.enderEmit.CEP,
         cPais: payload.emit.enderEmit.cPais,
-        xPais: payload.emit.enderEmit.xPais,
-        fone: payload.emit.enderEmit.fone,
+        xPais: payload.emit.enderEmit.xPais
       })
 
       NFe.tagAutXML({
@@ -539,7 +507,7 @@ class ConsultaNfeController {
         const det = item.det;
         const vrUnit = parseFloat(det.VUNCOM) || 0;
         const qtd = parseFloat(det.QCOM) || 0;
-
+        
         return {
           cProd: det.CPROD,
           cEAN: det.CEAN || "SEM GTIN",
@@ -554,6 +522,7 @@ class ConsultaNfeController {
           uTrib: det.UTRIB,
           qTrib: det.QTRIB,
           vUnTrib: det.VUNTRIB,
+          vDesc: det.VDESC,
           indTot: det.INDTOT
         };
       });
@@ -578,22 +547,22 @@ class ConsultaNfeController {
         V_Tot_Desconto += vrDesconto;
 
 
-        // 2.vERIFICAR REGIME TRIBUTÁRIO
-        const crt = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3";
+        // 2. VERIFICAR REGIME TRIBUTÁRIO (usar CRT do banco)
+        const crt = String(vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3");
         const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
         const ncm = det.NCM || "";
 
         // Calcular ICMS
         let icmsData = {}
 
-        if (crt == "1") {
-          // Simples Nacional
+        if (crt === "1") {
+          // Simples Nacional (CRT = 1)
           icmsData = {
             CSOSN: "102",
             orig: "0",
-            vBC: 0,
-            pICMS: 0,
-            vICMS: 0
+            vBC: "0.00",
+            pICMS: "0.00",
+            vICMS: "0.00"
           };
           // Simples Nacional: NÃO acumula v_TotICMS
         } else {
@@ -602,9 +571,9 @@ class ConsultaNfeController {
             icmsData = {
               CST: "40", // ISENTO
               orig: "0",
-              vBC: 0,
-              pICMS: 0,
-              vICMS: 0
+              vBC: "0.00",
+              pICMS: "0.00",
+              vICMS: "0.00"
             };
             // Não acumula ICMS
           } else {
@@ -623,9 +592,9 @@ class ConsultaNfeController {
               CST: "00", // TRIBUTADO INTEGRALMENTE
               orig: "0", // Nacional
               modBC: "3", // Valor da Operação
-              vBC: VrCalculado,
-              pICMS: pICMS,
-              vICMS: vICMS
+              vBC: VrCalculado.toFixed(2),
+              pICMS: pICMS.toFixed(2),
+              vICMS: vICMS.toFixed(2)
             };
 
             // Acumular total de ICMS
@@ -633,20 +602,20 @@ class ConsultaNfeController {
           }
         }
 
-        // 4.Calcular PIS
+        // 4. Calcular PIS
         let pisData = {}
 
-        if (crt == "1") {
+        if (crt === "1") {
           // Simples Nacional: PIS não aplicável na nota
-          pisData = { CST: "49", vBC: 0, pPIS: 0, vPIS: 0 };
+          pisData = { CST: "49", vBC: "0.00", pPIS: "0.00", vPIS: "0.00" };
         } else {
           if (ncm === "38089429") {
             // Produto não tributável
             pisData = {
               CST: "04",  // Operação não tributável
-              vBC: 0,
-              pPIS: 0,
-              vPIS: 0
+              vBC: "0.00",
+              pPIS: "0.00",
+              vPIS: "0.00"
             };
           } else {
             // Produto normal: 1.65%
@@ -654,9 +623,9 @@ class ConsultaNfeController {
 
             pisData = {
               CST: "01",  // Operação tributável
-              vBC: VrCalculado,
-              pPIS: 1.65,
-              vPIS: vPIS
+              vBC: VrCalculado.toFixed(2),
+              pPIS: "1.65",
+              vPIS: vPIS.toFixed(2)
             }
 
             // Acumular total de PIS
@@ -664,20 +633,20 @@ class ConsultaNfeController {
           }
         }
 
-        // 5.Calcular COFINS
+        // 5. Calcular COFINS
         let cofinsData = {}
 
-        if (crt == "1") {
+        if (crt === "1") {
           // Simples Nacional: COFINS não aplicável na nota
-          cofinsData = { CST: "49", vBC: 0, pCOFINS: 0, vCOFINS: 0 };
+          cofinsData = { CST: "49", vBC: "0.00", pCOFINS: "0.00", vCOFINS: "0.00" };
         } else {
           if (ncm === "38089429") {
             // Produto não tributável
             cofinsData = {
               CST: "04",  // Operação não tributável
-              vBC: 0,
-              pCOFINS: 0,
-              vCOFINS: 0
+              vBC: "0.00",
+              pCOFINS: "0.00",
+              vCOFINS: "0.00"
             };
           } else {
             // Produto normal: 7.60%
@@ -685,9 +654,9 @@ class ConsultaNfeController {
 
             cofinsData = {
               CST: "01",  // Operação tributável
-              vBC: VrCalculado,
-              pCOFINS: 7.60,
-              vCOFINS: vCOFINS
+              vBC: VrCalculado.toFixed(2),
+              pCOFINS: "7.60",
+              vCOFINS: vCOFINS.toFixed(2)
             }
 
             // Acumular total de COFINS
@@ -695,35 +664,35 @@ class ConsultaNfeController {
           }
         }
 
-        // ===== 6. CALCULAR IBS/CBS (REFORMA TRIBUTÁRIA) =====
+        // ===== 6. CALCULAR IBS/CBS (REFORMA TRIBUTÁRIA) - IGUAL PASCAL =====
         let ibscbsData = {};
 
         if (crt !== "1") {
           // Regime Normal
 
-          // IBS Estadual UF: 0.10%
-          const vIBSUF = roundTo(VrCalculado * 0.001, 2);
+          // IBS Estadual UF: 0.10% (igual Pascal: 0.10/100)
+          const vIBSUF = roundTo(VrCalculado * (0.10 / 100), 2);
 
-          //  CBS Federal: 0,90%
-          const vCBS = roundTo(VrCalculado * 0.009, 2);
+          // CBS Federal: 0.90% (igual Pascal: 0.90/100)
+          const vCBS = roundTo(VrCalculado * (0.90 / 100), 2);
 
           ibscbsData = {
             CST: "000",
             cClassTrib: "000001",
             gIBSCBS: {
-              vBC: VrCalculado,
-              vIBS: vIBSUF + 0,  // IBS UF + IBS Mun
+              vBC: VrCalculado.toFixed(2),
+              vIBS: (vIBSUF + 0).toFixed(2),  // IBS UF + IBS Mun
               gIBSUF: {
-                pIBSUF: 0.10,
-                vIBSUF: vIBSUF
+                pIBSUF: "0.10",
+                vIBSUF: vIBSUF.toFixed(2)
               },
               gIBSMun: {
-                pIBSMun: 0,
-                vIBSMun: 0
+                pIBSMun: "0.00",
+                vIBSMun: "0.00"
               },
               gCBS: {
-                pCBS: 0.90,
-                vCBS: vCBS
+                pCBS: "0.90",
+                vCBS: vCBS.toFixed(2)
               }
             }
           };
@@ -733,180 +702,90 @@ class ConsultaNfeController {
           v_TotCBS += vCBS;
         }
 
-        // ===== 7. MONTAR OBJETO DO ITEM COM IMPOSTOS =====
-        const itemComImposto = {
-          nItem: index + 1,
-          prod: {
-            cProd: det.CPROD,
-            cEAN: det.CEAN || "SEM GTIN",
-            xProd: det.XPROD,
-            NCM: det.NCM,
-            CFOP: det.CFOP,
-            uCom: det.UCOM,
-            qCom: det.QCOM,
-            vUnCom: det.VUNCOM,
-            vProd: roundTo(vrUnit * qtd, 2),
-            vDesc: vrDesconto,
-            cEANTrib: det.CEANTRIB || "SEM GTIN",
-            uTrib: det.UTRIB,
-            qTrib: det.QTRIB,
-            vUnTrib: det.VUNTRIB,
-            indTot: det.INDTOT
-          },
-          imposto: {
-            vTotTrib: 0,  // Lei da Transparência
-            ICMS: icmsData,
-            PIS: pisData,
-            COFINS: cofinsData,
-            IBSCBS: ibscbsData
-          }
-        };
-
-        // ===== TOTAIS DA NOTA =====
-        const totais = {
-          ICMSTot: {
-            vBC: (crt === "1") ? 0 : V_ICMSTot_vNF,
-            vICMS: v_TotICMS,
-            vICMSDeson: 0,
-            vFCP: 0,
-            vBCST: 0,
-            vST: 0,
-            vFCPST: 0,
-            vFCPSTRet: 0,
-            vProd: V_ICMSTot_vNF + V_Tot_Desconto,  // Valor bruto dos produtos
-            vFrete: 0,
-            vSeg: 0,
-            vDesc: V_Tot_Desconto,
-            vII: 0,
-            vIPI: 0,
-            vIPIDevol: 0,
-            vPIS: v_TotPis,
-            vCOFINS: v_TotCofins,
-            vOutro: 0,
-            vNF: V_ICMSTot_vNF  // Valor líquido da nota
-          },
-
-          IBSCBSTot: {
-            vBCIBSCBS: V_ICMSTot_vNF,
-            gIBS: {
-              vIBS: v_TotIBSUF,
-              vCredPres: 0,
-              vCredPresCondSus: 0,
-              gIBSUF: {
-                vDif: 0,
-                vDevTrib: 0,
-                vIBSUF: v_TotIBSUF
-              },
-              gIBSMun: {
-                vDif: 0,
-                vDevTrib: 0,
-                vIBSMun: 0
-              }
-            },
-            gCBS: {
-              vDif: 0,
-              vDevTrib: 0,
-              vCBS: v_TotCBS,
-              vCredPres: 0,
-              vCredPresCondSus: 0
-            }
-          },
-
-          vNFTot: V_ICMSTot_vNF  // Valor total da NF com impostos
-        };
-
-        // ===== LEI DA TRANSPARÊNCIA (IBPT) =====
-        const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
-        const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
-
-        const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
-          `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
-          `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS`;
-
-        console.log('Informações complementares:', infCpl);
-
-        // Aplicar impostos para este produto específico
-        // NFe.tagImposto(index, { vTotTrib: "0.00" });
+        // ===== 7. APLICAR IMPOSTOS DO ITEM =====
         NFe.tagProdICMS(index, icmsData);
         NFe.tagProdPIS(index, pisData);
         NFe.tagProdCOFINS(index, cofinsData);
         NFe.tagProdIBSCBS(index, ibscbsData);
-
-        NFe.tagTotal({
-          ICMSTot: {
-            vBC: totais.ICMSTot.vBC,
-            vICMS: totais.ICMSTot.vICMS,
-            vICMSDeson: totais.ICMSTot.vICMSDeson,
-            vFCP: totais.ICMSTot.vFCP,
-            vBCST: totais.ICMSTot.vBCST,
-            vST: totais.ICMSTot.vST,
-            vFCPST: totais.ICMSTot.vFCPST,
-            vFCPSTRet: totais.ICMSTot.vFCPSTRet,
-            vProd: totais.ICMSTot.vProd,
-            vFrete: totais.ICMSTot.vFrete,
-            vSeg: totais.ICMSTot.vSeg,
-            vDesc: totais.ICMSTot.vDesc,
-            vII: totais.ICMSTot.vII,
-            vIPI: totais.ICMSTot.vIPI,
-            vIPIDevol: totais.ICMSTot.vIPIDevol,
-            vPIS: totais.ICMSTot.vPIS,
-            vCOFINS: totais.ICMSTot.vCOFINS,
-            vOutro: totais.ICMSTot.vOutro,
-            vNF: totais.ICMSTot.vNF
-          },
-          IBSCBSTot: {
-            vBCIBSCBS: totais.IBSCBSTot.vBCIBSCBS,
-            gIBS: {
-              vIBS: totais.IBSCBSTot.gIBS.vIBS,
-              vCredPres: totais.IBSCBSTot.gIBS.vCredPres,
-              vCredPresCondSus: totais.IBSCBSTot.gIBS.vCredPresCondSus,
-              gIBSUF: {
-                vDif: totais.IBSCBSTot.gIBS.gIBSUF.vDif,
-                vDevTrib: totais.IBSCBSTot.gIBS.gIBSUF.vDevTrib,
-                vIBSUF: totais.IBSCBSTot.gIBS.gIBSUF.vIBSUF
-              },
-              gIBSMun: {
-                vDif: totais.IBSCBSTot.gIBS.gIBSMun.vDif,
-                vDevTrib: totais.IBSCBSTot.gIBS.gIBSMun.vDevTrib,
-                vIBSMun: totais.IBSCBSTot.gIBS.gIBSMun.vIBSMun
-              }
-            },
-            gCBS: {
-              vDif: totais.IBSCBSTot.gCBS.vDif,
-              vDevTrib: totais.IBSCBSTot.gCBS.vDevTrib,
-              vCBS: totais.IBSCBSTot.gCBS.vCBS,
-              vCredPres: totais.IBSCBSTot.gCBS.vCredPres,
-              vCredPresCondSus: totais.IBSCBSTot.gCBS.vCredPresCondSus
-            }
-          },
-          vNFTot: ' totais.vNFTot'
-        })
       });
 
+      // ===== TOTALIZAR NOTA (APÓS PROCESSAR TODOS OS ITENS) =====
+      const crtFinal = String(vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3");
+      
+      const totaisFinais = {
+        ICMSTot: {
+          vBC: (crtFinal === "1") ? "0.00" : V_ICMSTot_vNF.toFixed(2),
+          vICMS: v_TotICMS.toFixed(2),
+          vICMSDeson: "0.00",
+          vFCP: "0.00",
+          vBCST: "0.00",
+          vST: "0.00",
+          vFCPST: "0.00",
+          vFCPSTRet: "0.00",
+          vProd: (V_ICMSTot_vNF + V_Tot_Desconto).toFixed(2),
+          vFrete: "0.00",
+          vSeg: "0.00",
+          vDesc: V_Tot_Desconto.toFixed(2),
+          vII: "0.00",
+          vIPI: "0.00",
+          vIPIDevol: "0.00",
+          vPIS: v_TotPis.toFixed(2),
+          vCOFINS: v_TotCofins.toFixed(2),
+          vOutro: "0.00",
+          vNF: V_ICMSTot_vNF.toFixed(2)
+        },
+        IBSCBSTot: {
+          vBCIBSCBS: V_ICMSTot_vNF.toFixed(2),
+          gIBS: {
+            vIBS: (v_TotIBSUF + 0).toFixed(2),
+            vCredPres: "0.00",
+            vCredPresCondSus: "0.00",
+            gIBSUF: {
+              vDif: "0.00",
+              vDevTrib: "0.00",
+              vIBSUF: v_TotIBSUF.toFixed(2)
+            },
+            gIBSMun: {
+              vDif: "0.00",
+              vDevTrib: "0.00",
+              vIBSMun: "0.00"
+            }
+          },
+          gCBS: {
+            vDif: "0.00",
+            vDevTrib: "0.00",
+            vCBS: v_TotCBS.toFixed(2),
+            vCredPres: "0.00",
+            vCredPresCondSus: "0.00"
+          }
+        },
+        vNFTot: V_ICMSTot_vNF.toFixed(2)
+      };
+
+      NFe.tagTotal(totaisFinais);
+      
+
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
-      const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25,24% Federal
-      const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19,41% Estadual
+      const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25.24% Federal
+      const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19.41% Estadual
       const enderecoProconDF = `PROCON - DF - 151;SCS, QD. 08, BL. B-60, SALA 240, VENANCIO 2000`;
       const enderecoProconGO = `PROCON - 151;Rua 8, N . 242 QD. 5, LT. 36, St. Central, Goiania - GO`;
 
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
       const enderecoProcon = uf === "GO" ? enderecoProconGO : uf === "DF" ? enderecoProconDF : "";
 
+      const idVendaInfo = vendaData.data[0]?.venda.IDVENDA || idVenda;
       const infCpl = `Você pagou aproximadamente R$ ${OlhoImposto_Fed.toFixed(2)} tributos federais; ` +
         `R$ ${OlhoImposto_UF.toFixed(2)} tributos estaduais; ` +
         `R$ 0,00 tributos municipais. Fonte: IBPT/FECOMERCIO RS Xe67Eq` +
         (enderecoProcon ? ` ${enderecoProcon}` : '') +
-        `Nº VENDA: ${vendaData.data[0]?.venda.IDVENDA} ` +
+        `Nº VENDA: ${idVendaInfo} ` +
         `PRAZO DE TROCA: VALIDO POR 30 DIAS;`
         ;
 
       NFe.tagTransp({
         modFrete: payload.transp.modFrete
       })
-
-      // Passar array completo de pagamentos para tagDetPag
-      console.log('\n═══════════ GERANDO TAGS detPag ═══════════');
-      console.log('payload.pag.detPag:', JSON.stringify(payload.pag.detPag, null, 2));
 
       // Formatar array para a biblioteca (adicionar indPag se necessário)
       const pagamentosFormatados = Array.isArray(payload.pag.detPag)
@@ -915,24 +794,21 @@ class ConsultaNfeController {
           tPag: p.tPag,
           vPag: p.vPag
         }))
-        : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
-
-      console.log('Pagamentos formatados:', JSON.stringify(pagamentosFormatados, null, 2));
-
+      : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
+      
       NFe.tagDetPag(pagamentosFormatados);
 
-      console.log('═════════════════════════════════════════════\n');
 
       NFe.tagInfAdic({
         infCpl: infCpl,
-        tpAmb: payload.infProt.tbAmb,
-        verAplic: payload.infProt.verAplic,
-        chNFe: payload.infProt.chNFe,
-        dhRecbto: payload.infProt.dhRecbto,
-        nProt: payload.infProt.nProt,
-        digVal: payload.infProt.digVal,
-        cStat: payload.infProt.cStat,
-        cMotivo: payload.infProt.xMotivo,
+        tpAmb: payload.ide.tpAmb,
+        verAplic: "1.0",
+        chNFe: payload.ide.chave,
+        dhRecbto: new Date().toISOString(),
+        nProt: nProt,
+        digVal: digVal,
+        cStat: cStat,
+        cMotivo: xMotivo,
       })
 
 
@@ -942,31 +818,72 @@ class ConsultaNfeController {
         urlChave: payload.infNFeSupl.urlChave,
 
       })
-      if (payload?.ide.mod == "65") {
-        // NFC-e - Usa consultarNFe
-        await tools.consultarNFe(payload.ide.chave).then(res => {
-          // console.log('Protocolo NFC-e:', res);
-        });
-      } else if (payload?.ide.mod == "55") {
-        // NF-e - Usa sefazDistDFe
-        await tools.sefazDistDFe({ chNFe: payload.ide.chave }).then(res => {
-          // console.log('XML NF-e:', res);
-        });
-      }
 
-      tools.xmlSign(NFe.xml()).then(async xmlSigned => {
-        fs.writeFileSync(path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`), xmlSigned, { encoding: 'utf8' });
+      console.log(payload.infNFeSupl.urlChave, 'urlChave');
+      console.log(payload.infNFeSupl.qrCode, 'qrCode');
+      
+      // ❌ NÃO CONSULTAR ANTES DE ENVIAR - A nota ainda não existe na SEFAZ
+      // if (payload?.ide.mod == "65") {
+      //   await tools.consultarNFe(payload.ide.chave).then(res => {
+      //     console.log('Protocolo NFC-e:', res);
+      //   }).catch(err => {
+      //     console.error('Erro ao consultar NFC-e:', err);
+      //   });
+      // } else if (payload?.ide.mod == "55") {
+      //   await tools.sefazDistDFe({ chNFe: payload.ide.chave }).then(res => {
+      //     console.log('XML NF-e:', res);
+      //   }).catch(err => {
+      //     console.error('Erro ao consultar NF-e:', err);
+      //   });
+      // }
+
+      // Gerar XML antes de assinar
+      const xmlGerado = NFe.xml();
+      console.log('\n═══════════ DEBUG XML ═══════════');
+      console.log('Tamanho do XML:', xmlGerado.length, 'caracteres');
+      console.log('XML válido?', xmlGerado.includes('</NFe>'));
+      console.log('Tem tag <pag>?', xmlGerado.includes('<pag>'));
+      console.log('Fecha tag </pag>?', xmlGerado.includes('</pag>'));
+      
+      // Contar tags de pagamento
+      const countDetPag = (xmlGerado.match(/<detPag>/g) || []).length;
+      const countDetPagClose = (xmlGerado.match(/<\/detPag>/g) || []).length;
+      console.log('Tags <detPag>:', countDetPag);
+      console.log('Tags </detPag>:', countDetPagClose);
+      console.log('Tags balanceadas?', countDetPag === countDetPagClose);
+      console.log('═════════════════════════════════\n');
+
+      tools.xmlSign(xmlGerado).then(async xmlSigned => {
+        console.log('XML assinado, tamanho:', xmlSigned.length);
+        
+        // Salvar XML assinado
+        const caminhoXml = path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`);
+        // console.log(response.data.venda);
+        fs.writeFileSync(caminhoXml, xmlSigned, { encoding: 'utf8' });
+        console.log('XML salvo em:', caminhoXml);
+        
+        // Verificar se XML está bem formado
+        const temFechamento = xmlSigned.includes('</NFe>') && xmlSigned.includes('</Signature>');
+        console.log('XML tem fechamento correto?', temFechamento);
+        
+        // Não enviar para SEFAZ se XML inválido
+        if (!temFechamento) {
+          console.error('❌ XML INVÁLIDO! Não será enviado para SEFAZ');
+          return;
+        }
+        
         tools.sefazEnviaLote(xmlSigned, { indSinc: 1 }).then(res => {
-          // console.log('Resposta SEFAZ:', res);
-        })
+          console.log('Resposta SEFAZ:', res);
+        }).catch(err => {
+          console.error('Erro ao enviar para SEFAZ:', err);
+        });
       })
 
-      return res.json(result);
+      return res.json(vendaData);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
 }
-
 export default new ConsultaNfeController();
