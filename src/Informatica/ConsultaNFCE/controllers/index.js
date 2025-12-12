@@ -117,8 +117,8 @@ class ConsultaNfeController {
       console.log('═══════════════════════════════════════\n');
 
       let v_TotICMS = 0;
-      let v_TotPis = 0;clear
-      
+      let v_TotPis = 0;
+
       let v_TotCofins = 0;
       let v_TotIBSUF = 0;
       let v_TotCBS = 0;
