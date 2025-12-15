@@ -161,16 +161,6 @@ class ConsultaNfeController {
       const digVal = vendaData.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
       const xmotivo = vendaData.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "";
       const cstat = vendaData.data[0]?.venda.PROTNFE_INFPROT_CSTAT;
-      const CFOP = vendaData.data[0]?.detalhe?.map(item => item.det.CFOP) || "5102";
-      const uCom = vendaData.data[0]?.detalhe?.map(item => item.det.UCOM) || "UN";
-      const qCom = vendaData.data[0]?.detalhe?.map(item => item.det.QCOM) || "1.0000";
-      const vUnCom = vendaData.data[0]?.detalhe?.map(item => item.det.VUNCOM) || "0.01";
-      const cEANTrib = vendaData.data[0]?.detalhe?.map(item => item.det.CEANTRIB) || "0000000000000";
-      const uTrib = vendaData.data[0]?.detalhe?.map(item => item.det.UTRIB) || "UN";
-      const qTrib = vendaData.data[0]?.detalhe?.map(item => item.det.QTRIB) || "1.0000";
-      const vUnTrib = vendaData.data[0]?.detalhe?.map(item => item.det.VUNTRIB) || "0.01";
-      const indTot = vendaData.data[0]?.detalhe?.map(item => item.det.INDTOT) || "1";
-      const orig = vendaData.data[0]?.detalhe?.map(item => item.det.ICMS_ORIG) || "0";
       const CST = vendaData.data[0]?.detalhe?.map(item => item.det.ICMS_CST) || "00";
       const modBC = vendaData.data[0]?.detalhe?.map(item => item.det.ICMS_MODBC) || "3";
       const vBC = vendaData.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBC || "0.00";
