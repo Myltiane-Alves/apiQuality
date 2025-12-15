@@ -218,7 +218,7 @@ class ConsultaNfeController {
       const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
       const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
       const tpEmissao = configData.TPEMISSAO || "";
-      const tpAmbiente = configData.TPAMBIENTE || "";
+      const tpAmbiente = configData.TPAMBIENTE || "2"; // Default: homologação
       const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
@@ -364,7 +364,7 @@ class ConsultaNfeController {
       const tools = new Tools({
         mod: "65",
         UF: uf || "SP",
-        tpAmb: parseInt(tpAmbiente),
+        tpAmb: parseInt(tpAmb) || 2, // Fallback para homologação
         CSC: csc,
         CSCid: cscId ,
         versao: "4.00",
@@ -391,7 +391,7 @@ class ConsultaNfeController {
         tpImp: tpImp,
         tpEmis: tpEmis,
         cDV: cDV,
-        tpAmb: tpAmb,
+        tpAmb: tpAmbiente,
         finNFe: finNFe,
         indFinal: indFinal,
         indPres: indPres,
@@ -529,20 +529,22 @@ class ConsultaNfeController {
 
 
       // Gerar XML antes de assinar
-      fs.writeFileSync("./xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
+      fs.writeFileSync(`./xmls/nfe${chave}.xml`, NFe.xml(), { encoding: "utf-8" });
       
-      // Contar tags de pagamento
-      const countDetPag = (xmlGerado.match(/<detPag>/g) || []).length;
-      const countDetPagClose = (xmlGerado.match(/<\/detPag>/g) || []).length;
-      tools.xmlSign(NFe.xml()).then(async xmlSign => {
-        fs.writeFileSync(`./xmls/nfce${chave}.xml`, xmlSign, { encoding: "utf-8" });
-        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
-            console.log(res)
-        })
-      }).catch(err => {
-          console.log(err, 'erro tools');
-          return res.status(500).json({ error: 'Erro ao assinar ou enviar XML' });
-      })
+      tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
+
+      // tools.xmlSign(NFe.xml()).then(async xmlSign => {
+      //   fs.writeFileSync(`./xmls/nfce${chave}.xml`, xmlSign, { encoding: "utf-8" });
+      //   tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
+      //       fs.writeFileSync("ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
+      //       console.log('Resposta SEFAZ:', res);
+      //   }).catch(err => {
+      //       fs.writeFileSync("err.json", JSON.stringify(err, null, 2), { encoding: "utf-8" });
+      //       console.log(err, 'erro sefazEnviaLote');
+      //   });
+      // }).catch(err => {
+      //     console.log(err, 'erro tools');
+      // })
 
 
 
