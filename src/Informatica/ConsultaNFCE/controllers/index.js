@@ -161,9 +161,7 @@ class ConsultaNfeController {
       const digVal = vendaData.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
       const xmotivo = vendaData.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "";
       const cstat = vendaData.data[0]?.venda.PROTNFE_INFPROT_CSTAT;
-      const CSTIS = vendaData.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
-      const cClassTribIS = vendaData.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
-      const vFrete = vendaData.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
+  
       
       // Acessar configurações corretamente - é um array com objeto que tem propriedade config
       const configData = vendaData.data[0]?.configuracao?.config?.[0]?.config || {};
