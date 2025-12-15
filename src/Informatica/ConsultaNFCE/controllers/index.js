@@ -146,7 +146,6 @@ class ConsultaNfeController {
       const cep = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
       const xPais = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
       const cPais = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
-      const fone = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
       const cMun = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
       const xMun = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
       const xBairro = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
