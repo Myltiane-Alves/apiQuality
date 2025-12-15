@@ -122,7 +122,6 @@ class ConsultaNfeController {
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
       const cnf = vendaData.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
       const natOp = vendaData.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
-      const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65" || "55";
       const serie = vendaData.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
       const nnf = vendaData.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
       const dhEmiRaw = vendaData.data[0]?.venda.NFE_INFNFE_IDE_DHEMI;
