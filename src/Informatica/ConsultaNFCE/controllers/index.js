@@ -155,18 +155,7 @@ class ConsultaNfeController {
       const emit_CRT = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
       const infCpl = vendaData.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
       const modFrete = vendaData.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
-      const vIPIDevol = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
-      const vIPI = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
-      const vDesc = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
-      const vII = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
-      const vSeg = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
-      const vFCP = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
-      const vBCST = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
-      const vST = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
-      const vFCPST = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
-      const vFCPSTRet = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
-      const vProd = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
-      const icmsVFrete = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
+     
       const qrCode = vendaData.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
       const icms_vicmsdeson = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
       const procEmi = vendaData.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
