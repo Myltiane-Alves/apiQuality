@@ -156,7 +156,6 @@ class ConsultaNfeController {
       const infCpl = vendaData.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
       const modFrete = vendaData.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
       const procEmi = vendaData.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
-      const urlChave = vendaData.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
       const nProtRaw = vendaData.data[0]?.venda.PROTNFE_INFPROT_ID || "";
       const nProt = nProtRaw.replace(/^ID/i, '');
       const digVal = vendaData.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
