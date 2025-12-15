@@ -154,7 +154,6 @@ class ConsultaNfeController {
       const emit_IE = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_IE || "";
       const emit_CRT = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
       const infCpl = vendaData.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
-      const vOutro = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO || "0.00";
       const modFrete = vendaData.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
       const vIPIDevol = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
       const vIPI = vendaData.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
