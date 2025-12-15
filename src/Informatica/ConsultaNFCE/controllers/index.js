@@ -161,12 +161,6 @@ class ConsultaNfeController {
       const digVal = vendaData.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
       const xmotivo = vendaData.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "";
       const cstat = vendaData.data[0]?.venda.PROTNFE_INFPROT_CSTAT;
-      const cprod = vendaData.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
-      const cean = vendaData.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
-      const xprod = vendaData.data[0]?.detalhe?.map(item => item.det.XPROD) || "Produto Teste";
-
-      const ncm = vendaData.data[0]?.detalhe?.map(item => item.det.NCM) || "00000000";
-      // const tpCredPresIBSZFM 
       const CFOP = vendaData.data[0]?.detalhe?.map(item => item.det.CFOP) || "5102";
       const uCom = vendaData.data[0]?.detalhe?.map(item => item.det.UCOM) || "UN";
       const qCom = vendaData.data[0]?.detalhe?.map(item => item.det.QCOM) || "1.0000";
