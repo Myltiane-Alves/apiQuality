@@ -484,18 +484,18 @@ class ConsultaNfeController {
       
       tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
 
-      // tools.xmlSign(NFe.xml()).then(async xmlSign => {
-      //   fs.writeFileSync(`./xmls/nfce${chave}.xml`, xmlSign, { encoding: "utf-8" });
-      //   tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
-      //       fs.writeFileSync("ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
-      //       console.log('Resposta SEFAZ:', res);
-      //   }).catch(err => {
-      //       fs.writeFileSync("err.json", JSON.stringify(err, null, 2), { encoding: "utf-8" });
-      //       console.log(err, 'erro sefazEnviaLote');
-      //   });
-      // }).catch(err => {
-      //     console.log(err, 'erro tools');
-      // })
+      tools.xmlSign(NFe.xml()).then(async xmlSign => {
+        fs.writeFileSync(`./xmls/nfce${chave}.xml`, xmlSign, { encoding: "utf-8" });
+        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
+            fs.writeFileSync("ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
+            console.log('Resposta SEFAZ:', res);
+        }).catch(err => {
+            fs.writeFileSync("err.json", JSON.stringify(err, null, 2), { encoding: "utf-8" });
+            console.log(err, 'erro sefazEnviaLote');
+        });
+      }).catch(err => {
+          console.log(err, 'erro tools');
+      })
 
 
 
