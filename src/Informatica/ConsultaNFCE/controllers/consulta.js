@@ -127,7 +127,8 @@ class ConsultaNfeController {
       return res.status(500).json({ error: error.message });
     }
   }
-async validarStatusSefaz(req, res) {
+  
+  async validarStatusSefaz(req, res) {
   try {
     const CERTIFICADO_BASE64 =
       process.env.CERTIFICADO_BASE64 ||
@@ -229,7 +230,7 @@ async validarStatusSefaz(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
- } 
+  } 
 
   async issueFromVendaId(req, res) {
   try {
@@ -678,8 +679,9 @@ async validarStatusSefaz(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
- }
-   async consultaNFe(req, res) {
+  }
+  
+  async consultaNFe(req, res) {
     try {
       let { idVenda } = req.query;
 
