@@ -415,10 +415,10 @@ class ConsultaNfeController {
           infAdic: {
             infCpl: infCpl
           },
-          // infNFeSupl: {
-          //   qrCode: qrCode,
-          //   urlChave: urlChave
-          // }
+          infNFeSupl: {
+            qrCode: qrCode,
+            urlChave: urlChave
+          }
         };
 
         return payload;
@@ -432,7 +432,7 @@ class ConsultaNfeController {
       const cStat = response.data.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
       const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
 
-      const configData = vendaData.data[0]?.configuracao?.config?.[0]?.config || {};
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
         const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
         const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
         const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
@@ -441,7 +441,10 @@ class ConsultaNfeController {
         const dsCRT = configData.DSCRT || "";
         const cscId = configData.IDTOKEN || "1";
         const csc = configData.TOKENCSC || "";
-        
+      // console.log(response.data.data[0].configuracao, 'configuracao completa');
+      // console.log(configData, 'configData extraído');
+      console.log(csc, 'CSC');
+      console.log(cscId, 'CSC ID');
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -452,20 +455,23 @@ class ConsultaNfeController {
         });
       }
 
-      const tools = new Tools({
-        mod: "65",
-        tpAmb: payload.ide.tpAmb || 2,
-        UF: payload.emit.enderEmit.UF || "SP",
+      const tpAmbTools = parseInt(tpAmbiente) || 2;
+      console.log('tpAmb usado:', tpAmbTools);
+
+      let tools = new Tools({
+        mod: '65',
+        tpAmb: tpAmbTools,
+        UF: payload.emit.enderEmit.UF || 'SP',
         CSC: csc,
         CSCid: cscId,
-        versao: "4.00",
+        versao: '4.00',
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       }, certOptions);
 
-
+      
       let NFe = new Make()
       NFe.tagInfNFe({
-        Id: `NFe${payload.ide.chave}`,
+        Id: null,
         versao: "4.00"
       });
       console.log(payload.ide.chave, 'chave da NFe');
@@ -717,6 +723,7 @@ class ConsultaNfeController {
                 pIBSMun: "0.00",
                 vIBSMun: "0.00"
               },
+              vIBS: vIBSUF.toFixed(2),
               gCBS: {
                 pCBS: "0.90",
                 vCBS: vCBS.toFixed(2)
@@ -802,9 +809,9 @@ class ConsultaNfeController {
       const enderecoProcon = uf === "GO" ? enderecoProconGO : uf === "DF" ? enderecoProconDF : "";
 
       const idVendaInfo = vendaData.data[0]?.venda.IDVENDA || idVenda;
-      const infCpl = `Voce pagou aproximadamente ${OlhoImposto_Fed.toFixed(2)} tributos federais ` +
-        `${OlhoImposto_UF.toFixed(2)} tributos estaduais ` +
-        `0.00 tributos municipais Fonte IBPT FECOMERCIO RS Xe67Eq ` +
+      const infCpl = `Voce pagou aproximadamente ${OlhoImposto_Fed.toFixed(2).replace('.', ',')} tributos federais ` +
+        `${OlhoImposto_UF.toFixed(2).replace('.', ',')} tributos estaduais ` +
+        `0,00 tributos municipais Fonte IBPT FECOMERCIO RS Xe67Eq ` +
         (enderecoProcon ? `${enderecoProcon} ` : '') +
         `Numero VENDA ${idVendaInfo} ` +
         `PRAZO DE TROCA VALIDO POR 30 DIAS`;
@@ -813,90 +820,68 @@ class ConsultaNfeController {
         modFrete: payload.transp.modFrete
       })
 
-      // Formatar array para a biblioteca (adicionar indPag se necessário)
+      // Formatar array para a biblioteca (adicionar indPag e xPag se necessário)
       const pagamentosFormatados = Array.isArray(payload.pag.detPag)
-        ? payload.pag.detPag.map((p, idx) => ({
-          indPag: 0, // 0=Pagamento à Vista
-          tPag: p.tPag,
-          vPag: p.vPag
-        }))
+        ? payload.pag.detPag.map((p, idx) => {
+          const pag = {
+            indPag: 0, // 0=Pagamento à Vista
+            tPag: p.tPag,
+            vPag: p.vPag
+          };
+          // Se for tipo 99 (Outros), adicionar descrição obrigatória
+          if (p.tPag === '99') {
+            pag.xPag = 'Outros';
+          }
+          return pag;
+        })
       : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
       
       NFe.tagDetPag(pagamentosFormatados);
 
+      // Calcular troco (diferença entre valor pago e valor da nota)
+      const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
+      const vTroco = roundTo(Math.max(0, totalPago - V_ICMSTot_vNF), 2);
+
+      // NFe.tagPag({
+      //   vTroco: vTroco.toFixed(2)
+      // });
 
       NFe.tagInfAdic({
         infCpl: infCpl
       })
 
-
+      // Responsável Técnico (opcional mas recomendado)
+      NFe.tagInfRespTec({
+        CNPJ: "11098707000107",
+        xContato: "Suporte Tecnico",
+        email: "suporte@gtocomercio.com.br",
+        fone: "61999999999"
+      });
 
       // NFe.taginfNFeSupl({
       //   qrCode: payload.infNFeSupl.qrCode,
       //   urlChave: payload.infNFeSupl.urlChave,
-
       // })
 
-      // console.log(payload.infNFeSupl.urlChave, 'urlChave');
-      // console.log(payload.infNFeSupl.qrCode, 'qrCode');
-      
-      // ❌ NÃO CONSULTAR ANTES DE ENVIAR - A nota ainda não existe na SEFAZ
-      // if (payload?.ide.mod == "65") {
-      //   await tools.consultarNFe(payload.ide.chave).then(res => {
-      //     console.log('Protocolo NFC-e:', res);
-      //   }).catch(err => {
-      //     console.error('Erro ao consultar NFC-e:', err);
-      //   });
-      // } else if (payload?.ide.mod == "55") {
-      //   await tools.sefazDistDFe({ chNFe: payload.ide.chave }).then(res => {
-      //     console.log('XML NF-e:', res);
-      //   }).catch(err => {
-      //     console.error('Erro ao consultar NF-e:', err);
-      //   });
-      // }
 
-      // Gerar XML antes de assinar
-      const xmlGerado = NFe.xml();
-      console.log('\n═══════════ DEBUG XML ═══════════');
-      console.log('Tamanho do XML:', xmlGerado.length, 'caracteres');
-      console.log('XML válido?', xmlGerado.includes('</NFe>'));
-      console.log('Tem tag <pag>?', xmlGerado.includes('<pag>'));
-      console.log('Fecha tag </pag>?', xmlGerado.includes('</pag>'));
-      
-      // Contar tags de pagamento
-      const countDetPag = (xmlGerado.match(/<detPag>/g) || []).length;
-      const countDetPagClose = (xmlGerado.match(/<\/detPag>/g) || []).length;
-      console.log('Tags <detPag>:', countDetPag);
-      console.log('Tags </detPag>:', countDetPagClose);
-      console.log('Tags balanceadas?', countDetPag === countDetPagClose);
-      console.log('═════════════════════════════════\n');
 
-      tools.xmlSign(xmlGerado).then(async xmlSigned => {
-        console.log('XML assinado, tamanho:', xmlSigned.length);
-        
-        // Salvar XML assinado
-        const caminhoXml = path.resolve(`./xmls/nfe_venda_${vendaData.data[0]?.venda.IDVENDA}.xml`);
-        // console.log(response.data.venda);
-        fs.writeFileSync(caminhoXml, xmlSigned, { encoding: 'utf8' });
-        console.log('XML salvo em:', caminhoXml);
-        
-        // Verificar se XML está bem formado
-        const temFechamento = xmlSigned.includes('</NFe>') && xmlSigned.includes('</Signature>');
-        console.log('XML tem fechamento correto?', temFechamento);
-        
-        // Não enviar para SEFAZ se XML inválido
-        if (!temFechamento) {
-          console.error('❌ XML INVÁLIDO! Não será enviado para SEFAZ');
-          return;
-        }
-        
-        tools.sefazEnviaLote(xmlSigned, { indSinc: 1 }).then(res => {
-          console.log('Resposta SEFAZ:', res);
+      // fs.writeFileSync(`./xmls/nfe${payload.ide.chave}.xml`, NFe.xml(), { encoding: "utf-8" });
+            
+      tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
+
+
+      tools.xmlSign(NFe.xml()).then(async xmlSign => {
+        fs.writeFileSync(`./xmls/nfce${payload.ide.chave}.xml`, xmlSign, { encoding: "utf-8" });
+        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
+            fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
+            console.log('Resposta SEFAZ:', res);
         }).catch(err => {
-          console.error('Erro ao enviar para SEFAZ:', err);
+            fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify(err, null, 2), { encoding: "utf-8" });
+            console.log(err, 'erro sefazEnviaLote');
         });
-      })
-
+      }).catch(err => {
+          console.log(err, 'erro tools');
+      });
       return res.json(vendaData);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
