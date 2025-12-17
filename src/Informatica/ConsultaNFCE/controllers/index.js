@@ -3,10 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import 'dotenv/config';
-import Decimal from 'decimal.js';
 
-// Configure precisão global
-Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP });
 
 function extrairCStat(xml) {
   const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
@@ -234,23 +231,23 @@ class ConsultaNfeController {
         // MAPEAMENTO: Códigos do banco → Códigos SEFAZ
         function mapearTipoPagamento(tPagBanco) {
           const mapeamento = {
-            '001': '01',  // Dinheiro
-            '002': '02',  // Cheque
-            '003': '03',  // Cartão Crédito
-            '004': '04',  // Cartão Débito
-            '005': '05',  // Crédito Loja
-            '009': '03',  // Credsystem → Cartão Crédito
-            '010': '10',  // Vale Alimentação
-            '011': '11',  // Vale Refeição
-            '012': '12',  // Vale Presente
-            '013': '13',  // Vale Combustível
-            '015': '15',  // Boleto
-            '016': '16',  // Depósito
-            '017': '17',  // PIX
-            '018': '18',  // Transferência
-            '031': '03',  // Outros cartões → Cartão Crédito
-            '090': '90',  // Sem pagamento
-            '099': '99'   // Outros
+              '001': '01',  // Dinheiro
+              '002': '02',  // Cheque
+              '003': '03',  // Cartão Crédito
+              '004': '04',  // Cartão Débito
+              '005': '05',  // Crédito Loja
+              '009': '03',  // Credsystem → Cartão Crédito
+              '010': '10',  // Vale Alimentação
+              '011': '11',  // Vale Refeição
+              '012': '12',  // Vale Presente
+              '013': '13',  // Vale Combustível
+              '015': '15',  // Boleto Bancário
+              '016': '16',  // Depósito Bancário
+              '017': '17',  // PIX
+              '018': '18',  // Transferência Bancária
+              '031': '03',  // Outros cartões → Cartão Crédito
+              '090': '90',  // Sem pagamento
+              '099': '99'   // Outros
           };
           return mapeamento[tPagBanco] || '99';
         }
@@ -264,7 +261,7 @@ class ConsultaNfeController {
           const agrupados = {};
 
           pagamentos.forEach(p => {
-            const tPagBanco = p.pag.TPAG || "01";
+            const tPagBanco = p.pag.TPAG || "OUTROS";
             const tPagSefaz = mapearTipoPagamento(tPagBanco);
             const valor = parseFloat(p.pag.VALORRECEBIDO || 0);
 
@@ -474,7 +471,7 @@ class ConsultaNfeController {
         Id: null,
         versao: "4.00"
       });
-      console.log(payload.ide.chave, 'chave da NFe');
+  
       NFe.tagIde({
         cUF: ufToCodigo(payload.ide.cUF),
         cNF: payload.ide.cNF,
@@ -497,12 +494,6 @@ class ConsultaNfeController {
         verProc: payload.ide.verProc,
 
       })
-
-      // NFe.tagRefNFe({
-      //   tpEnteGov: payload.ide.gCompraGov.tpEnteGov,
-      //   pRedutor: payload.ide.gCompraGov.pRedutor,
-      //   tpOperGov: payload.ide.gCompraGov.tpOperGov,
-      // })
 
       NFe.tagEmit({
         CNPJ: payload.emit.CNPJ,
@@ -743,6 +734,7 @@ class ConsultaNfeController {
         NFe.tagProdIBSCBS(index, ibscbsData);
       });
 
+      
       // ===== TOTALIZAR NOTA (APÓS PROCESSAR TODOS OS ITENS) =====
       const crtFinal = String(vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3");
       
@@ -820,7 +812,6 @@ class ConsultaNfeController {
         modFrete: payload.transp.modFrete
       })
 
-      // Formatar array para a biblioteca (adicionar indPag e xPag se necessário)
       const pagamentosFormatados = Array.isArray(payload.pag.detPag)
         ? payload.pag.detPag.map((p, idx) => {
           const pag = {
@@ -828,10 +819,7 @@ class ConsultaNfeController {
             tPag: p.tPag,
             vPag: p.vPag
           };
-          // Se for tipo 99 (Outros), adicionar descrição obrigatória
-          if (p.tPag === '99') {
-            pag.xPag = 'Outros';
-          }
+          console.log(`Pagamento ${idx + 1}: tPag=${pag.tPag}, vPag=R$ ${pag.vPag}`);
           return pag;
         })
       : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
@@ -840,38 +828,15 @@ class ConsultaNfeController {
 
       // Calcular troco (diferença entre valor pago e valor da nota)
       const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
-      const vTroco = roundTo(Math.max(0, totalPago - V_ICMSTot_vNF), 2);
-
-      // NFe.tagPag({
-      //   vTroco: vTroco.toFixed(2)
-      // });
 
       NFe.tagInfAdic({
         infCpl: infCpl
       })
 
-      // Responsável Técnico (opcional mas recomendado)
-      NFe.tagInfRespTec({
-        CNPJ: "11098707000107",
-        xContato: "Suporte Tecnico",
-        email: "suporte@gtocomercio.com.br",
-        fone: "61999999999"
-      });
-
-      // NFe.taginfNFeSupl({
-      //   qrCode: payload.infNFeSupl.qrCode,
-      //   urlChave: payload.infNFeSupl.urlChave,
-      // })
-
-
-
-      // fs.writeFileSync(`./xmls/nfe${payload.ide.chave}.xml`, NFe.xml(), { encoding: "utf-8" });
-            
       tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
 
-
       tools.xmlSign(NFe.xml()).then(async xmlSign => {
-        fs.writeFileSync(`./xmls/nfce${payload.ide.chave}.xml`, xmlSign, { encoding: "utf-8" });
+        fs.writeFileSync(`./xmls/nfce${response.data.data[0]?.venda.IDVENDA}.xml`, xmlSign, { encoding: "utf-8" });
         tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
             fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
             console.log('Resposta SEFAZ:', res);
