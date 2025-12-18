@@ -77,12 +77,6 @@ class ConsultaNfeController {
 
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
-      
-      console.log('\n════════════ DADOS DA VENDA ════════════');
-      console.log('IDVENDA:', vendaData.data[0]?.venda.IDVENDA);
-      console.log('Itens:', vendaData.data[0]?.detalhe?.length);
-      console.log('Pagamentos:', vendaData.data[0]?.pagamento?.length);
-      console.log('═══════════════════════════════════════\n');
 
       let v_TotICMS = 0;
       let v_TotPis = 0;
@@ -98,7 +92,7 @@ class ConsultaNfeController {
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
-        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65" || "55";
+        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || '65';
         const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
         const data = new Date().toISOString().slice(5, 7) + new Date().toISOString().slice(8, 10);
@@ -111,33 +105,12 @@ class ConsultaNfeController {
         const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "2";
         const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
         const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
-        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "1");
+        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2");
         const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
         const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
         const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
         const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
-        // console.log(chaveRaw, 'chave');
-        console.log(uf, 'uf');
-        console.log('cnpj', cnpj);
-        console.log(mod, 'mod');
-        console.log(serie, 'serie');
-        console.log(nnf, 'nnf');
-        console.log(cnf, 'cnf');
-        console.log(cDV, 'cDV');
-        //  chave        53251136769602000236650010000162031676910925 CORRETA
-        // CHAVE NODEJS  53251236769602000236650010000162031676910929
-        /* 
-          UF: 35
-          DHEMI DMMM: 2511
-          CNPJ: 36769602000236
-          MOD: 65
-          SERIE: 001
-          NNF: 16203
-          CNF: 67691092
-          CDV: 5
-        */
-       // Montar a chave com padding correto para cada componente (43 dígitos + 1 DV)
-        // IMPORTANTE: Garantir exatamente 44 dígitos = 2+4+14+2+2+8+8+1
+
         const ufCode = String(ufToCodigo(uf)).padStart(2, '0');
         const dataPadded = String(data).padStart(4, '0'); // DDMM
         const cnpjPadded = String(cnpj || '').padStart(14, '0');
@@ -150,11 +123,6 @@ class ConsultaNfeController {
         const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
         const chave = chaveBase + dvPadded;
         
-        console.log('COMPONENTES CHAVE:', {ufCode, dataPadded, cnpjPadded, modPadded, seriePadded, nnfPadded, cnfPadded, dvPadded});
-        console.log('Chave montada:', chave, `(${chave.length} dígitos - esperado: 44)`);
-        // 53251136769602000236650010000162031676910925 funciona
-        // 53121836769602000236650100016203676910925
-        // 5312183676960200023665116203676910925 nodejs errado
         const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
         const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
@@ -291,12 +259,6 @@ class ConsultaNfeController {
         }
 
         const pagamentosAgrupados = agruparPagamentos(venda.data[0]?.pagamento);
-        
-        console.log('\n─── PAGAMENTOS AGRUPADOS ───');
-        pagamentosAgrupados.forEach((p, idx) => {
-          console.log(`  ${idx + 1}. tPag: ${p.tPag} | Valor: R$ ${p.vPag}`);
-        });
-        console.log('────────────────────────────\n');
 
         function montarItens(venda) {
           const itens = venda.data[0]?.detalhe || [];
@@ -372,24 +334,24 @@ class ConsultaNfeController {
         const payload = {
           ide: {
             chave: chave, 
-            cUF: uf,
+            cUF: ufToCodigo(uf),
             cNF: cnf,
             natOp: natOp,
-            mod: mod,
-            serie: serie,
-            nNF: nnf,
+            mod: parseInt(mod),
+            serie: parseInt(serie),
+            nNF: parseInt(nnf),
             dhEmi: dhEmi,
-            tpNF: tpNF,
-            idDest: idDest,
+            tpNF: parseInt(tpNF),
+            idDest: parseInt(idDest),
             cMunFG: cMunFG,
-            tpImp: tpImp,
-            tpEmis: tpEmis,
-            cDV: cDV,
+            tpImp: parseInt(tpImp),
+            tpEmis: parseInt(tpEmis),
+            cDV: parseInt(cDV),
             tpAmb: tpAmb,
-            finNFe: finNFe,
-            indFinal: indFinal,
-            indPres: indPres,
-            procEmi: procEmi,
+            finNFe: parseInt(finNFe),
+            indFinal: parseInt(indFinal),
+            indPres: parseInt(indPres),
+            procEmi: parseInt(procEmi),
             verProc: "1.0",
           },
           emit: {
@@ -449,10 +411,8 @@ class ConsultaNfeController {
         const dsCRT = configData.DSCRT || "";
         const cscId = configData.IDTOKEN || "1";
         const csc = configData.TOKENCSC || "";
-      // console.log(response.data.data[0].configuracao, 'configuracao completa');
-      // console.log(configData, 'configData extraído');
-      console.log(csc, 'CSC');
-      console.log(cscId, 'CSC ID');
+     
+    
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -463,13 +423,12 @@ class ConsultaNfeController {
         });
       }
 
-      const tpAmbTools = parseInt(tpAmbiente) || 2;
-      console.log('tpAmb usado:', tpAmbTools);
+      // const tpAmbTools = parseInt(tpAmbiente) || '2';
 
       let tools = new Tools({
-        mod: '65',
-        tpAmb: tpAmbTools,
-        UF: payload.emit.enderEmit.UF || 'SP',
+        mod: 65,
+        tpAmb: payload.ide.tpAmb,
+        UF: ufToCodigo(payload.emit.enderEmit.UF || 'SP'),
         CSC: csc,
         CSCid: cscId,
         versao: '4.00',
@@ -487,21 +446,21 @@ class ConsultaNfeController {
         cUF: ufToCodigo(payload.ide.cUF),
         cNF: payload.ide.cNF,
         natOp: payload.ide.natOp,
-        mod: payload.ide.mod,
-        serie: payload.ide.serie,
-        nNF: payload.ide.nNF,
+        mod: parseInt(payload.ide.mod),
+        serie: parseInt(payload.ide.serie),
+        nNF: parseInt(payload.ide.nNF),
         dhEmi: payload.ide.dhEmi,
-        tpNF: payload.ide.tpNF,
-        idDest: payload.ide.idDest,
+        tpNF: parseInt(payload.ide.tpNF),
+        idDest: parseInt(payload.ide.idDest),
         cMunFG: payload.ide.cMunFG,
-        tpImp: payload.ide.tpImp,
-        tpEmis: payload.ide.tpEmis,
-        cDV: payload.ide.cDV,
-        tpAmb: payload.ide.tpAmb,
-        finNFe: payload.ide.finNFe,
-        indFinal: payload.ide.indFinal,
-        indPres: payload.ide.indPres,
-        procEmi: payload.ide.procEmi,
+        tpImp: parseInt(payload.ide.tpImp),
+        tpEmis: parseInt(payload.ide.tpEmis),
+        cDV: parseInt(payload.ide.cDV),
+        tpAmb: parseInt(payload.ide.tpAmb),
+        finNFe: parseInt(payload.ide.finNFe),
+        indFinal: parseInt(payload.ide.indFinal),
+        indPres: parseInt(payload.ide.indPres),
+        procEmi: parseInt(payload.ide.procEmi),
         verProc: payload.ide.verProc,
 
       })
@@ -853,8 +812,6 @@ class ConsultaNfeController {
         infCpl: infCpl
       })
 
-      tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
-
       tools.xmlSign(NFe.xml()).then(async xmlSign => {
         fs.writeFileSync(`./xmls/nfce${response.data.data[0]?.venda.IDVENDA}.xml`, xmlSign, { encoding: "utf-8" });
         tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
@@ -906,18 +863,15 @@ class ConsultaNfeController {
       
 
       let tools = new Tools({
-        mod: '55',
+        mod: 55,
         tpAmb: tpAmbTools,
-        UF: uf || 'SP',
-        CNPJ: cnpjEmitente,
+        UF: ufToCodigo(uf || 'SP'),
         CSC: csc,
         CSCid: cscId,
         versao: '4.00',
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       }, certOptions);
 
-
-      tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
 
       tools.sefazDistDFe({chNFe: chave}).then(res => {
         console.log('Resposta SEFAZ Distribuição:', res);
