@@ -926,8 +926,8 @@ class ConsultaNfeController {
           stack: errSign.stack
         }, null, 2), { encoding: "utf-8" });
       });
-      return xmlGerado
-      // return res.json(vendaData, { xml: xmlGerado });
+      console.log(xmlGerado);
+      return res.json(vendaData);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
