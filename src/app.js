@@ -16,6 +16,7 @@ class App {
         this.middlewares();
         this.routes();
     }
+    
     middlewares() {
         this.server.use(cors({
             // origin: ['http://164.152.245.77:8000', 'http://localhost:5173'],
@@ -49,7 +50,9 @@ class App {
     routes() {
         this.server.use(routes);
     }
+    
 }
+
 
 export default new App().server;
 

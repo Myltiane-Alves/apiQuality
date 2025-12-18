@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import 'dotenv/config';
-
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
   if (process.env.CERT_PFX_BASE64) {
     try {
@@ -90,12 +91,23 @@ class ConsultaNfeController {
       function gerarXML(venda) {
 
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+        console.log("🔍 DEBUG - UF recebido:", uf, typeof uf);
+        const ufConverted = ufToCodigo(uf);
+        console.log("🔍 DEBUG - UF convertido:", ufConverted);
+        
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
         const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
         const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
-        const data = new Date().toISOString().slice(5, 7) + new Date().toISOString().slice(8, 10);
+        
+        // IMPORTANTE: Data deve estar em formato DDMM (dia+mês), não MMDD
+        const dataObj = new Date();
+        const dia = String(dataObj.getDate()).padStart(2, '0');
+        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+        const data = dia + mes; // DDMM correto
+        console.log("📅 Data calculada:", data, `(hoje: ${dia}/${mes})`);
+        
         // const chaveRaw = venda.data[0]?.venda.CHAVE || "";
         // const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
         
@@ -118,10 +130,23 @@ class ConsultaNfeController {
         const seriePadded = String(serie || '').padStart(2, '0');
         const nnfPadded = String(nnf || '').padStart(8, '0'); // NNF: 16203 → 00016203 (8 dígitos)
         const cnfPadded = String(cnf || '').padStart(8, '0'); // CNF: 67691092 → 67691092 (8 dígitos)
-        const dvPadded = String(venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || '0').padStart(1, '0');
         
+        // NOTA: O Make() calcula a chave e DV automaticamente baseado nos valores de ide
+        // Não devemos tentar calcular manualmente - deixar a biblioteca fazer
+        // Mas vamos deixar esse debug para comparação
         const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
-        const chave = chaveBase + dvPadded;
+        const chaveDebug = chaveBase + "X"; // placeholder, será recalculado pelo Make()
+        
+        console.log("🔧 === CONSTRUÇÃO DA CHAVE (informativo) ===");
+        console.log("   ufCode:", ufCode, "(esperado: 53)");
+        console.log("   dataPadded:", dataPadded);
+        console.log("   cnpjPadded:", cnpjPadded);
+        console.log("   modPadded:", modPadded);
+        console.log("   seriePadded:", seriePadded);
+        console.log("   nnfPadded:", nnfPadded);
+        console.log("   cnfPadded:", cnfPadded);
+        console.log("   NOTA: Chave será calculada pelo Make()");
+        console.log("===========================");
         
         const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
@@ -333,7 +358,6 @@ class ConsultaNfeController {
     
         const payload = {
           ide: {
-            chave: chave, 
             cUF: ufToCodigo(uf),
             cNF: cnf,
             natOp: natOp,
@@ -453,14 +477,26 @@ class ConsultaNfeController {
         });
       }
       
+      // Configurar variáveis de ambiente para OpenSSL 3.x
+      const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+      process.env.OPENSSL_MODULES = opensslModulesPath;
+      
       let tools = new Tools({
         mod: '65',
-        tpAmb: tpAmbTools,
-        UF: ufTools,
+        tpAmb: 2,
+        UF: payload.emit.enderEmit.UF,
         CSC: csc,
-        CSCid: cscId,
+        CSCid: String(cscId),
         versao: '4.00',
+        proxy: null,
+        agent: null,
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+        webservice: {
+          status: 'https://nfce-homologacao.svrs.rs.gov.br/ws/NfeStatusServico/NFeStatusServico4.asmx',
+          envio: 'https://nfce-homologacao.svrs.rs.gov.br/ws/NfeAutorizacao/NFeAutorizacao4.asmx'
+        }
       }, certOptions);
 
       
@@ -840,80 +876,67 @@ class ConsultaNfeController {
         infCpl: infCpl
       })
 
-      tools.xmlSign(NFe.xml()).then(async xmlSign => {
-        fs.writeFileSync(`./xmls/nfce${response.data.data[0]?.venda.IDVENDA}.xml`, xmlSign, { encoding: "utf-8" });
-        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
-            fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(res, null, 2), { encoding: "utf-8" });
-            console.log('Resposta SEFAZ:', res);
-        }).catch(err => {
-            fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify(err, null, 2), { encoding: "utf-8" });
-            console.log(err, 'erro sefazEnviaLote');
-        });
-      }).catch(err => {
-          console.log(err, 'erro tools');
-      });
-      return res.json(vendaData);
-    } catch (error) {
-      console.error('Erro ao consultar venda ou gerar XML:', error);
-      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
-    }
-  }
-
-  async downloadNFe(req, res) {
-    try {
-      let { idVenda } = req.query;
-
-      if (!idVenda) {
-        return res.status(400).json({ error: "idVenda é obrigatório" });
-      }
-
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
-      const vendaData = response.data;
-      const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
-      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-      const cnpjEmitente = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CNPJ || "";
-      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-      const tpAmbiente = configData.TPAMBIENTE || "2"; // Default: homologação
-      const cscId = configData.IDTOKEN || "1";
-      const csc = configData.TOKENCSC || "";
-
-      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
-
-      if (!certOptions) {
-        return res.status(500).json({
-          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
-        });
-      }
-
-      const tpAmbTools = parseInt(tpAmbiente) || 2;
+      const xmlGerado = NFe.xml();
+      // console.log("\n📄 XML GERADO:");
+      // console.log("   Tamanho:", xmlGerado.length, "bytes");
+      // console.log("   Contém <infNFe>:", xmlGerado.includes("<infNFe") ? "✓" : "❌");
+      // console.log("   Contém <ide>:", xmlGerado.includes("<ide") ? "✓" : "❌");
+      // console.log("   Contém <emit>:", xmlGerado.includes("<emit") ? "✓" : "❌");
+      // console.log("   Contém <det>:", xmlGerado.includes("<det") ? "✓" : "❌");
+      // console.log("   Contém <total>:", xmlGerado.includes("<total") ? "✓" : "❌");
+      // console.log("   Contém <pag>:", xmlGerado.includes("<pag") ? "✓" : "❌");
       
-
-      let tools = new Tools({
-        mod: 55,
-        tpAmb: tpAmbTools,
-        UF: ufToCodigo(uf || 'SP'),
-        CSC: csc,
-        CSCid: cscId,
-        versao: '4.00',
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-      }, certOptions);
-
-
-      tools.sefazDistDFe({chNFe: chave}).then(res => {
-        console.log('Resposta SEFAZ Distribuição:', res);
-        docZip(res).then(res => {
-          console.log('XML extraído do ZIP:', res);
-        })
-      }).catch(err => {
-        console.log(err, 'erro sefazDistDFe');
+      // Extrair chave para verificar
+      // Tenta encontrar a chave no atributo Id de infNFe (formato: NFe + 44 dígitos)
+      const matchChaveId = xmlGerado.match(/Id="NFe(\d{44})"/);
+      // Se não encontrar, tenta buscar em elemento chNFe
+      const matchChave = matchChaveId || xmlGerado.match(/<chNFe>(\d{44})<\/chNFe>/);
+      const chaveNoXml = matchChave ? (matchChave[1] || (matchChaveId ? matchChaveId[1] : "NÃO ENCONTRADA")) : "NÃO ENCONTRADA";
+      // console.log("   Chave (44 dígitos):", chaveNoXml);
+      
+      // Debug: verificar o ID do NFe
+      const idNFeMatch = xmlGerado.match(/Id="(NFe\d+)"/);
+      // console.log("   ID infNFe extraído:", idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO");
+      tools.sefazStatus().then(res => {
+          console.log(res, 'status sefaz')
+      }).catch(err=>{
+          console.log(err, 'erro status sefaz')
       })
+      
+      // tools.xmlSign(xmlGerado).then(async xmlSign => {
+      //   // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
+      //   fs.writeFileSync(`./xmls/nfe.xml`, xmlSign, { encoding: "utf-8" });
+        
+      //   try {
+      //     console.log("📤 Iniciando sefazEnviaLote...");
+      //     const resposta = await tools.sefazEnviaLote(xmlSign, { indSinc: 1 });
+      //     console.log("✅ Resposta SEFAZ recebida:", resposta);
+      //     fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
+      //   } catch (errSefaz) {
+      //     console.error("❌ Erro em sefazEnviaLote:", errSefaz);
+      //     console.error("   Mensagem:", errSefaz.message);
+      //     console.error("   Stack:", errSefaz.stack);
+      //     fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+      //       message: errSefaz.message,
+      //       stack: errSefaz.stack,
+      //       code: errSefaz.code
+      //     }, null, 2), { encoding: "utf-8" });
+      //   }
+      // }).catch(errSign => {
+      //   console.error("❌ Erro em xmlSign:");
+      //   console.error("   Mensagem:", errSign.message);
+      //   console.error("   Stack:", errSign.stack);
+      //   fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+      //     message: errSign.message,
+      //     stack: errSign.stack
+      //   }, null, 2), { encoding: "utf-8" });
+      // });
       return res.json(vendaData);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
+
 }
 export default new ConsultaNfeController();
