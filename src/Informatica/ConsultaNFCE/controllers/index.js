@@ -1,4 +1,4 @@
-import { Make, Tools } from 'node-sped-nfe';
+import { docZip, Make, Tools } from 'node-sped-nfe';
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
@@ -86,7 +86,7 @@ export function roundTo(valor, casasDecimais) {
 }
 class ConsultaNfeController {
   
-   async consultaNFce(req, res) {
+  async consultaNFce(req, res) {
     try {
       let { idVenda } = req.query;
 
@@ -105,7 +105,7 @@ class ConsultaNfeController {
         return map[u] || "35";
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
       
       console.log('\n════════════ DADOS DA VENDA ════════════');
@@ -129,11 +129,12 @@ class ConsultaNfeController {
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
         const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65" || "55";
-        const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "0";
+        const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
-        const chaveRaw = venda.data[0]?.venda.CHAVE || "";
-        const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-        // console.log('Chave da NFe:', venda.data[0]?.venda);
+        const data = new Date().toISOString().slice(5, 7) + new Date().toISOString().slice(8, 10);
+        // const chaveRaw = venda.data[0]?.venda.CHAVE || "";
+        // const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
+        
         const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
         const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
         const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
@@ -144,7 +145,46 @@ class ConsultaNfeController {
         const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
         const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
         const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
-        const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ || "00000000000000";
+        const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+        // console.log(chaveRaw, 'chave');
+        console.log(uf, 'uf');
+        console.log('cnpj', cnpj);
+        console.log(mod, 'mod');
+        console.log(serie, 'serie');
+        console.log(nnf, 'nnf');
+        console.log(cnf, 'cnf');
+        console.log(cDV, 'cDV');
+        //  chave        53251136769602000236650010000162031676910925 CORRETA
+        // CHAVE NODEJS  53251236769602000236650010000162031676910929
+        /* 
+          UF: 35
+          DHEMI DMMM: 2511
+          CNPJ: 36769602000236
+          MOD: 65
+          SERIE: 001
+          NNF: 16203
+          CNF: 67691092
+          CDV: 5
+        */
+       // Montar a chave com padding correto para cada componente (43 dígitos + 1 DV)
+        // IMPORTANTE: Garantir exatamente 44 dígitos = 2+4+14+2+2+8+8+1
+        const ufCode = String(ufToCodigo(uf)).padStart(2, '0');
+        const dataPadded = String(data).padStart(4, '0'); // DDMM
+        const cnpjPadded = String(cnpj || '').padStart(14, '0');
+        const modPadded = String(mod || '').padStart(2, '0');
+        const seriePadded = String(serie || '').padStart(2, '0');
+        const nnfPadded = String(nnf || '').padStart(8, '0'); // NNF: 16203 → 00016203 (8 dígitos)
+        const cnfPadded = String(cnf || '').padStart(8, '0'); // CNF: 67691092 → 67691092 (8 dígitos)
+        const dvPadded = String(venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || '0').padStart(1, '0');
+        
+        const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
+        const chave = chaveBase + dvPadded;
+        
+        console.log('COMPONENTES CHAVE:', {ufCode, dataPadded, cnpjPadded, modPadded, seriePadded, nnfPadded, cnfPadded, dvPadded});
+        console.log('Chave montada:', chave, `(${chave.length} dígitos - esperado: 44)`);
+        // 53251136769602000236650010000162031676910925 funciona
+        // 53121836769602000236650100016203676910925
+        // 5312183676960200023665116203676910925 nodejs errado
         const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
         const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
@@ -231,25 +271,26 @@ class ConsultaNfeController {
         // MAPEAMENTO: Códigos do banco → Códigos SEFAZ
         function mapearTipoPagamento(tPagBanco) {
           const mapeamento = {
-              '001': '01',  // Dinheiro
-              '002': '02',  // Cheque
-              '003': '03',  // Cartão Crédito
-              '004': '04',  // Cartão Débito
-              '005': '05',  // Crédito Loja
-              '009': '03',  // Credsystem → Cartão Crédito
-              '010': '10',  // Vale Alimentação
-              '011': '11',  // Vale Refeição
-              '012': '12',  // Vale Presente
-              '013': '13',  // Vale Combustível
-              '015': '15',  // Boleto Bancário
-              '016': '16',  // Depósito Bancário
-              '017': '17',  // PIX
-              '018': '18',  // Transferência Bancária
-              '031': '03',  // Outros cartões → Cartão Crédito
-              '090': '90',  // Sem pagamento
-              '099': '99'   // Outros
+            '001': '01',  // Dinheiro
+            '002': '02',  // Cheque
+            '003': '03',  // Cartão Crédito
+            '004': '04',  // Cartão Débito
+            '005': '05',  // Crédito Loja
+            '009': '03',  // Credsystem → Cartão Crédito
+            '010': '10',  // Vale Alimentação
+            '011': '11',  // Vale Refeição
+            '012': '12',  // Vale Presente
+            '013': '13',  // Vale Combustível
+            '015': '15',  // Boleto Bancário
+            '016': '16',  // Depósito Bancário
+            '017': '17',  // PIX
+            '018': '18',  // Transferência Bancária
+            '031': '03',  // Outros cartões → Cartão Crédito
+            '090': '90',  // Sem pagamento
+            '099': '99'   // Outros
           };
-          return mapeamento[tPagBanco] || '99';
+
+          return mapeamento[tPagBanco] ?? '99';
         }
 
         // AGRUPAR PAGAMENTOS POR tPag (soma valores do mesmo tipo)
@@ -357,7 +398,7 @@ class ConsultaNfeController {
             };
           });
         }
-
+    
         const payload = {
           ide: {
             chave: chave, 
@@ -819,15 +860,24 @@ class ConsultaNfeController {
             tPag: p.tPag,
             vPag: p.vPag
           };
-          console.log(`Pagamento ${idx + 1}: tPag=${pag.tPag}, vPag=R$ ${pag.vPag}`);
+          
+          // Adicionar xPag (descrição) APENAS quando tPag = "99" (Outros)
+          if (p.tPag === "99") {
+            pag.xPag = "Outros";
+          }
+          
+          
           return pag;
         })
-      : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
+        : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
+        
+        NFe.tagDetPag(pagamentosFormatados);
+        
+        // Calcular troco (diferença entre valor pago e valor da nota)
+        const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
+        const vrTroco = roundTo(totalPago - parseFloat(totaisFinais.vNFTot), 2);
+ 
       
-      NFe.tagDetPag(pagamentosFormatados);
-
-      // Calcular troco (diferença entre valor pago e valor da nota)
-      const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
 
       NFe.tagInfAdic({
         infCpl: infCpl
@@ -847,6 +897,71 @@ class ConsultaNfeController {
       }).catch(err => {
           console.log(err, 'erro tools');
       });
+      return res.json(vendaData);
+    } catch (error) {
+      console.error('Erro ao consultar venda ou gerar XML:', error);
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+    }
+  }
+
+  async downloadNFe(req, res) {
+    try {
+      let { idVenda } = req.query;
+
+      if (!idVenda) {
+        return res.status(400).json({ error: "idVenda é obrigatório" });
+      }
+
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const vendaData = response.data;
+      const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
+      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
+      const cnpjEmitente = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CNPJ || "";
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
+      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
+      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
+      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
+      const tpEmissao = configData.TPEMISSAO || "";
+      const tpAmbiente = configData.TPAMBIENTE || "2"; // Default: homologação
+      const dsCRT = configData.DSCRT || "";
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      const tpAmbTools = parseInt(tpAmbiente) || 2;
+      
+
+      let tools = new Tools({
+        mod: '55',
+        tpAmb: tpAmbTools,
+        UF: uf || 'SP',
+        CNPJ: cnpjEmitente,
+        CSC: csc,
+        CSCid: cscId,
+        versao: '4.00',
+        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      }, certOptions);
+
+
+      tools.sefazStatus().then(s => console.log(JSON.stringify(s, null, 2))).catch(err => console.log(err, 'erro status'));
+
+      tools.sefazDistDFe({chNFe: chave}).then(res => {
+        console.log('Resposta SEFAZ Distribuição:', res);
+        docZip(res).then(res => {
+          console.log('XML extraído do ZIP:', res);
+        })
+      }).catch(err => {
+        console.log(err, 'erro sefazDistDFe');
+      })
       return res.json(vendaData);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
