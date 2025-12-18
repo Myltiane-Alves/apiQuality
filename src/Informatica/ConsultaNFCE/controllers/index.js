@@ -4,25 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import 'dotenv/config';
 
-
-function extrairCStat(xml) {
-  const match = String(xml).match(/<cStat>(\d+)<\/cStat>/);
-  return match ? match[1] : 'SEM_CSTAT';
-}
-/**
- * Carrega opções de certificado para passar ao constructor de Tools.
- * Suporta, na ordem de preferência:
- *  - PFX via variável de ambiente CERT_PFX_BASE64
- *  - PFX arquivo local './GTO COMERCIO 2025-2026.pfx'
- *  - PEM via variáveis CERT_PEM_CERT_BASE64 / CERT_PEM_KEY_BASE64
- *  - PEM via caminhos process.env.CERT_PEM_CERT_PATH / process.env.CERT_PEM_KEY_PATH
- * Retorna um objeto que pode ser passado como 2º argumento do Tools, por exemplo { pfx: Buffer, senha } ou { cert: Buffer, key: Buffer }
- */
-
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
-  // -----------------------------
-  // 1) PFX BASE64 VIA ENV
-  // -----------------------------
   if (process.env.CERT_PFX_BASE64) {
     try {
       const buf = Buffer.from(process.env.CERT_PFX_BASE64, "base64");
@@ -34,9 +16,7 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
     }
   }
 
-  // -----------------------------
-  // 2) PFX ARQUIVO LOCAL
-  // -----------------------------
+
   if (fallbackPfxPath && fs.existsSync(fallbackPfxPath)) {
     try {
       const buf = fs.readFileSync(path.resolve(fallbackPfxPath));
@@ -48,9 +28,6 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
     }
   }
 
-  // -----------------------------
-  // 3) PEM BASE64 (cert + key)
-  // -----------------------------
   if (process.env.CERT_PEM_CERT_BASE64 && process.env.CERT_PEM_KEY_BASE64) {
     try {
       const cert = Buffer.from(process.env.CERT_PEM_CERT_BASE64, "base64");
@@ -61,9 +38,6 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
     }
   }
 
-  // -----------------------------
-  // 4) PEM POR CAMINHO
-  // -----------------------------
   if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
     try {
       const cert = fs.readFileSync(process.env.CERT_PEM_CERT_PATH);
@@ -73,10 +47,6 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
       console.error("ERRO ao ler caminhos PEM:", e.message);
     }
   }
-
-  // -----------------------------
-  // 5) NADA ENCONTRADO
-  // -----------------------------
   return null;
 }
 
@@ -919,12 +889,7 @@ class ConsultaNfeController {
       const cnpjEmitente = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CNPJ || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
-      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
-      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
-      const tpEmissao = configData.TPEMISSAO || "";
       const tpAmbiente = configData.TPAMBIENTE || "2"; // Default: homologação
-      const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
 
