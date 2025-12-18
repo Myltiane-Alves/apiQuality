@@ -1,5 +1,5 @@
 {
-  "message": "",
-  "stack": "AggregateError: \n    at internalConnectMultiple (node:net:1134:18)\n    at afterConnectMultiple (node:net:1715:7)",
+  "message": "connect ECONNREFUSED ::1:443",
+  "stack": "Error: connect ECONNREFUSED ::1:443\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1615:16)",
   "code": "ECONNREFUSED"
 }
