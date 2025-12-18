@@ -92,7 +92,7 @@ class ConsultaNfeController {
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
-        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || '65';
+        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
         const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
         const data = new Date().toISOString().slice(5, 7) + new Date().toISOString().slice(8, 10);
@@ -105,7 +105,7 @@ class ConsultaNfeController {
         const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "2";
         const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
         const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
-        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2");
+        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
         const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
         const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
         const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
@@ -337,21 +337,21 @@ class ConsultaNfeController {
             cUF: ufToCodigo(uf),
             cNF: cnf,
             natOp: natOp,
-            mod: parseInt(mod),
-            serie: parseInt(serie),
-            nNF: parseInt(nnf),
+            mod: mod,
+            serie: serie,
+            nNF: nnf,
             dhEmi: dhEmi,
-            tpNF: parseInt(tpNF),
-            idDest: parseInt(idDest),
+            tpNF: tpNF,
+            idDest: idDest,
             cMunFG: cMunFG,
-            tpImp: parseInt(tpImp),
-            tpEmis: parseInt(tpEmis),
-            cDV: parseInt(cDV),
+            tpImp: tpImp,
+            tpEmis: tpEmis,
+            cDV: cDV,
             tpAmb: tpAmb,
-            finNFe: parseInt(finNFe),
-            indFinal: parseInt(indFinal),
-            indPres: parseInt(indPres),
-            procEmi: parseInt(procEmi),
+            finNFe: finNFe,
+            indFinal: indFinal,
+            indPres: indPres,
+            procEmi: procEmi,
             verProc: "1.0",
           },
           emit: {
@@ -407,7 +407,8 @@ class ConsultaNfeController {
         const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
         const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
         const tpEmissao = configData.TPEMISSAO || "";
-        const tpAmbiente = configData.TPAMBIENTE || "2"; // Default: homologação
+        const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
+
         const dsCRT = configData.DSCRT || "";
         const cscId = configData.IDTOKEN || "1";
         const csc = configData.TOKENCSC || "";
@@ -423,12 +424,39 @@ class ConsultaNfeController {
         });
       }
 
-      // const tpAmbTools = parseInt(tpAmbiente) || '2';
-
+      const tpAmbTools = parseInt(tpAmbiente) || 2;
+      const ufTools = ufToCodigo(payload.emit.enderEmit.UF || 'SP');
+      
+      // VALIDAÇÃO CRÍTICA
+      console.log("🔧 === VALIDAÇÃO TOOLS ===");
+      console.log("   mod: '65'", csc ? "✓" : "⚠️");
+      console.log("   tpAmb:", tpAmbTools, typeof tpAmbTools === 'number' ? "✓" : "❌");
+      console.log("   UF:", ufTools, ufTools && ufTools !== "" ? "✓" : "❌");
+      console.log("   CSC:", csc && csc.trim() ? "✓" : "❌ VAZIO!");
+      console.log("   CSCid:", cscId, "✓");
+      console.log("   certOptions:", certOptions ? "✓ carregado" : "❌ vazio");
+      console.log("==========================");
+      
+      if (!csc || csc.trim() === "") {
+        console.error("❌ ERRO: CSC vazio - não é possível gerar NFC-e");
+        return res.status(400).json({
+          error: "CSC (Token) não configurado",
+          details: { csc: "vazio", cscId }
+        });
+      }
+      
+      if (!ufTools || ufTools === "") {
+        console.error("❌ ERRO: UF inválido:", payload.emit.enderEmit.UF);
+        return res.status(400).json({
+          error: "UF não identificado",
+          received: payload.emit.enderEmit.UF
+        });
+      }
+      
       let tools = new Tools({
-        mod: 65,
-        tpAmb: payload.ide.tpAmb,
-        UF: ufToCodigo(payload.emit.enderEmit.UF || 'SP'),
+        mod: '65',
+        tpAmb: tpAmbTools,
+        UF: ufTools,
         CSC: csc,
         CSCid: cscId,
         versao: '4.00',
@@ -446,21 +474,21 @@ class ConsultaNfeController {
         cUF: ufToCodigo(payload.ide.cUF),
         cNF: payload.ide.cNF,
         natOp: payload.ide.natOp,
-        mod: parseInt(payload.ide.mod),
-        serie: parseInt(payload.ide.serie),
-        nNF: parseInt(payload.ide.nNF),
+        mod: String(payload.ide.mod),
+        serie: payload.ide.serie,
+        nNF: payload.ide.nNF,
         dhEmi: payload.ide.dhEmi,
-        tpNF: parseInt(payload.ide.tpNF),
-        idDest: parseInt(payload.ide.idDest),
+        tpNF: payload.ide.tpNF,
+        idDest: payload.ide.idDest,
         cMunFG: payload.ide.cMunFG,
-        tpImp: parseInt(payload.ide.tpImp),
-        tpEmis: parseInt(payload.ide.tpEmis),
-        cDV: parseInt(payload.ide.cDV),
-        tpAmb: parseInt(payload.ide.tpAmb),
-        finNFe: parseInt(payload.ide.finNFe),
-        indFinal: parseInt(payload.ide.indFinal),
-        indPres: parseInt(payload.ide.indPres),
-        procEmi: parseInt(payload.ide.procEmi),
+        tpImp: payload.ide.tpImp,
+        tpEmis: payload.ide.tpEmis,
+        cDV: payload.ide.cDV,
+        tpAmb: payload.ide.tpAmb,
+        finNFe: payload.ide.finNFe,
+        indFinal: payload.ide.indFinal,
+        indPres: payload.ide.indPres,
+        procEmi: payload.ide.procEmi,
         verProc: payload.ide.verProc,
 
       })
