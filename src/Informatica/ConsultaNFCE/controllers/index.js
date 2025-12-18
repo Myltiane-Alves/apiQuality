@@ -897,41 +897,37 @@ class ConsultaNfeController {
       // Debug: verificar o ID do NFe
       const idNFeMatch = xmlGerado.match(/Id="(NFe\d+)"/);
       // console.log("   ID infNFe extraído:", idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO");
-      tools.sefazStatus().then(res => {
-          console.log(res, 'status sefaz')
-      }).catch(err=>{
-          console.log(err, 'erro status sefaz')
-      })
       
-      // tools.xmlSign(xmlGerado).then(async xmlSign => {
-      //   // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
-      //   fs.writeFileSync(`./xmls/nfe.xml`, xmlSign, { encoding: "utf-8" });
+      tools.xmlSign(xmlGerado).then(async xmlSign => {
+        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
+        fs.writeFileSync(`./xmls/nfe.xml`, xmlSign, { encoding: "utf-8" });
         
-      //   try {
-      //     console.log("📤 Iniciando sefazEnviaLote...");
-      //     const resposta = await tools.sefazEnviaLote(xmlSign, { indSinc: 1 });
-      //     console.log("✅ Resposta SEFAZ recebida:", resposta);
-      //     fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
-      //   } catch (errSefaz) {
-      //     console.error("❌ Erro em sefazEnviaLote:", errSefaz);
-      //     console.error("   Mensagem:", errSefaz.message);
-      //     console.error("   Stack:", errSefaz.stack);
-      //     fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-      //       message: errSefaz.message,
-      //       stack: errSefaz.stack,
-      //       code: errSefaz.code
-      //     }, null, 2), { encoding: "utf-8" });
-      //   }
-      // }).catch(errSign => {
-      //   console.error("❌ Erro em xmlSign:");
-      //   console.error("   Mensagem:", errSign.message);
-      //   console.error("   Stack:", errSign.stack);
-      //   fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-      //     message: errSign.message,
-      //     stack: errSign.stack
-      //   }, null, 2), { encoding: "utf-8" });
-      // });
-      return res.json(vendaData);
+        try {
+          console.log("📤 Iniciando sefazEnviaLote...");
+          const resposta = await tools.sefazEnviaLote(xmlSign, { indSinc: 1 });
+          console.log("✅ Resposta SEFAZ recebida:", resposta);
+          fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
+        } catch (errSefaz) {
+          console.error("❌ Erro em sefazEnviaLote:", errSefaz);
+          console.error("   Mensagem:", errSefaz.message);
+          console.error("   Stack:", errSefaz.stack);
+          fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+            message: errSefaz.message,
+            stack: errSefaz.stack,
+            code: errSefaz.code
+          }, null, 2), { encoding: "utf-8" });
+        }
+      }).catch(errSign => {
+        console.error("❌ Erro em xmlSign:");
+        console.error("   Mensagem:", errSign.message);
+        console.error("   Stack:", errSign.stack);
+        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+          message: errSign.message,
+          stack: errSign.stack
+        }, null, 2), { encoding: "utf-8" });
+      });
+      return xmlGerado
+      // return res.json(vendaData, { xml: xmlGerado });
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
