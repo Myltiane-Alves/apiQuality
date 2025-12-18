@@ -927,6 +927,7 @@ class ConsultaNfeController {
         }, null, 2), { encoding: "utf-8" });
       });
       
+      
       // Retornar dados completos incluindo XML gerado
       return res.json({
         venda: vendaData,
