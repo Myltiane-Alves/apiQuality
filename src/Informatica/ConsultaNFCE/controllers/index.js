@@ -926,11 +926,20 @@ class ConsultaNfeController {
           stack: errSign.stack
         }, null, 2), { encoding: "utf-8" });
       });
-      console.log(xmlGerado);
-      return res.json(vendaData);
+      
+      // Retornar dados completos incluindo XML gerado
+      return res.json({
+        venda: vendaData,
+        xml: {
+          gerado: xmlGerado,
+          tamanho: xmlGerado.length,
+          chave: chaveNoXml,
+          id: idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO"
+        }
+      });
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
-      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML', details: error.message });
     }
   }
 
