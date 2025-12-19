@@ -64,6 +64,7 @@ class ConsultaNfeController {
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
+      
 
       function ufToCodigo(uf) {
         const map = {
@@ -945,7 +946,25 @@ class ConsultaNfeController {
   }
 
   async downloadXML(req, res) {
+   
+    let { idVenda, chave } = req.query;
 
+    if (!idVenda) {
+      return res.status(400).json({ error: "idVenda é obrigatório" });
+    }
+
+    const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+    const vendaData = response.data;
+    
+    let tools = new Tools({
+      mod: "65",
+      tpAmb: 2,
+      UF: "DF",
+      versao: "4.00",
+      CNP: "53242678000160",
+      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+    })
   }
 
   async putValidarVendaContigencia(req, res) {
