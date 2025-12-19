@@ -965,15 +965,15 @@ class ConsultaNfeController {
   
   async validarStatusSefaz(req, res) {
     try {
-      const CERTIFICADO_BASE64 =
-        process.env.CERTIFICADO_BASE64 ||
-        fs.readFileSync("./cert_base64.txt", "utf-8").trim();
 
-      const SENHA = process.env.SENHA_CERTIFICADO || "#senhagto2024#";
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
 
-      // Salva o arquivo temporário do certificado (PFX)
-      const tempPfxPath = path.join(os.tmpdir(), "certificado.pfx");
-      fs.writeFileSync(tempPfxPath, Buffer.from(CERTIFICADO_BASE64, "base64"));
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
 
       let { vendas } = req.body;
       let { page, pageSize } = req.query;
@@ -1011,11 +1011,6 @@ class ConsultaNfeController {
         return res.status(400).json({ error: "Nenhuma venda para consultar." });
       }
 
-      const certOptions = {
-        pfx: fs.readFileSync(tempPfxPath),
-        senha: SENHA,
-      };
-
       const resultados = [];
 
       for (const row of vendas) {
@@ -1033,9 +1028,10 @@ class ConsultaNfeController {
             {
               mod: "65",
               tpAmb: 1,
-              UF,
+              UF: UF,
               versao: "4.00",
               xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+              openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
             },
             certOptions
           );
@@ -1053,9 +1049,6 @@ class ConsultaNfeController {
           resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
         }
       }
-
-      // remove o arquivo temporário
-      fs.unlinkSync(tempPfxPath);
 
       return res.json({
         total: resultados.length,
