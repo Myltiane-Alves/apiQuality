@@ -4,6 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import 'dotenv/config';
 import dns from 'dns';
+import { time } from 'console';
 dns.setDefaultResultOrder('ipv4first');
 
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
@@ -484,14 +485,12 @@ class ConsultaNfeController {
         mod: '65',
         tpAmb: 2,
         UF: payload.emit.enderEmit.UF,
+        versao: '4.00',
+        timeout: 60,
         CSC: csc,
         CSCid: String(cscId),
-        versao: '4.00',
-        proxy: null,
-        agent: null,
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
         openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
-
       }, certOptions);
 
 
@@ -519,6 +518,7 @@ class ConsultaNfeController {
         finNFe: payload.ide.finNFe,
         indFinal: payload.ide.indFinal,
         indPres: payload.ide.indPres,
+        indIntermed: "0",
         procEmi: payload.ide.procEmi,
         verProc: payload.ide.verProc,
 
@@ -935,202 +935,202 @@ class ConsultaNfeController {
   }
 
   async downloadXML(req, res) {
-  try {
-    const { idVenda } = req.body;
+    try {
+      const { idVenda } = req.body;
 
-    function ufToCodigo(uf) {
-      const map = {
-        "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
-        "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27", "SE": "28", "BA": "29",
-        "MG": "31", "ES": "32", "RJ": "33", "SP": "35", "PR": "41", "SC": "42", "RS": "43", "MS": "50", "MT": "51", "GO": "52", "DF": "53"
-      };
-      if (!uf) return "35";
-      const u = uf.toUpperCase();
-      return map[u] || "35";
-    }
-    const response = await axios.get(
-      `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`
-    );
+      function ufToCodigo(uf) {
+        const map = {
+          "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
+          "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27", "SE": "28", "BA": "29",
+          "MG": "31", "ES": "32", "RJ": "33", "SP": "35", "PR": "41", "SC": "42", "RS": "43", "MS": "50", "MT": "51", "GO": "52", "DF": "53"
+        };
+        if (!uf) return "35";
+        const u = uf.toUpperCase();
+        return map[u] || "35";
+      }
+      const response = await axios.get(
+        `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`
+      );
 
-    const vendaApi = response.data.data[0];
-    const venda = vendaApi.venda;
-    const itens = vendaApi.detalhe;
-    const pagamentos = vendaApi.pagamento;
-    const config = vendaApi.configuracao[0].config;
+      const vendaApi = response.data.data[0];
+      const venda = vendaApi.venda;
+      const itens = vendaApi.detalhe;
+      const pagamentos = vendaApi.pagamento;
+      const config = vendaApi.configuracao[0].config;
 
-    // ================== 2. VALIDAR CHAVE ==================
-    const chaveLimpa = venda.CHAVE.replace(/^NFe/, "");
+      // ================== 2. VALIDAR CHAVE ==================
+      const chaveLimpa = venda.CHAVE.replace(/^NFe/, "");
 
-    if (!/^\d{44}$/.test(chaveLimpa)) {
-      throw new Error(`Chave inválida: ${chaveLimpa}`);
-    }
+      if (!/^\d{44}$/.test(chaveLimpa)) {
+        throw new Error(`Chave inválida: ${chaveLimpa}`);
+      }
 
-    // ================== 3. VALIDAR DATA ==================
-    let dhEmi = venda.NFE_INFNFE_IDE_DHEMI;
-    if (!dhEmi.includes("T")) {
-      const agora = new Date();
-      dhEmi = `${dhEmi}T${agora.toTimeString().substring(0, 8)}-03:00`;
-    }
+      // ================== 3. VALIDAR DATA ==================
+      let dhEmi = venda.NFE_INFNFE_IDE_DHEMI;
+      if (!dhEmi.includes("T")) {
+        const agora = new Date();
+        dhEmi = `${dhEmi}T${agora.toTimeString().substring(0, 8)}-03:00`;
+      }
 
-    // ================== 4. CERTIFICADO ==================
-    const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-    const certOptions = await getCertOptions(
-      SENHA_CERT,
-      "./GTO COMERCIO 2025-2026.pfx"
-    );
+      // ================== 4. CERTIFICADO ==================
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(
+        SENHA_CERT,
+        "./GTO COMERCIO 2025-2026.pfx"
+      );
 
-    if (!certOptions) {
-      throw new Error("Erro ao carregar certificado");
-    }
+      if (!certOptions) {
+        throw new Error("Erro ao carregar certificado");
+      }
 
-    // ================== 5. TOOLS ==================
-    const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
-    process.env.OPENSSL_MODULES = path.resolve("./libs/openssl/lib/ossl-modules");
+      // ================== 5. TOOLS ==================
+      const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+      process.env.OPENSSL_MODULES = path.resolve("./libs/openssl/lib/ossl-modules");
 
-    const tools = new Tools(
-      {
-        mod: "65",
-        tpAmb: String(venda.NFE_INFNFE_IDE_TPAMB),
-        UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
+      const tools = new Tools(
+        {
+          mod: "65",
+          tpAmb: String(venda.NFE_INFNFE_IDE_TPAMB),
+          UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
+          versao: "4.00",
+          xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+          openssl: opensslPath,
+          CSC: String(config.TOKENCSC),
+          CSCid: String(config.IDTOKEN),
+        },
+        certOptions
+      );
+
+      // ================== 6. MONTAR XML ==================
+      const NFe = new Make();
+
+      NFe.tagInfNFe({
+        Id: null,
         versao: "4.00",
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-        openssl: opensslPath,
-        CSC: String(config.TOKENCSC),
-        CSCid: String(config.IDTOKEN),
-      },
-      certOptions
-    );
-
-    // ================== 6. MONTAR XML ==================
-    const NFe = new Make();
-
-    NFe.tagInfNFe({
-      Id: null,
-      versao: "4.00",
-    });
-
-    NFe.tagIde({
-      cUF: ufToCodigo(venda.NFE_INFNFE_EMIT_ENDEREMIT_UF),
-      cNF: venda.NFE_INFNFE_IDE_CNF,
-      natOp: venda.NFE_INFNFE_IDE_NATOP,
-      mod: "65",
-      serie: venda.NFE_INFNFE_IDE_SERIE,
-      nNF: venda.NFE_INFNFE_IDE_NNF,
-      dhEmi,
-      tpNF: venda.NFE_INFNFE_IDE_TPNF,
-      idDest: venda.NFE_INFNFE_IDDEST,
-      cMunFG: venda.NFE_INFNFE_IDE_CMUNFG,
-      tpImp: venda.NFE_INFNFE_IDE_TPIMP,
-      tpEmis: venda.NFE_INFNFE_IDE_TPEMIS,
-      cDV: venda.NFE_INFNFE_IDE_CDV,
-      tpAmb: venda.NFE_INFNFE_IDE_TPAMB,
-      finNFe: venda.NFE_INFNFE_IDE_FINNFE,
-      indFinal: venda.NFE_INFNFE_IDE_INDFINAL,
-      indPres: venda.NFE_INFNFE_IDE_INDPRES,
-      procEmi: venda.NFE_INFNFE_IDE_PROCEMI,
-      verProc: "1.0.0",
-    });
-
-    NFe.tagEmit({
-      CNPJ: venda.NFE_INFNFE_EMIT_CNPJ,
-      xNome: venda.NFE_INFNFE_EMIT_NOME,
-      xFant: venda.NFE_INFNFE_EMIT_FANT,
-      IE: venda.NFE_INFNFE_EMIT_IE,
-      CRT: venda.NFE_INFNFE_EMIT_CRT,
-    });
-
-    NFe.tagEnderEmit({
-      xLgr: venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR,
-      nro: venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
-      xBairro: venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO,
-      cMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
-      xMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN,
-      UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
-      CEP: venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP,
-      cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
-      xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS
-    });
-
-    // ================== PRODUTOS ==================
-    NFe.tagProd(
-      itens.map((item) => ({
-        cProd: item.det.CPROD,
-        cEAN: item.det.CEAN,
-        xProd: item.det.XPROD,
-        NCM: item.det.NCM,
-        CFOP: item.det.CFOP,
-        uCom: item.det.UCOM,
-        qCom: item.det.QCOM,
-        vUnCom: item.det.VUNCOM,
-        vProd: item.det.VPROD,
-        cEANTrib: item.det.CEANTRIB,
-        uTrib: item.det.UTRIB,
-        qTrib: item.det.QTRIB,
-        vUnTrib: item.det.VUNTRIB,
-        indTot: item.det.INDTOT,
-      }))
-    );
-
-    itens.forEach((item, index) => {
-      NFe.tagProdICMS(index, {
-        orig: item.det.ICMS_ORIG,
-        CST: item.det.ICMS_CST,
-        modBC: item.det.ICMS_MODBC,
-        vBC: item.det.ICMS_VBC,
-        pICMS: item.det.ICMS_PICMS,
-        vICMS: item.det.ICMS_VICMS,
       });
 
-      NFe.tagProdPIS(index, {
-        CST: item.det.PIS_CST,
-        vBC: item.det.PIS_VBC,
-        pPIS: item.det.PIS_PPIS,
-        vPIS: item.det.PIS_VPIS,
+      NFe.tagIde({
+        cUF: ufToCodigo(venda.NFE_INFNFE_EMIT_ENDEREMIT_UF),
+        cNF: venda.NFE_INFNFE_IDE_CNF,
+        natOp: venda.NFE_INFNFE_IDE_NATOP,
+        mod: "65",
+        serie: venda.NFE_INFNFE_IDE_SERIE,
+        nNF: venda.NFE_INFNFE_IDE_NNF,
+        dhEmi,
+        tpNF: venda.NFE_INFNFE_IDE_TPNF,
+        idDest: venda.NFE_INFNFE_IDDEST,
+        cMunFG: venda.NFE_INFNFE_IDE_CMUNFG,
+        tpImp: venda.NFE_INFNFE_IDE_TPIMP,
+        tpEmis: venda.NFE_INFNFE_IDE_TPEMIS,
+        cDV: venda.NFE_INFNFE_IDE_CDV,
+        tpAmb: venda.NFE_INFNFE_IDE_TPAMB,
+        finNFe: venda.NFE_INFNFE_IDE_FINNFE,
+        indFinal: venda.NFE_INFNFE_IDE_INDFINAL,
+        indPres: venda.NFE_INFNFE_IDE_INDPRES,
+        procEmi: venda.NFE_INFNFE_IDE_PROCEMI,
+        verProc: "1.0.0",
       });
 
-      NFe.tagProdCOFINS(index, {
-        CST: item.det.COFINS_CST,
-        vBC: item.det.COFINS_VBC,
-        pCOFINS: item.det.COFINS_PCOFINS,
-        vCOFINS: item.det.COFINS_VCOFINS,
+      NFe.tagEmit({
+        CNPJ: venda.NFE_INFNFE_EMIT_CNPJ,
+        xNome: venda.NFE_INFNFE_EMIT_NOME,
+        xFant: venda.NFE_INFNFE_EMIT_FANT,
+        IE: venda.NFE_INFNFE_EMIT_IE,
+        CRT: venda.NFE_INFNFE_EMIT_CRT,
       });
-    });
 
-    NFe.tagTotal();
-    NFe.tagTransp({ modFrete: venda.NFE_INFNFE_TRANSP_MODFRETE });
+      NFe.tagEnderEmit({
+        xLgr: venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR,
+        nro: venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
+        xBairro: venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO,
+        cMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
+        xMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN,
+        UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
+        CEP: venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP,
+        cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
+        xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS
+      });
 
-    NFe.tagDetPag(
-      pagamentos.map((p) => ({
-        indPag: 0,
-        tPag: p.pag.TPAG,
-        vPag: p.pag.VALORRECEBIDO
-      }))
-    );
+      // ================== PRODUTOS ==================
+      NFe.tagProd(
+        itens.map((item) => ({
+          cProd: item.det.CPROD,
+          cEAN: item.det.CEAN,
+          xProd: item.det.XPROD,
+          NCM: item.det.NCM,
+          CFOP: item.det.CFOP,
+          uCom: item.det.UCOM,
+          qCom: item.det.QCOM,
+          vUnCom: item.det.VUNCOM,
+          vProd: item.det.VPROD,
+          cEANTrib: item.det.CEANTRIB,
+          uTrib: item.det.UTRIB,
+          qTrib: item.det.QTRIB,
+          vUnTrib: item.det.VUNTRIB,
+          indTot: item.det.INDTOT,
+        }))
+      );
+
+      itens.forEach((item, index) => {
+        NFe.tagProdICMS(index, {
+          orig: item.det.ICMS_ORIG,
+          CST: item.det.ICMS_CST,
+          modBC: item.det.ICMS_MODBC,
+          vBC: item.det.ICMS_VBC,
+          pICMS: item.det.ICMS_PICMS,
+          vICMS: item.det.ICMS_VICMS,
+        });
+
+        NFe.tagProdPIS(index, {
+          CST: item.det.PIS_CST,
+          vBC: item.det.PIS_VBC,
+          pPIS: item.det.PIS_PPIS,
+          vPIS: item.det.PIS_VPIS,
+        });
+
+        NFe.tagProdCOFINS(index, {
+          CST: item.det.COFINS_CST,
+          vBC: item.det.COFINS_VBC,
+          pCOFINS: item.det.COFINS_PCOFINS,
+          vCOFINS: item.det.COFINS_VCOFINS,
+        });
+      });
+
+      NFe.tagTotal();
+      NFe.tagTransp({ modFrete: venda.NFE_INFNFE_TRANSP_MODFRETE });
+
+      NFe.tagDetPag(
+        pagamentos.map((p) => ({
+          indPag: 0,
+          tPag: p.pag.TPAG,
+          vPag: p.pag.VALORRECEBIDO
+        }))
+      );
 
 
 
-    // ================== 7. ASSINAR XML ==================
-    fs.writeFileSync("xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
-    tools.xmlSign(NFe.xml()).then(async xmlSign => {
-        fs.writeFileSync("xmls/nfe_sign.xml", xmlSign, { encoding: "utf-8" });
-        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
-            console.log(res, 'res')
-        })
-    }).catch(err => {
-        console.log(err, 'err')
-    })
+      // ================== 7. ASSINAR XML ==================
+      fs.writeFileSync("xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
+      tools.xmlSign(NFe.xml()).then(async xmlSign => {
+          fs.writeFileSync("xmls/nfe_sign.xml", xmlSign, { encoding: "utf-8" });
+          tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
+              console.log(res, 'res')
+          })
+      }).catch(err => {
+          console.log(err, 'err')
+      })
 
 
 
-    // console.log("✅ XML assinado com sucesso. Tamanho:");
+      // console.log("✅ XML assinado com sucesso. Tamanho:");
 
-    // return res.sendStatus(200);
+      // return res.sendStatus(200);
 
-  } catch (error) {
-    console.error("ERRO:", error);
-    // return res.status(500).json({ error: error.message });
+    } catch (error) {
+      console.error("ERRO:", error);
+      // return res.status(500).json({ error: error.message });
+    }
   }
-}
 
 }
 
