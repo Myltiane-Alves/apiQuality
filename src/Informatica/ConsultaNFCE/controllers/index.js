@@ -60,7 +60,7 @@ class ConsultaNfeController {
 
   async consultaNFce(req, res) {
     try {
-      let { idVenda } = req.query;
+      let { idVenda } = req.body;
 
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
@@ -938,87 +938,58 @@ class ConsultaNfeController {
   try {
     const { idVenda } = req.body;
 
-    // ================== 1. BUSCAR VENDA ==================
-    console.log("=== BUSCANDO VENDA ===");
-    console.log("ID Venda:", idVenda);
-    
+    function ufToCodigo(uf) {
+      const map = {
+        "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
+        "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27", "SE": "28", "BA": "29",
+        "MG": "31", "ES": "32", "RJ": "33", "SP": "35", "PR": "41", "SC": "42", "RS": "43", "MS": "50", "MT": "51", "GO": "52", "DF": "53"
+      };
+      if (!uf) return "35";
+      const u = uf.toUpperCase();
+      return map[u] || "35";
+    }
     const response = await axios.get(
       `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`
     );
-    
-  
-    const vendaApi = response.data. data[0];
+
+    const vendaApi = response.data.data[0];
     const venda = vendaApi.venda;
     const itens = vendaApi.detalhe;
     const pagamentos = vendaApi.pagamento;
-    const config = vendaApi.configuracao[0]. config;
+    const config = vendaApi.configuracao[0].config;
 
-    // ================== VALIDAR CHAVE ==================
-    const chaveNFe = venda. CHAVE;
-    const chave = chaveNFe.replace(/^NFe/, '');
-    
-    console.log("=== VALIDAÇÃO CHAVE ===");
-    console.log("Chave original:", chaveNFe);
-    console.log("Chave limpa:", chave);
-    console.log("Tamanho:", chave.length);
+    // ================== 2. VALIDAR CHAVE ==================
+    const chaveLimpa = venda.CHAVE.replace(/^NFe/, "");
 
-    if (! chave || chave. length !== 44) {
-      throw new Error(`Chave inválida: ${chave} (tamanho: ${chave.length}, esperado: 44)`);
+    if (!/^\d{44}$/.test(chaveLimpa)) {
+      throw new Error(`Chave inválida: ${chaveLimpa}`);
     }
 
-    if (!/^\d{44}$/.test(chave)) {
-      throw new Error(`Chave contém caracteres inválidos: ${chave}`);
-    }
-
-    // ================== VALIDAR E CORRIGIR DATA/HORA ==================
-    console.log("=== VALIDAÇÃO DATA/HORA ===");
+    // ================== 3. VALIDAR DATA ==================
     let dhEmi = venda.NFE_INFNFE_IDE_DHEMI;
-    console.log("dhEmi original:", dhEmi);
-    
-    // Verificar se tem hora
-    if (! dhEmi. includes('T')) {
-      // Se só tem data (2024-09-13), adicionar hora atual e timezone
+    if (!dhEmi.includes("T")) {
       const agora = new Date();
-      const horaFormatada = agora.toTimeString().substring(0, 8); // HH:MM:SS
-      const timezone = '-03:00'; // Brasília (ajuste se necessário)
-      dhEmi = `${dhEmi}T${horaFormatada}${timezone}`;
-      console.log("⚠️  dhEmi sem hora, ajustado para:", dhEmi);
+      dhEmi = `${dhEmi}T${agora.toTimeString().substring(0, 8)}-03:00`;
     }
-    
-    // Validar formato ISO 8601
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(dhEmi)) {
-      throw new Error(`Formato de data inválido:  ${dhEmi}. Esperado: YYYY-MM-DDTHH: MM:SS±HH:MM`);
-    }
-    
-    console.log("✓ dhEmi validado:", dhEmi);
 
-    // ================== 2. CERTIFICADO ==================
-    console.log("=== CARREGANDO CERTIFICADO ===");
+    // ================== 4. CERTIFICADO ==================
     const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-
     const certOptions = await getCertOptions(
       SENHA_CERT,
       "./GTO COMERCIO 2025-2026.pfx"
     );
 
     if (!certOptions) {
-      return res.status(500).json({ error: "Erro ao carregar certificado" });
+      throw new Error("Erro ao carregar certificado");
     }
-    console.log("✓ Certificado carregado");
 
-    // ================== 3. CONFIGURAR TOOLS ==================
-    console.log("=== CONFIGURANDO TOOLS ===");
+    // ================== 5. TOOLS ==================
     const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
     process.env.OPENSSL_MODULES = path.resolve("./libs/openssl/lib/ossl-modules");
 
-    console.log("CSC:", config. TOKENCSC);
-    console.log("CSCid:", config. IDTOKEN);
-    console.log("UF:", venda.NFE_INFNFE_EMIT_ENDEREMIT_UF);
-    console.log("Ambiente:", venda.NFE_INFNFE_IDE_TPAMB);
-
     const tools = new Tools(
       {
-        mod:  "65",
+        mod: "65",
         tpAmb: String(venda.NFE_INFNFE_IDE_TPAMB),
         UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
         versao: "4.00",
@@ -1030,25 +1001,23 @@ class ConsultaNfeController {
       certOptions
     );
 
-    // ================== 4. MONTAR XML ==================
-    console.log("=== MONTANDO XML ===");
+    // ================== 6. MONTAR XML ==================
     const NFe = new Make();
-    
+
     NFe.tagInfNFe({
-      Id: `NFe${chave}`,
+      Id: null,
       versao: "4.00",
     });
 
-    // -------- IDE --------
     NFe.tagIde({
-      cUF: venda. CHAVE. substring(3, 5),
+      cUF: ufToCodigo(venda.NFE_INFNFE_EMIT_ENDEREMIT_UF),
       cNF: venda.NFE_INFNFE_IDE_CNF,
-      natOp:  venda.NFE_INFNFE_IDE_NATOP,
+      natOp: venda.NFE_INFNFE_IDE_NATOP,
       mod: "65",
       serie: venda.NFE_INFNFE_IDE_SERIE,
-      nNF: venda. NFE_INFNFE_IDE_NNF,
-      dhEmi:  dhEmi, // ⬅️ USAR DATA CORRIGIDA
-      tpNF:  venda.NFE_INFNFE_IDE_TPNF,
+      nNF: venda.NFE_INFNFE_IDE_NNF,
+      dhEmi,
+      tpNF: venda.NFE_INFNFE_IDE_TPNF,
       idDest: venda.NFE_INFNFE_IDDEST,
       cMunFG: venda.NFE_INFNFE_IDE_CMUNFG,
       tpImp: venda.NFE_INFNFE_IDE_TPIMP,
@@ -1056,203 +1025,113 @@ class ConsultaNfeController {
       cDV: venda.NFE_INFNFE_IDE_CDV,
       tpAmb: venda.NFE_INFNFE_IDE_TPAMB,
       finNFe: venda.NFE_INFNFE_IDE_FINNFE,
-      indFinal:  venda.NFE_INFNFE_IDE_INDFINAL,
+      indFinal: venda.NFE_INFNFE_IDE_INDFINAL,
       indPres: venda.NFE_INFNFE_IDE_INDPRES,
-      indIntermed: "0",
-      procEmi:  venda.NFE_INFNFE_IDE_PROCEMI,
+      procEmi: venda.NFE_INFNFE_IDE_PROCEMI,
       verProc: "1.0.0",
     });
 
-    // -------- EMITENTE --------
     NFe.tagEmit({
-      CNPJ:  venda.NFE_INFNFE_EMIT_CNPJ,
-      xNome: venda. NFE_INFNFE_EMIT_NOME,
+      CNPJ: venda.NFE_INFNFE_EMIT_CNPJ,
+      xNome: venda.NFE_INFNFE_EMIT_NOME,
       xFant: venda.NFE_INFNFE_EMIT_FANT,
-      enderEmit: {
-        xLgr: venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR,
-        nro:  venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
-        xBairro: venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO,
-        cMun: venda. NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
-        xMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN,
-        UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
-        CEP: venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP,
-        cPais:  venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
-        xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS,
-        fone:  venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE,
-      },
       IE: venda.NFE_INFNFE_EMIT_IE,
       CRT: venda.NFE_INFNFE_EMIT_CRT,
     });
 
     NFe.tagEnderEmit({
       xLgr: venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR,
-      nro:  venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
+      nro: venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
       xBairro: venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO,
-      cMun: venda. NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
+      cMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
       xMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN,
       UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
       CEP: venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP,
       cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
-      xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS,
-      fone:  venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE,
+      xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS
     });
 
-    // -------- PRODUTOS --------
-    console.log(`✓ Adicionando ${itens.length} produtos`);
+    // ================== PRODUTOS ==================
     NFe.tagProd(
       itens.map((item) => ({
-        cProd: item.det. CPROD,
-        cEAN:  item.det.CEAN,
-        xProd: item.det. XPROD,
+        cProd: item.det.CPROD,
+        cEAN: item.det.CEAN,
+        xProd: item.det.XPROD,
         NCM: item.det.NCM,
         CFOP: item.det.CFOP,
-        uCom:  item.det. UCOM,
-        qCom: item.det. QCOM,
+        uCom: item.det.UCOM,
+        qCom: item.det.QCOM,
         vUnCom: item.det.VUNCOM,
         vProd: item.det.VPROD,
-        cEANTrib: item. det.CEANTRIB,
-        uTrib: item.det. UTRIB,
-        qTrib:  item.det.QTRIB,
+        cEANTrib: item.det.CEANTRIB,
+        uTrib: item.det.UTRIB,
+        qTrib: item.det.QTRIB,
         vUnTrib: item.det.VUNTRIB,
         indTot: item.det.INDTOT,
       }))
     );
 
-    // -------- IMPOSTOS --------
     itens.forEach((item, index) => {
       NFe.tagProdICMS(index, {
         orig: item.det.ICMS_ORIG,
-        CST: item.det. ICMS_CST,
+        CST: item.det.ICMS_CST,
         modBC: item.det.ICMS_MODBC,
-        vBC: item.det. ICMS_VBC,
+        vBC: item.det.ICMS_VBC,
         pICMS: item.det.ICMS_PICMS,
-        vICMS:  item.det.ICMS_VICMS,
+        vICMS: item.det.ICMS_VICMS,
       });
 
       NFe.tagProdPIS(index, {
         CST: item.det.PIS_CST,
         vBC: item.det.PIS_VBC,
         pPIS: item.det.PIS_PPIS,
-        vPIS:  item.det.PIS_VPIS,
+        vPIS: item.det.PIS_VPIS,
       });
 
       NFe.tagProdCOFINS(index, {
-        CST: item.det. COFINS_CST,
-        vBC: item.det. COFINS_VBC,
-        pCOFINS:  item.det.COFINS_PCOFINS,
-        vCOFINS: item. det.COFINS_VCOFINS,
+        CST: item.det.COFINS_CST,
+        vBC: item.det.COFINS_VBC,
+        pCOFINS: item.det.COFINS_PCOFINS,
+        vCOFINS: item.det.COFINS_VCOFINS,
       });
     });
 
-    // -------- TOTAL / TRANSP --------
-    NFe. tagTotal();
+    NFe.tagTotal();
     NFe.tagTransp({ modFrete: venda.NFE_INFNFE_TRANSP_MODFRETE });
 
-    // -------- PAGAMENTO --------
-    console.log(`✓ Adicionando ${pagamentos.length} formas de pagamento`);
     NFe.tagDetPag(
       pagamentos.map((p) => ({
         indPag: 0,
-        tPag:  p.pag. TPAG,
-        vPag: p.pag. VALORRECEBIDO,
-        xPag: p.pag. DSTIPOPAGAMENTO,
+        tPag: p.pag.TPAG,
+        vPag: p.pag.VALORRECEBIDO
       }))
     );
 
-    // ================== 5. GERAR XML ==================
-    console.log("=== GERANDO XML ===");
-    const xml = NFe.xml();
-    
-    console.log("Tamanho do XML:", xml.length, "bytes");
-    console.log("Possui <infNFe>?", xml. includes("<infNFe") ? "✓" : "✗");
-    console.log("ID correto?", xml.includes(`Id="NFe${chave}"`) ? "✓" : "✗");
-    console.log("dhEmi correto?", xml. includes(dhEmi) ? "✓" : "✗");
-    
-    // Salvar XML original
-    const xmlOriginalPath = `./xml-logs/${venda. IDVENDA}_original.xml`;
-    fs.writeFileSync(xmlOriginalPath, xml);
-    console.log(`✓ XML original salvo:  ${xmlOriginalPath}`);
 
-    // ================== 6. ASSINAR XML ==================
-    console. log("=== ASSINANDO XML ===");
-    
-    let xmlAssinado;
-    try {
-      xmlAssinado = await tools.xmlSign(xml);
-      
-      console.log("✓ Assinatura concluída");
-      console.log("Tamanho do XML assinado:", xmlAssinado.length, "bytes");
-      console.log("Possui <Signature>?", xmlAssinado.includes("<Signature") ? "✓" : "✗");
-      console.log("Possui <SignedInfo>?", xmlAssinado.includes("<SignedInfo") ? "✓" : "✗");
-      console.log("Possui <qrCode>?", xmlAssinado.includes("<qrCode>") ? "✓" : "✗");
-      
-    } catch (signError) {
-      console.error("✗ Erro na assinatura:", signError.message);
-      console.error("Stack:", signError.stack);
-      throw new Error(`Falha ao assinar XML: ${signError. message}`);
-    }
-    
-    if (! xmlAssinado.includes('<Signature')) {
-      throw new Error("Assinatura digital não foi gerada corretamente");
-    }
 
-    // Salvar XML assinado
-    const xmlAssinadoPath = `./xml-logs/${venda.IDVENDA}_assinado.xml`;
-    fs.writeFileSync(xmlAssinadoPath, xmlAssinado);
-    console.log(`✓ XML assinado salvo:  ${xmlAssinadoPath}`);
+    // ================== 7. ASSINAR XML ==================
+    fs.writeFileSync("xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
+    tools.xmlSign(NFe.xml()).then(async xmlSign => {
+        fs.writeFileSync("xmls/nfe_sign.xml", xmlSign, { encoding: "utf-8" });
+        tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
+            console.log(res, 'res')
+        })
+    }).catch(err => {
+        console.log(err, 'err')
+    })
 
-    // ================== 7. ENVIAR PARA SEFAZ ==================
-    console. log("=== ENVIANDO PARA SEFAZ ===");
-    
-    let sefazRetorno;
-    try {
-      sefazRetorno = await tools.sefazEnviaLote(xmlAssinado, {
-        indSinc: 1,
-      });
-      
-      console.log("=== RETORNO SEFAZ ===");
-      console.log(JSON.stringify(sefazRetorno, null, 2));
 
-      // Salvar retorno da SEFAZ
-      const retornoPath = `./xml-logs/${venda.IDVENDA}_retorno.json`;
-      fs.writeFileSync(retornoPath, JSON. stringify(sefazRetorno, null, 2));
-      console.log(`✓ Retorno SEFAZ salvo: ${retornoPath}`);
-      
-    } catch (sefazError) {
-      console.error("✗ Erro ao enviar para SEFAZ:", sefazError.message);
-      
-      // Mesmo com erro, retorna o XML para análise
-      res.setHeader("Content-Type", "application/xml");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=${venda.IDVENDA}_erro.xml`
-      );
-      return res.send(xmlAssinado);
-    }
 
-    // ================== 8. DOWNLOAD ==================
-    console.log("=== PREPARANDO DOWNLOAD ===");
-    res.setHeader("Content-Type", "application/xml");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${venda.IDVENDA}. xml`
-    );
+    // console.log("✅ XML assinado com sucesso. Tamanho:");
 
-    console.log("✓ Processo concluído com sucesso!");
-    return res.send(xmlAssinado);
-    
+    // return res.sendStatus(200);
+
   } catch (error) {
-    console.error("=== ERRO GERAL ===");
-    console.error("Mensagem:", error.message);
-    console.error("Stack:", error. stack);
-    
-    return res.status(500).json({ 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack :  undefined,
-      timestamp: new Date().toISOString()
-    });
+    console.error("ERRO:", error);
+    // return res.status(500).json({ error: error.message });
   }
 }
+
 }
 
 export default new ConsultaNfeController();
