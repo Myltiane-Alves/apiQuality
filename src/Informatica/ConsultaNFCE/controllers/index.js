@@ -521,7 +521,6 @@ class ConsultaNfeController {
         indIntermed: "0",
         procEmi: payload.ide.procEmi,
         verProc: payload.ide.verProc,
-
       })
 
       NFe.tagEmit({
@@ -936,7 +935,7 @@ class ConsultaNfeController {
 
   async downloadXML(req, res) {
     try {
-      const { idVenda } = req.body;
+      const { idVenda } = req.query;
 
       function ufToCodigo(uf) {
         const map = {
@@ -957,7 +956,8 @@ class ConsultaNfeController {
       const itens = vendaApi.detalhe;
       const pagamentos = vendaApi.pagamento;
       const config = vendaApi.configuracao[0].config;
-
+      const qrCode = venda.NFE_INFNFESUPL_QRCODE;
+      const urlChave = venda.NFE_INFNFESUPL_URLCHAVE
       // ================== 2. VALIDAR CHAVE ==================
       const chaveLimpa = venda.CHAVE.replace(/^NFe/, "");
 
@@ -974,10 +974,7 @@ class ConsultaNfeController {
 
       // ================== 4. CERTIFICADO ==================
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-      const certOptions = await getCertOptions(
-        SENHA_CERT,
-        "./GTO COMERCIO 2025-2026.pfx"
-      );
+      const certOptions = await getCertOptions(SENHA_CERT, "./GTO COMERCIO 2025-2026.pfx");
 
       if (!certOptions) {
         throw new Error("Erro ao carregar certificado");
@@ -990,13 +987,14 @@ class ConsultaNfeController {
       const tools = new Tools(
         {
           mod: "65",
-          tpAmb: String(venda.NFE_INFNFE_IDE_TPAMB),
+          tpAmb: 2,
           UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
           versao: "4.00",
+          timeout: 60,
+          CSC: config.TOKENCSC,
+          CSCid: config.IDTOKEN,
           xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
           openssl: opensslPath,
-          CSC: String(config.TOKENCSC),
-          CSCid: String(config.IDTOKEN),
         },
         certOptions
       );
@@ -1027,6 +1025,7 @@ class ConsultaNfeController {
         finNFe: venda.NFE_INFNFE_IDE_FINNFE,
         indFinal: venda.NFE_INFNFE_IDE_INDFINAL,
         indPres: venda.NFE_INFNFE_IDE_INDPRES,
+        indIntermed: "0",
         procEmi: venda.NFE_INFNFE_IDE_PROCEMI,
         verProc: "1.0.0",
       });
@@ -1050,7 +1049,10 @@ class ConsultaNfeController {
         cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
         xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS
       });
-
+      
+      NFe.tagAutXML({
+        CNPJ: venda.NFE_INFNFE_AUTXML_CNPJ
+      })
       // ================== PRODUTOS ==================
       NFe.tagProd(
         itens.map((item) => ({
@@ -1107,27 +1109,52 @@ class ConsultaNfeController {
         }))
       );
 
-
-
-      // ================== 7. ASSINAR XML ==================
-      fs.writeFileSync("xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
-      tools.xmlSign(NFe.xml()).then(async xmlSign => {
-          fs.writeFileSync("xmls/nfe_sign.xml", xmlSign, { encoding: "utf-8" });
-          tools.sefazEnviaLote(xmlSign, { indSinc: 1 }).then(res => {
-              console.log(res, 'res')
-          })
-      }).catch(err => {
-          console.log(err, 'err')
+      // NFe.tagInfAdic({
+      //   qrCode: qrCode,
+      //   urlChave: urlChave
+      // })
+      NFe.taginfNFeSupl({
+        qrCode: qrCode,
+        urlChave: urlChave
       })
 
+      const xmlGerado = NFe.xml();
 
+    // fs.writeFileSync(`xmls/nfe${venda.IDVENDA}.xml`, NFe.xml(), { encoding: "utf-8" });
 
-      // console.log("✅ XML assinado com sucesso. Tamanho:");
+      tools.xmlSign(xmlGerado).then(async xmlSign => {
+        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
+        fs.writeFileSync(`./xmls/nfe.xml`, xmlSign, { encoding: "utf-8" });
 
-      // return res.sendStatus(200);
+        try {
+          console.log("📤 Iniciando sefazEnviaLote...");
+          const resposta = await tools.sefazEnviaLote(xmlSign, { indSinc: 1 });
+          console.log("✅ Resposta SEFAZ recebida:", resposta);
+          fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
+        } catch (errSefaz) {
+          console.error("❌ Erro em sefazEnviaLote:", errSefaz);
+          console.error("   Mensagem:", errSefaz.message);
+          console.error("   Stack:", errSefaz.stack);
+          fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+            message: errSefaz.message,
+            stack: errSefaz.stack,
+            code: errSefaz.code
+          }, null, 2), { encoding: "utf-8" });
+        }
+      }).catch(errSign => {
+        console.error("❌ Erro em xmlSign:");
+        console.error("   Mensagem:", errSign.message);
+        console.error("   Stack:", errSign.stack);
+        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+          message: errSign.message,
+          stack: errSign.stack
+        }, null, 2), { encoding: "utf-8" });
+      });
+
+      return res.sendStatus(200);
 
     } catch (error) {
-      console.error("ERRO:", error);
+      // console.error("ERRO:", error);
       // return res.status(500).json({ error: error.message });
     }
   }
