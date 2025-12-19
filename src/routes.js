@@ -488,8 +488,8 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.post('/consulta-nfec', ConsultaNfeController.consultar)
 // routes.post('/consultar-nfe', upload.single('planilha'), ConsultaNfeController.consultar);
 // routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
-// routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
-// routes.get('/validarConsulta', ConsultaNfeController.validarConsultar);
+routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
+routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
 routes.get('/statusSefaz', ConsultaNfeController.consultaNFce);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)

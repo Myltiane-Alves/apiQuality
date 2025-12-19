@@ -963,7 +963,7 @@ class ConsultaNfeController {
     }
   }
   
-  async validarStatusSefaz(req, res) {
+  async validarConsulta(req, res) {
     try {
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
