@@ -428,15 +428,15 @@ class ConsultaNfeController {
       const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
 
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-        const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
-        const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
-        const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
-        const tpEmissao = configData.TPEMISSAO || "";
-        const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
+      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
+      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
+      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
+      const tpEmissao = configData.TPEMISSAO || "";
+      const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
 
-        const dsCRT = configData.DSCRT || "";
-        const cscId = configData.IDTOKEN || "1";
-        const csc = configData.TOKENCSC || "";
+      const dsCRT = configData.DSCRT || "";
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
      
     
       // Usa getCertOptions para carregar o certificado
@@ -962,6 +962,15 @@ class ConsultaNfeController {
     const mod = response.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
     const tpAmb = String(response.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
 
+    const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+    const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+    if (!certOptions) {
+      return res.status(500).json({
+        error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+      });
+    }
+
     let tools = new Tools({
       mod: mod,
       tpAmb: tpAmb,
@@ -970,7 +979,7 @@ class ConsultaNfeController {
       CNP: cnpj,
       xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
-    })
+    }, certOptions);
   }
 
   async putValidarVendaContigencia(req, res) {
