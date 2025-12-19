@@ -947,21 +947,27 @@ class ConsultaNfeController {
 
   async downloadXML(req, res) {
    
-    let { idVenda, chave } = req.query;
+    let { idVenda } = req.query;
 
     if (!idVenda) {
       return res.status(400).json({ error: "idVenda é obrigatório" });
     }
 
     const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
-    const vendaData = response.data;
-    
+    const numVenda = response.data[0]?.venda.IDVENDA || "";
+    const urlChave = response.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
+    const nProtRaw = response.data[0]?.venda.PROTNFE_INFPROT_ID || "";
+    const cnpj = response.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+    const uf = response.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "DF";
+    const mod = response.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
+    const tpAmb = String(response.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
+
     let tools = new Tools({
-      mod: "65",
-      tpAmb: 2,
-      UF: "DF",
+      mod: mod,
+      tpAmb: tpAmb,
+      UF: uf,
       versao: "4.00",
-      CNP: "53242678000160",
+      CNP: cnpj,
       xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
     })
