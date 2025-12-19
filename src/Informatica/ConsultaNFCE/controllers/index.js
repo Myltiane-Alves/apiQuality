@@ -980,6 +980,15 @@ class ConsultaNfeController {
       xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
     }, certOptions);
+
+    tools.sefazDistDFe({chNFe: nProtRaw}).then((resposta) => {
+      docZip(resposta).then(xml => {
+        console.log(xml, 'XML BAIXADO DA SEFAZ');
+      })
+    }).catch((error) => {
+      console.error("Erro ao baixar XML da SEFAZ:", error);
+      return res.status(500).json({ error: 'Erro ao baixar XML da SEFAZ', details: error.message });
+    });
   }
 
   async putValidarVendaContigencia(req, res) {
