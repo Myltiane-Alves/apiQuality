@@ -1049,7 +1049,7 @@ class ConsultaNfeController {
         cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
         xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS
       });
-      
+
       NFe.tagAutXML({
         CNPJ: venda.NFE_INFNFE_AUTXML_CNPJ
       })
@@ -1109,10 +1109,7 @@ class ConsultaNfeController {
         }))
       );
 
-      // NFe.tagInfAdic({
-      //   qrCode: qrCode,
-      //   urlChave: urlChave
-      // })
+
       NFe.taginfNFeSupl({
         qrCode: qrCode,
         urlChave: urlChave
@@ -1123,7 +1120,7 @@ class ConsultaNfeController {
     // fs.writeFileSync(`xmls/nfe${venda.IDVENDA}.xml`, NFe.xml(), { encoding: "utf-8" });
 
       tools.xmlSign(xmlGerado).then(async xmlSign => {
-        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
+        console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
         fs.writeFileSync(`./xmls/nfe.xml`, xmlSign, { encoding: "utf-8" });
 
         try {
@@ -1151,7 +1148,9 @@ class ConsultaNfeController {
         }, null, 2), { encoding: "utf-8" });
       });
 
-      return res.sendStatus(200);
+      return res.JSON({
+        venda: vendaApi,
+      });
 
     } catch (error) {
       // console.error("ERRO:", error);
