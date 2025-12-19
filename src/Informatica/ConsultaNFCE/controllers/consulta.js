@@ -2337,6 +2337,216 @@ class ConsultaNfeController {
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
+
+
+/*
+  async downloadXML(req, res) {
+   
+    let { idVenda } = req.query;
+
+    if (!idVenda) {
+      return res.status(400).json({ error: "idVenda é obrigatório" });
+    }
+
+    const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+    const vendaData = response.data;
+    const numVenda = vendaData.data[0]?.venda.IDVENDA || "";
+    const chave = vendaData.data[0]?.venda.CHAVE || "";
+    const chave44 = chave.replace(/^NFe/i, '');
+    const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+    const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "DF";
+    const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
+    const tpAmb = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
+
+    const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+    const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+    if (!certOptions) {
+      return res.status(500).json({
+        error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+      });
+    }
+
+    const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+    const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+    process.env.OPENSSL_MODULES = opensslModulesPath;
+    
+    const tpAmbInt = parseInt(tpAmb) || 2; 
+
+    
+    let tools = new Tools({
+      mod: String(mod),
+      tpAmb: tpAmbInt,
+      UF: uf,
+      versao: "4.00",
+      CNPJ: cnpj,
+      xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+      openssl: opensslPath,
+    }, certOptions);
+    
+
+    
+    tools.sefazDistDFe({chNFe: chave44}).then((resposta) => {
+      console.log("📥 RESPOSTA DA SEFAZ:", resposta);
+      
+      // Verificar se houve erro na resposta
+      if (resposta?.retDistDFeInt?.cStat) {
+        const cStat = resposta.retDistDFeInt.cStat;
+        const xMotivo = resposta.retDistDFeInt.xMotivo || "Sem mensagem";
+        console.error(`❌ SEFAZ retornou cStat ${cStat}: ${xMotivo}`);
+        return res.status(400).json({
+          error: `SEFAZ retornou erro`,
+          cStat: cStat,
+          xMotivo: xMotivo
+        });
+      }
+      
+      // Se sucesso, tentar extrair XMLs
+      docZip(resposta).then(xmlsExtraidos => {
+        console.log("✅ XMLs extraídos:", xmlsExtraidos);
+        
+        if (!xmlsExtraidos || xmlsExtraidos.length === 0) {
+          return res.status(404).json({
+            error: "Nenhum XML encontrado na resposta do SEFAZ",
+            detalhes: "A NFC-e pode ainda não estar autorizada ou o XML já foi removido"
+          });
+        }
+        
+        return res.json({
+          venda: vendaData,
+          xmls: xmlsExtraidos,
+          total: xmlsExtraidos.length
+        });
+      }).catch(errDocZip => {
+        console.error("❌ Erro ao extrair XMLs:", errDocZip.message);
+        return res.status(500).json({
+          error: "Erro ao extrair XMLs da resposta SEFAZ",
+          details: errDocZip.message,
+          resposta: resposta
+        });
+      });
+      
+    }).catch((error) => {
+      console.error("❌ Erro em sefazDistDFe:", error.message);
+      return res.status(500).json({
+        error: 'Erro ao baixar XML da SEFAZ',
+        details: error.message
+      });
+    });
+  }
+
+  async putValidarVendaContigencia(req, res) {
+    try {
+      let { IDVENDA,  page, pageSize } = req.body;
+      page = page ? page : ''
+      pageSize = pageSize ? pageSize : ''
+      const response = await axios.put(`http://164.152.245.77:8000/quality/concentrador/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`, {
+        IDVENDA
+      })
+      return res.json(response.data);
+    } catch (error) {
+      console.error("Erro no ConsultaNfeController.putValidarVendaContigencia", error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async validarConsulta(req, res) {
+    try {
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      let { vendas } = req.body;
+      let { page, pageSize } = req.query;
+      
+      if (!vendas) {
+        page = page || '';
+        pageSize = pageSize || '';
+        
+        const queryParams = new URLSearchParams();
+        if (page) queryParams.append('page', page);
+        if (pageSize) queryParams.append('pageSize', pageSize);
+        
+        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`;
+        const response = await axios.get(apiUrl);
+        vendas = response.data;
+      }
+      // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+      if (!Array.isArray(vendas)) {
+        if (Array.isArray(vendas.data)) {
+          vendas = vendas.data;
+        } else if (Array.isArray(vendas.rows)) {
+          vendas = vendas.rows;
+        } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+          vendas = vendas.data.rows;
+        } else {
+          // tenta encontrar a primeira propriedade que é array
+          const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+          if (Array.isArray(possibleArray)) {
+            vendas = possibleArray;
+          }
+        }
+      }
+
+      if (!Array.isArray(vendas) || vendas.length === 0) {
+        return res.status(400).json({ error: "Nenhuma venda para consultar." });
+      }
+
+      const resultados = [];
+
+      for (const row of vendas) {
+        const IDVENDA = String(row.IDVENDA ?? "").trim();
+        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
+        const CHAVE = String(row.CHAVE ?? "").trim();
+
+        if (!CHAVE) {
+          resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
+          continue;
+        }
+
+        try {
+          const tools = new Tools(
+            {
+              mod: "65",
+              tpAmb: 1,
+              UF: UF,
+              versao: "4.00",
+              xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+              openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+            },
+            certOptions
+          );
+
+          const resposta = await tools.sefazStatus(CHAVE);
+          console.log('resposta status sefaz:', resposta);
+        
+          const xml = resposta ?? null;
+          const cstat =
+            resposta?.retConsSitNFe?.cStat ??
+            (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
+
+          resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
+        } catch (e) {
+          resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
+        }
+      }
+
+      return res.json({
+        total: resultados.length,
+        processados: resultados.filter((r) => !r.error).length,
+        data: resultados,
+      });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  } 
+  */
 }
 
 export default new ConsultaNfeController();
