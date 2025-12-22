@@ -490,8 +490,8 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
 // routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
 // routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
-routes.get('/downloadXML', ConsultaNfeController.consultaSefaz);
-// routes.get('/statusSefaz', ConsultaNfeController.consultaNFce);
+// routes.get('/downloadXML', ConsultaNfeController.consultaSefaz);
+routes.get('/statusSefaz', ConsultaNfeController.consultaNFce);
 // routes.get('/status', ConsultaNfeController.statusSefaz);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)

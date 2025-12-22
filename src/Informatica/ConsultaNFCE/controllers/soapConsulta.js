@@ -64,900 +64,234 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
 }
 
 class SoapController {
-
-  async consultaNFce(req, res) {
+   async consultaSefaz(req, res) {
     try {
-      let { idVenda } = req.body;
-
-      if (!idVenda) {
-        return res.status(400).json({ error: "idVenda é obrigatório" });
-      }
-
+      const { idVenda } = req.query;
 
       function ufToCodigo(uf) {
         const map = {
-          "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
-          "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27", "SE": "28", "BA": "29",
-          "MG": "31", "ES": "32", "RJ": "33", "SP": "35", "PR": "41", "SC": "42", "RS": "43", "MS": "50", "MT": "51", "GO": "52", "DF": "53"
+          RO: "11", AC: "12", AM: "13", RR: "14", PA: "15", AP: "16", TO: "17",
+          MA: "21", PI: "22", CE: "23", RN: "24", PB: "25", PE: "26", AL: "27",
+          SE: "28", BA: "29", MG: "31", ES: "32", RJ: "33", SP: "35",
+          PR: "41", SC: "42", RS: "43", MS: "50", MT: "51", GO: "52", DF: "53"
         };
-        if (!uf) return "35";
-        const u = uf.toUpperCase();
-        return map[u] || "35";
+        return map[uf?.toUpperCase()] || "35";
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
-      const vendaData = response.data;
+      // ================== 1. BUSCAR VENDA ==================
+      const response = await axios.get(
+        `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`
+      );
 
-      let v_TotICMS = 0;
-      let v_TotPis = 0;
+      const vendaApi = response.data.data[0];
+      const venda = vendaApi.venda;
+      const itens = vendaApi.detalhe;
+      const pagamentos = vendaApi.pagamento;
+      const config = vendaApi.configuracao[0].config;
 
-      let v_TotCofins = 0;
-      let v_TotIBSUF = 0;
-      let v_TotCBS = 0;
-      let V_Tot_Desconto = 0;
-      let V_ICMSTot_vNF = 0;
-
-      function gerarXML(venda) {
-
-        const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-        const ufConverted = ufToCodigo(uf);
-        const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
-        const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
-        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
-        const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
-        const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
-
-        // IMPORTANTE: Data deve estar em formato DDMM (dia+mês), não MMDD
-        const dataObj = new Date();
-        const dia = String(dataObj.getDate()).padStart(2, '0');
-        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
-        const data = dia + mes; // DDMM correto
-
-        // const chaveRaw = venda.data[0]?.venda.CHAVE || "";
-        // const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-
-        const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
-        const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
-        const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
-        const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "2";
-        const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
-        const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
-        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
-        const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
-        const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
-        const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
-        const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
-
-        const ufCode = String(ufToCodigo(uf)).padStart(2, '0');
-        const dataPadded = String(data).padStart(4, '0'); // DDMM
-        const cnpjPadded = String(cnpj || '').padStart(14, '0');
-        const modPadded = String(mod || '').padStart(2, '0');
-        const seriePadded = String(serie || '').padStart(2, '0');
-        const nnfPadded = String(nnf || '').padStart(8, '0'); // NNF: 16203 → 00016203 (8 dígitos)
-        const cnfPadded = String(cnf || '').padStart(8, '0'); // CNF: 67691092 → 67691092 (8 dígitos)
-
-        // NOTA: O Make() calcula a chave e DV automaticamente baseado nos valores de ide
-        // Não devemos tentar calcular manualmente - deixar a biblioteca fazer
-        // Mas vamos deixar esse debug para comparação
-        const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
-        const chaveDebug = chaveBase + "X"; // placeholder, será recalculado pelo Make()
-
-        console.log("🔧 === CONSTRUÇÃO DA CHAVE (informativo) ===");
-        console.log("   ufCode:", ufCode, "(esperado: 53)");
-        console.log("   dataPadded:", dataPadded);
-        console.log("   cnpjPadded:", cnpjPadded);
-        console.log("   modPadded:", modPadded);
-        console.log("   seriePadded:", seriePadded);
-        console.log("   nnfPadded:", nnfPadded);
-        console.log("   cnfPadded:", cnfPadded);
-        console.log("   NOTA: Chave será calculada pelo Make()");
-        console.log("===========================");
-
-        const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
-        const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
-        const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
-        const cep = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
-        const xPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
-        const cPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
-        const fone = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
-        const cMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
-        const xMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
-        const xBairro = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
-        const nro = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO || "0";
-        const xLgr = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR || "Endereco";
-        const emit_IE = venda.data[0]?.venda.NFE_INFNFE_EMIT_IE || "";
-        const emit_CRT = venda.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
-        const infCpl = venda.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
-        const vOutro = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO || "0.00";
-        const modFrete = venda.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
-        const vIPIDevol = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
-        const vIPI = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
-        const vDesc = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
-        const vII = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
-        const vSeg = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
-        const vFCP = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
-        const vBCST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
-        const vST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
-        const vFCPST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
-        const vFCPSTRet = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
-        const vProd = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
-        const icmsVFrete = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
-        const qrCode = venda.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
-        const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
-        const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
-        const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
-        const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
-        const nProt = nProtRaw.replace(/^ID/i, '');
-        const digVal = venda.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
-        const cprod = venda.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
-        const cean = venda.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
-        const xprod = venda.data[0]?.detalhe?.map(item => item.det.XPROD) || "Produto Teste";
-
-        const ncm = venda.data[0]?.detalhe?.map(item => item.det.NCM) || "00000000";
-        // const tpCredPresIBSZFM 
-        const CFOP = venda.data[0]?.detalhe?.map(item => item.det.CFOP) || "5102";
-        const uCom = venda.data[0]?.detalhe?.map(item => item.det.UCOM) || "UN";
-        const qCom = venda.data[0]?.detalhe?.map(item => item.det.QCOM) || "1.0000";
-        const vUnCom = venda.data[0]?.detalhe?.map(item => item.det.VUNCOM) || "0.01";
-        const cEANTrib = venda.data[0]?.detalhe?.map(item => item.det.CEANTRIB) || "0000000000000";
-        const uTrib = venda.data[0]?.detalhe?.map(item => item.det.UTRIB) || "UN";
-        const qTrib = venda.data[0]?.detalhe?.map(item => item.det.QTRIB) || "1.0000";
-        const vUnTrib = venda.data[0]?.detalhe?.map(item => item.det.VUNTRIB) || "0.01";
-        const indTot = venda.data[0]?.detalhe?.map(item => item.det.INDTOT) || "1";
-        const orig = venda.data[0]?.detalhe?.map(item => item.det.ICMS_ORIG) || "0";
-        const CST = venda.data[0]?.detalhe?.map(item => item.det.ICMS_CST) || "00";
-        const modBC = venda.data[0]?.detalhe?.map(item => item.det.ICMS_MODBC) || "3";
-        const vBC = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBC || "0.00";
-        const vICMS = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMS || "0.00";
-        const pICMS = venda.data[0]?.detalhe?.map(item => item.det.ICMS_PICMS) || "0.00";
-        const PIS_CST = venda.data[0]?.detalhe?.map(item => item.det.PIS_CST) || "01";
-        const PIS_VBC = venda.data[0]?.detalhe?.map(item => item.det.PIS_VBC) || "0.00";
-        const PIS_PPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_PPIS) || "0.00";
-        const VPIS_VPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_VPIS) || "0.00";
-        const COFINS_CST = venda.data[0]?.detalhe?.map(item => item.det.COFINS_CST) || "01";
-        const COFINS_VBC = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VBC) || "0.00";
-        const COFINS_PCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_PCOFINS) || "0.00";
-        const VCOFINS_VCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VCOFINS) || "0.00";
-        const CSTIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
-        const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
-        const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
-
-
-        // Gerar dhEmi no momento da emissão com formato Brasil (-03:00)
-        const formatarDataBrasil = () => {
-          const d = new Date();
-          const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-          const hours = String(d.getHours()).padStart(2, '0');
-          const minutes = String(d.getMinutes()).padStart(2, '0');
-          const seconds = String(d.getSeconds()).padStart(2, '0');
-          return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}-03:00`;
-        };
-        const dhEmi = formatarDataBrasil();
-
-        // MAPEAMENTO: Códigos do banco → Códigos SEFAZ
-        function mapearTipoPagamento(tPagBanco) {
-          const mapeamento = {
-            '001': '01',  // Dinheiro
-            '002': '02',  // Cheque
-            '003': '03',  // Cartão Crédito
-            '004': '04',  // Cartão Débito
-            '005': '05',  // Crédito Loja
-            '009': '03',  // Credsystem → Cartão Crédito
-            '010': '10',  // Vale Alimentação
-            '011': '11',  // Vale Refeição
-            '012': '12',  // Vale Presente
-            '013': '13',  // Vale Combustível
-            '015': '15',  // Boleto Bancário
-            '016': '16',  // Depósito Bancário
-            '017': '17',  // PIX
-            '018': '18',  // Transferência Bancária
-            '031': '03',  // Outros cartões → Cartão Crédito
-            '090': '90',  // Sem pagamento
-            '099': '99'   // Outros
-          };
-
-          return mapeamento[tPagBanco] ?? '99';
-        }
-
-        // AGRUPAR PAGAMENTOS POR tPag (soma valores do mesmo tipo)
-        function agruparPagamentos(pagamentos) {
-          if (!pagamentos || pagamentos.length === 0) {
-            return [{ tPag: "01", vPag: "0.00" }];
-          }
-
-          const agrupados = {};
-
-          pagamentos.forEach(p => {
-            const tPagBanco = p.pag.TPAG || "OUTROS";
-            const tPagSefaz = mapearTipoPagamento(tPagBanco);
-            const valor = parseFloat(p.pag.VALORRECEBIDO || 0);
-
-            if (!agrupados[tPagSefaz]) {
-              agrupados[tPagSefaz] = 0;
-            }
-
-            agrupados[tPagSefaz] += valor;
-          });
-
-          // Converter objeto em array
-          return Object.entries(agrupados).map(([tPag, vPag]) => ({
-            tPag: tPag,
-            vPag: vPag.toFixed(2)
-          }));
-        }
-
-        const pagamentosAgrupados = agruparPagamentos(venda.data[0]?.pagamento);
-
-        function montarItens(venda) {
-          const itens = venda.data[0]?.detalhe || [];
-
-          return itens.map((item, index) => {
-            const det = item.det;
-
-            return {
-              nItem: index + 1,
-              prod: {
-                cProd: det.CPROD,
-                cEAN: det.CEAN,
-                xProd: det.XPROD,
-                NCM: det.NCM,
-                CFOP: det.CFOP,
-                uCom: det.UCOM,
-                qCom: det.QCOM,
-                vUnCom: det.VUNCOM,
-                vProd: det.VPROD,
-                cEANTrib: det.CEANTRIB,
-                uTrib: det.UTRIB,
-                qTrib: det.QTRIB,
-                vUnTrib: det.VUNTRIB,
-                indTot: det.INDTOT
-              },
-
-              imposto: {
-                ICMS: {
-                  ICMS00: {
-                    orig: det.ICMS_ORIG || "0",
-                    CST: det.ICMS_CST || "00",
-                    modBC: det.ICMS_MODBC || "3",
-                    vBC: det.ICMS_VBC || "0.00",
-                    pICMS: det.ICMS_PICMS || "0.00",
-                    vICMS: det.ICMS_VICMS || "0.00"
-                  }
-                },
-
-                PIS: {
-                  PISAliq: {
-                    CST: det.PIS_CST || "01",
-                    vBC: det.PIS_VBC || "0.00",
-                    pPIS: det.PIS_PPIS || "0.00",
-                    vPIS: det.PIS_VPIS || "0.00"
-                  }
-                },
-
-                COFINS: {
-                  COFINSAliq: {
-                    CST: det.COFINS_CST || "01",
-                    vBC: det.COFINS_VBC || "0.00",
-                    pCOFINS: det.COFINS_PCOFINS || "0.00",
-                    vCOFINS: det.COFINS_VCOFINS || "0.00"
-                  }
-                },
-
-                ISSQN: det.IS_CST
-                  ? {
-                    ISSQN: {
-                      cSitTrib: det.IS_CST || "N",
-                      cListServ: det.IS_CCLASSTRIBIS || "0000",
-                      vBC: det.IS_VBC || "0.00",
-                      vAliq: det.IS_VALIQ || "0.00",
-                      vISSQN: det.IS_VISSQN || "0.00"
-                    }
-                  }
-                  : undefined
-              }
-            };
-          });
-        }
-
-        const payload = {
-          ide: {
-            cUF: ufToCodigo(uf),
-            cNF: cnf,
-            natOp: natOp,
-            mod: mod,
-            serie: serie,
-            nNF: nnf,
-            dhEmi: dhEmi,
-            tpNF: tpNF,
-            idDest: idDest,
-            cMunFG: cMunFG,
-            tpImp: tpImp,
-            tpEmis: tpEmis,
-            cDV: cDV,
-            tpAmb: tpAmb,
-            finNFe: finNFe,
-            indFinal: indFinal,
-            indPres: indPres,
-            procEmi: procEmi,
-            verProc: "1.0",
-          },
-          emit: {
-            CNPJ: cnpj,
-            xNome: nome,
-            xFant: nomeFantasia,
-            enderEmit: {
-              xLgr: xLgr,
-              nro: nro,
-              xBairro: xBairro,
-              cMun: cMun,
-              xMun: xMun,
-              UF: uf,
-              CEP: cep,
-              cPais: cPais,
-              xPais: xPais,
-            },
-            IE: emit_IE,
-            CRT: emit_CRT
-          },
-          autXML: {
-            CNPJ: cnpjAutxml,
-          },
-          det: montarItens(venda),
-          transp: {
-            modFrete: modFrete
-          },
-          pag: {
-            detPag: pagamentosAgrupados
-          },
-          infAdic: {
-            infCpl: infCpl
-          },
-          infNFeSupl: {
-            qrCode: qrCode,
-            urlChave: urlChave
-          }
-        };
-
-        return payload;
+      // ================== 2. CHAVE ==================
+      const chave = venda.CHAVE.replace(/^NFe/, "");
+      if (!/^\d{44}$/.test(chave)) {
+        throw new Error(`Chave inválida: ${chave}`);
       }
-      const payload = gerarXML(response.data);
 
-      // Extrair variáveis de protocolo para usar no tagInfAdic
-      const nProtRaw = response.data.data[0]?.venda.PROTNFE_INFPROT_ID || "";
-      const nProt = nProtRaw.replace(/^ID/i, '');
-      const digVal = response.data.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
-      const cStat = response.data.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
-      const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
+      // ================== 3. DATA ==================
+      let dhEmi = venda.NFE_INFNFE_IDE_DHEMI;
+      if (!dhEmi.includes("T")) {
+        const agora = new Date();
+        dhEmi = `${dhEmi}T${agora.toTimeString().substring(0, 8)}-03:00`;
+      }
 
-      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
-      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
-      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
-      const tpEmissao = configData.TPEMISSAO || "";
-      const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
-
-      const dsCRT = configData.DSCRT || "";
-      const cscId = configData.IDTOKEN || "1";
-      const csc = configData.TOKENCSC || "";
-
-
-      // Usa getCertOptions para carregar o certificado
+      // ================== 4. CERTIFICADO ==================
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
-
-      if (!certOptions) {
-        return res.status(500).json({
-          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
-        });
-      }
-
-      const tpAmbTools = parseInt(tpAmbiente) || 2;
-      const ufTools = ufToCodigo(payload.emit.enderEmit.UF || 'SP');
-
-      // VALIDAÇÃO CRÍTICA
-      console.log("🔧 === VALIDAÇÃO TOOLS ===");
-      console.log("   mod: '65'", csc ? "✓" : "⚠️");
-      console.log("   tpAmb:", tpAmbTools, typeof tpAmbTools === 'number' ? "✓" : "❌");
-      console.log("   UF:", ufTools, ufTools && ufTools !== "" ? "✓" : "❌");
-      console.log("   CSC:", csc && csc.trim() ? "✓" : "❌ VAZIO!");
-      console.log("   CSCid:", cscId, "✓");
-      console.log("   certOptions:", certOptions ? "✓ carregado" : "❌ vazio");
-      console.log("==========================");
-
-      if (!csc || csc.trim() === "") {
-        console.error("❌ ERRO: CSC vazio - não é possível gerar NFC-e");
-        return res.status(400).json({
-          error: "CSC (Token) não configurado",
-          details: { csc: "vazio", cscId }
-        });
-      }
-
-      if (!ufTools || ufTools === "") {
-        console.error("❌ ERRO: UF inválido:", payload.emit.enderEmit.UF);
-        return res.status(400).json({
-          error: "UF não identificado",
-          received: payload.emit.enderEmit.UF
-        });
-      }
-
-      // Configurar variáveis de ambiente para OpenSSL 3.x
-      const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+      const certOptions = await getCertOptions(
+        SENHA_CERT,
+        "./GTO COMERCIO 2025-2026.pfx"
+      );
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
 
-      let tools = new Tools({
-        mod: '65',
-        tpAmb: 2,
-        UF: 'MT',
-        // UF: payload.emit.enderEmit.UF,
-        versao: '4.00',
-        timeout: 60,
-        CSC: csc,
-        CSCid: String(cscId),
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
-      }, certOptions);
+      // ================== 5. TOOLS ==================
+      const tools = new Tools(
+        {
+          mod: "65",
+          tpAmb: 2,
+          UF: 'DF',
+          versao: "4.00",
+          CSC: config.TOKENCSC,
+          CSCid: config.IDTOKEN,
+          timeout: 60,
+          xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+          openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+        },
+        certOptions
+      );
 
+      // ================== 6. MONTAR XML (MAKE) ==================
+      const NFe = new Make();
 
-      let NFe = new Make()
-      NFe.tagInfNFe({
-        Id: null,
-        versao: "4.00"
-      });
+      // 👉 Pode ser null OU NFe + chave (ambos funcionam)
+      NFe.tagInfNFe({ Id: `NFe${chave}`, versao: "4.00" });
 
       NFe.tagIde({
-        cUF: ufToCodigo(payload.ide.cUF),
-        cNF: payload.ide.cNF,
-        natOp: payload.ide.natOp,
-        mod: String(payload.ide.mod),
-        serie: payload.ide.serie,
-        nNF: payload.ide.nNF,
-        dhEmi: payload.ide.dhEmi,
-        tpNF: payload.ide.tpNF,
-        idDest: payload.ide.idDest,
-        cMunFG: payload.ide.cMunFG,
-        tpImp: payload.ide.tpImp,
-        tpEmis: payload.ide.tpEmis,
-        cDV: payload.ide.cDV,
-        tpAmb: payload.ide.tpAmb,
-        finNFe: payload.ide.finNFe,
-        indFinal: payload.ide.indFinal,
-        indPres: payload.ide.indPres,
+        cUF: ufToCodigo(venda.NFE_INFNFE_EMIT_ENDEREMIT_UF),
+        cNF: venda.NFE_INFNFE_IDE_CNF,
+        natOp: venda.NFE_INFNFE_IDE_NATOP,
+        mod: "65",
+        serie: venda.NFE_INFNFE_IDE_SERIE,
+        nNF: venda.NFE_INFNFE_IDE_NNF,
+        dhEmi,
+        tpNF: "1",
+        idDest: "1",
+        cMunFG: venda.NFE_INFNFE_IDE_CMUNFG,
+        tpImp: "4",
+        tpEmis: "1",
+        cDV: venda.NFE_INFNFE_IDE_CDV,
+        tpAmb: "2",
+        finNFe: "1",
+        indFinal: "1",
+        indPres: "1",
         indIntermed: "0",
-        procEmi: payload.ide.procEmi,
-        verProc: payload.ide.verProc,
-      })
+        procEmi: "0",
+        verProc: "1.0.0",
+      });
 
       NFe.tagEmit({
-        CNPJ: payload.emit.CNPJ,
-        xNome: payload.emit.xNome,
-        xFant: payload.emit.xFant,
-        IE: payload.emit.IE,
-        CRT: payload.emit.CRT,
-      })
-
+        CNPJ: venda.NFE_INFNFE_EMIT_CNPJ,
+        xNome: venda.NFE_INFNFE_EMIT_NOME,
+        xFant: venda.NFE_INFNFE_EMIT_FANT,
+        IE: venda.NFE_INFNFE_EMIT_IE,
+        CRT: venda.NFE_INFNFE_EMIT_CRT,
+      });
 
       NFe.tagEnderEmit({
-        xLgr: payload.emit.enderEmit.xLgr,
-        nro: payload.emit.enderEmit.nro,
-        xBairro: payload.emit.enderEmit.xBairro,
-        cMun: payload.emit.enderEmit.cMun,
-        xMun: payload.emit.enderEmit.xMun,
-        UF: payload.emit.enderEmit?.UF,
-        CEP: payload.emit.enderEmit.CEP,
-        cPais: payload.emit.enderEmit.cPais,
-        xPais: payload.emit.enderEmit.xPais
-      })
-
-      NFe.tagAutXML({
-        CNPJ: payload.autXML.CNPJ
-      })
-      // Processar cada item do detalhe
-
-      const itens = vendaData.data[0]?.detalhe || [];
-
-      // Primeiro: construir array de produtos para passar ao tagProd
-      const produtosArray = itens.map((item, index) => {
-        const det = item.det;
-        const vrUnit = parseFloat(det.VUNCOM) || 0;
-        const qtd = parseFloat(det.QCOM) || 0;
-        const vDesconto = parseFloat(det.VDESC) || 0;
-
-        const produto = {
-          cProd: det.CPROD,
-          cEAN: det.CEAN || "SEM GTIN",
-          xProd: det.XPROD,
-          NCM: det.NCM,
-          CFOP: det.CFOP,
-          uCom: det.UCOM,
-          qCom: det.QCOM,
-          vUnCom: det.VUNCOM,
-          vProd: roundTo(vrUnit * qtd, 2),
-          cEANTrib: det.CEANTRIB || "SEM GTIN",
-          uTrib: det.UTRIB,
-          qTrib: det.QTRIB,
-          vUnTrib: det.VUNTRIB,
-          indTot: det.INDTOT
-        };
-
-        // Só adicionar vDesc se for maior que 0
-        if (vDesconto > 0) {
-          produto.vDesc = vDesconto.toFixed(2);
-        }
-
-        return produto;
+        xLgr: venda.NFE_INFNFE_EMIT_ENDEREMIT_XLGR,
+        nro: venda.NFE_INFNFE_EMIT_ENDEREMIT_NRO,
+        xBairro: venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO,
+        cMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN,
+        xMun: venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN,
+        UF: venda.NFE_INFNFE_EMIT_ENDEREMIT_UF,
+        CEP: venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP,
+        cPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS,
+        xPais: venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS,
       });
 
-      // Passar array completo de produtos de uma vez
-      NFe.tagProd(produtosArray);
-
-      // Segundo: calcular impostos e aplicar para cada produto
-      itens.forEach((item, index) => {
-        const det = item.det;
-
-        //1. Calcular valor base do Item
-        const vrUnit = parseFloat(det.VUNCOM) || 0;
-        const qtd = parseFloat(det.QCOM) || 0;
-        const vrDesconto = parseFloat(det.VDESC) || 0;
-
-        // Fórmula: VrCalculado = (VrUnit * qtd) - VrDesconto
-        const VrCalculado = roundTo((vrUnit * qtd) - vrDesconto, 2);
-
-        // Acumular total da nota e descontos
-        V_ICMSTot_vNF += VrCalculado;
-        V_Tot_Desconto += vrDesconto;
-
-
-        // 2. VERIFICAR REGIME TRIBUTÁRIO (usar CRT do banco)
-        const crt = String(vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3");
-        const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-        const ncm = det.NCM || "";
-
-        // Calcular ICMS
-        let icmsData = {}
-
-        if (crt === "1") {
-          // Simples Nacional (CRT = 1)
-          icmsData = {
-            orig: "0",
-            CSOSN: "102"
-          };
-          // Simples Nacional: NÃO acumula v_TotICMS
-        } else {
-          // Regime Normal
-          if ((ncm === "38089429" || ncm === "22072019") && uf === "DF") {
-            icmsData = {
-              orig: "0",
-              CST: "40", // ISENTO
-              vBC: "0.00",
-              pICMS: "0.00",
-              vICMS: "0.00"
-            };
-            // Não acumula ICMS
-          } else {
-            // Caso 2: Outros Produtos
-            let pICMS = 19.00;
-
-            if (uf === "DF") {
-              // DF: usa % do produto se >= 12, senão 20%
-              const percProduto = parseFloat(det.ICMS_PICMS) || 0;
-              pICMS = (percProduto >= 12) ? percProduto : 20.00;
-            }
-
-            const vICMS = roundTo(VrCalculado * (pICMS / 100), 2);
-
-            icmsData = {
-              orig: "0", // Nacional
-              CST: "00", // TRIBUTADO INTEGRALMENTE
-              modBC: "3", // Valor da Operação
-              vBC: VrCalculado.toFixed(2),
-              pICMS: pICMS.toFixed(2),
-              vICMS: vICMS.toFixed(2)
-            };
-
-            // Acumular total de ICMS
-            v_TotICMS += vICMS;
-          }
+      // ================== PRODUTOS ==================
+      // Função auxiliar para formatar valores decimais com precisão máxima de 2 casas
+      const formatDecimal = (value, decimals = 2) => {
+        if (value === null || value === undefined || value === "") {
+          return "0.00";
         }
-
-        // 4. Calcular PIS
-        let pisData = {}
-
-        if (crt === "1") {
-          // Simples Nacional: PIS não aplicável na nota
-          pisData = { CST: "49", vBC: "0.00", pPIS: "0.00", vPIS: "0.00" };
-        } else {
-          if (ncm === "38089429") {
-            // Produto não tributável
-            pisData = {
-              CST: "04",  // Operação não tributável
-              vBC: "0.00",
-              pPIS: "0.00",
-              vPIS: "0.00"
-            };
-          } else {
-            // Produto normal: 1.65%
-            const vPIS = roundTo(VrCalculado * 0.0165, 2);
-
-            pisData = {
-              CST: "01",  // Operação tributável
-              vBC: VrCalculado.toFixed(2),
-              pPIS: "1.65",
-              vPIS: vPIS.toFixed(2)
-            }
-
-            // Acumular total de PIS
-            v_TotPis += vPIS;
-          }
-        }
-
-        // 5. Calcular COFINS
-        let cofinsData = {}
-
-        if (crt === "1") {
-          // Simples Nacional: COFINS não aplicável na nota
-          cofinsData = { CST: "49", vBC: "0.00", pCOFINS: "0.00", vCOFINS: "0.00" };
-        } else {
-          if (ncm === "38089429") {
-            // Produto não tributável
-            cofinsData = {
-              CST: "04",  // Operação não tributável
-              vBC: "0.00",
-              pCOFINS: "0.00",
-              vCOFINS: "0.00"
-            };
-          } else {
-            // Produto normal: 7.60%
-            const vCOFINS = roundTo(VrCalculado * 0.076, 2);
-
-            cofinsData = {
-              CST: "01",  // Operação tributável
-              vBC: VrCalculado.toFixed(2),
-              pCOFINS: "7.60",
-              vCOFINS: vCOFINS.toFixed(2)
-            }
-
-            // Acumular total de COFINS
-            v_TotCofins += vCOFINS;
-          }
-        }
-
-        // ===== 6. CALCULAR IBS/CBS (REFORMA TRIBUTÁRIA) - IGUAL PASCAL =====
-        let ibscbsData = {};
-
-        if (crt !== "1") {
-          // Regime Normal
-
-          // IBS Estadual UF: 0.10% (igual Pascal: 0.10/100)
-          const vIBSUF = roundTo(VrCalculado * (0.10 / 100), 2);
-
-          // CBS Federal: 0.90% (igual Pascal: 0.90/100)
-          const vCBS = roundTo(VrCalculado * (0.90 / 100), 2);
-
-          ibscbsData = {
-            CST: "000",
-            cClassTrib: "000001",
-            gIBSCBS: {
-              vBC: VrCalculado.toFixed(2),
-              gIBSUF: {
-                pIBSUF: "0.10",
-                vIBSUF: vIBSUF.toFixed(2)
-              },
-              gIBSMun: {
-                pIBSMun: "0.00",
-                vIBSMun: "0.00"
-              },
-              vIBS: vIBSUF.toFixed(2),
-              gCBS: {
-                pCBS: "0.90",
-                vCBS: vCBS.toFixed(2)
-              }
-            }
-          };
-
-          // Acumular totais IBS/CBS
-          v_TotIBSUF += vIBSUF;
-          v_TotCBS += vCBS;
-        }
-
-        // ===== 7. APLICAR IMPOSTOS DO ITEM =====
-        NFe.tagProdICMS(index, icmsData);
-        NFe.tagProdPIS(index, pisData);
-        NFe.tagProdCOFINS(index, cofinsData);
-        NFe.tagProdIBSCBS(index, ibscbsData);
-      });
-
-
-      // ===== TOTALIZAR NOTA (APÓS PROCESSAR TODOS OS ITENS) =====
-      const crtFinal = String(vendaData.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "3");
-
-      const totaisFinais = {
-        ICMSTot: {
-          vBC: (crtFinal === "1") ? "0.00" : V_ICMSTot_vNF.toFixed(2),
-          vICMS: v_TotICMS.toFixed(2),
-          vICMSDeson: "0.00",
-          vFCP: "0.00",
-          vBCST: "0.00",
-          vST: "0.00",
-          vFCPST: "0.00",
-          vFCPSTRet: "0.00",
-          vProd: (V_ICMSTot_vNF + V_Tot_Desconto).toFixed(2),
-          vFrete: "0.00",
-          vSeg: "0.00",
-          vDesc: V_Tot_Desconto.toFixed(2),
-          vII: "0.00",
-          vIPI: "0.00",
-          vIPIDevol: "0.00",
-          vPIS: v_TotPis.toFixed(2),
-          vCOFINS: v_TotCofins.toFixed(2),
-          vOutro: "0.00",
-          vNF: V_ICMSTot_vNF.toFixed(2)
-        },
-        IBSCBSTot: {
-          vBCIBSCBS: V_ICMSTot_vNF.toFixed(2),
-          gIBS: {
-            gIBSUF: {
-              vDif: "0.00",
-              vDevTrib: "0.00",
-              vIBSUF: v_TotIBSUF.toFixed(2)
-            },
-            gIBSMun: {
-              vDif: "0.00",
-              vDevTrib: "0.00",
-              vIBSMun: "0.00"
-            },
-            vIBS: (v_TotIBSUF + 0).toFixed(2),
-            vCredPres: "0.00",
-            vCredPresCondSus: "0.00"
-          },
-          gCBS: {
-            vDif: "0.00",
-            vDevTrib: "0.00",
-            vCBS: v_TotCBS.toFixed(2),
-            vCredPres: "0.00",
-            vCredPresCondSus: "0.00"
-          }
-        },
-        vNFTot: V_ICMSTot_vNF.toFixed(2)
+        const num = parseFloat(value);
+        return isNaN(num) ? "0.00" : num.toFixed(decimals);
       };
 
-      NFe.tagTotal(totaisFinais);
+      NFe.tagProd(
+        itens.map(item => ({
+          cProd: item.det.CPROD,
+          cEAN: item.det.CEAN,
+          xProd: item.det.XPROD,
+          NCM: item.det.NCM,
+          CFOP: item.det.CFOP,
+          uCom: item.det.UCOM,
+          qCom: formatDecimal(item.det.QCOM, 4),
+          vUnCom: formatDecimal(item.det.VUNCOM),
+          vProd: formatDecimal(item.det.VPROD),
+          cEANTrib: item.det.CEANTRIB,
+          uTrib: item.det.UTRIB,
+          qTrib: formatDecimal(item.det.QTRIB, 4),
+          vUnTrib: formatDecimal(item.det.VUNTRIB),
+          indTot: "1",
+        }))
+      );
 
+      itens.forEach((item, index) => {
+        NFe.tagProdICMS(index, {
+          orig: item.det.ICMS_ORIG,
+          CST: item.det.ICMS_CST,
+          modBC: item.det.ICMS_MODBC,
+          vBC: formatDecimal(item.det.ICMS_VBC),
+          pICMS: formatDecimal(item.det.ICMS_PICMS),
+          vICMS: formatDecimal(item.det.ICMS_VICMS),
+        });
 
-      // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
-      const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25.24% Federal
-      const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19.41% Estadual
-      const enderecoProconDF = `PROCON - DF - 151;SCS, QD. 08, BL. B-60, SALA 240, VENANCIO 2000`;
-      const enderecoProconGO = `PROCON - 151;Rua 8, N . 242 QD. 5, LT. 36, St. Central, Goiania - GO`;
+        NFe.tagProdPIS(index, {
+          CST: item.det.PIS_CST,
+          vBC: formatDecimal(item.det.PIS_VBC),
+          pPIS: formatDecimal(item.det.PIS_PPIS),
+          vPIS: formatDecimal(item.det.PIS_VPIS),
+        });
 
-      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
-      const enderecoProcon = uf === "GO" ? enderecoProconGO : uf === "DF" ? enderecoProconDF : "";
-
-      const idVendaInfo = vendaData.data[0]?.venda.IDVENDA || idVenda;
-      const infCpl = `Voce pagou aproximadamente ${OlhoImposto_Fed.toFixed(2).replace('.', ',')} tributos federais ` +
-        `${OlhoImposto_UF.toFixed(2).replace('.', ',')} tributos estaduais ` +
-        `0,00 tributos municipais Fonte IBPT FECOMERCIO RS Xe67Eq ` +
-        (enderecoProcon ? `${enderecoProcon} ` : '') +
-        `Numero VENDA ${idVendaInfo} ` +
-        `PRAZO DE TROCA VALIDO POR 30 DIAS`;
-
-      NFe.tagTransp({
-        modFrete: payload.transp.modFrete
-      })
-
-      const pagamentosFormatados = Array.isArray(payload.pag.detPag)
-        ? payload.pag.detPag.map((p, idx) => {
-          const pag = {
-            indPag: 0, // 0=Pagamento à Vista
-            tPag: p.tPag,
-            vPag: p.vPag
-          };
-
-          // Adicionar xPag (descrição) APENAS quando tPag = "99" (Outros)
-          // if (p.tPag === "99") {
-          //   pag.xPag = "Outros";
-          // }
-
-
-          return pag;
-        })
-        : [{ indPag: 0, tPag: "01", vPag: "0.00" }];
-
-      NFe.tagDetPag(pagamentosFormatados);
-
-      // Calcular troco (diferença entre valor pago e valor da nota)
-      const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
-      const vrTroco = roundTo(totalPago - parseFloat(totaisFinais.vNFTot), 2);
-
-
-
-      NFe.tagInfAdic({
-        infCpl: infCpl
-      })
-
-      const xmlGerado = NFe.xml();
-      console.log("\n📄 XML GERADO:");
-      console.log("   Tamanho:", xmlGerado.length, "bytes");
-      console.log("   Contém <infNFe>:", xmlGerado.includes("<infNFe") ? "✓" : "❌");
-      console.log("   Contém <ide>:", xmlGerado.includes("<ide") ? "✓" : "❌");
-      console.log("   Contém <emit>:", xmlGerado.includes("<emit") ? "✓" : "❌");
-      console.log("   Contém <det>:", xmlGerado.includes("<det") ? "✓" : "❌");
-      console.log("   Contém <total>:", xmlGerado.includes("<total") ? "✓" : "❌");
-      console.log("   Contém <pag>:", xmlGerado.includes("<pag") ? "✓" : "❌");
-
-      // Extrair chave para verificar
-      // Tenta encontrar a chave no atributo Id de infNFe (formato: NFe + 44 dígitos)
-      const matchChaveId = xmlGerado.match(/Id="NFe(\d{44})"/);
-      // Se não encontrar, tenta buscar em elemento chNFe
-      const matchChave = matchChaveId || xmlGerado.match(/<chNFe>(\d{44})<\/chNFe>/);
-      const chaveNoXml = matchChave ? (matchChave[1] || (matchChaveId ? matchChaveId[1] : "NÃO ENCONTRADA")) : "NÃO ENCONTRADA";
-      // console.log("   Chave (44 dígitos):", chaveNoXml);
-
-      // Debug: verificar o ID do NFe
-      const idNFeMatch = xmlGerado.match(/Id="(NFe\d+)"/);
-      // console.log("   ID infNFe extraído:", idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO");
-
-      tools.xmlSign(xmlGerado).then(async xmlSign => {
-        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
-
-        // CRÍTICO: Garantir que o XML esteja com declaração UTF-8
-        let xmlParaEnviar = xmlSign;
-
-        // Verificar e corrigir declaração XML
-        if (!xmlParaEnviar.includes('encoding="UTF-8"')) {
-          // Se não tiver encoding, adicionar
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /^<\?xml[^>]*\?>/,
-            '<?xml version="1.0" encoding="UTF-8"?>'
-          );
-        } else {
-          // Se tiver mas for diferente de UTF-8, corrigir
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /encoding="[^"]+"/,
-            'encoding="UTF-8"'
-          );
-        }
-
-        fs.writeFileSync(`./xmls/nfe.xml`, xmlParaEnviar, { encoding: "utf-8" });
-        console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlParaEnviar.length);
-
-        try {
-          console.log("📤 Iniciando sefazEnviaLote...");
-          const resposta = await tools.sefazEnviaLote(xmlParaEnviar, { indSinc: 1 });
-          console.log("✅ Resposta SEFAZ recebida:", resposta);
-          fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
-        } catch (errSefaz) {
-          console.error("❌ Erro em sefazEnviaLote:", errSefaz);
-          console.error("   Mensagem:", errSefaz.message);
-          console.error("   Stack:", errSefaz.stack);
-          fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-            message: errSefaz.message,
-            stack: errSefaz.stack,
-            code: errSefaz.code
-          }, null, 2), { encoding: "utf-8" });
-        }
-      }).catch(errSign => {
-        console.error("❌ Erro em xmlSign:");
-        console.error("   Mensagem:", errSign.message);
-        console.error("   Stack:", errSign.stack);
-        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-          message: errSign.message,
-          stack: errSign.stack
-        }, null, 2), { encoding: "utf-8" });
+        NFe.tagProdCOFINS(index, {
+          CST: item.det.COFINS_CST,
+          vBC: formatDecimal(item.det.COFINS_VBC),
+          pCOFINS: formatDecimal(item.det.COFINS_PCOFINS),
+          vCOFINS: formatDecimal(item.det.COFINS_VCOFINS),
+        });
       });
 
-      // Retornar dados completos incluindo XML gerado
+      // ================== TOTAL / PAGAMENTO ==================
+      NFe.tagTotal();
+      NFe.tagTransp({ modFrete: "9" });
+
+      NFe.tagDetPag(
+        pagamentos.map(p => ({
+          indPag: "0",
+          tPag: p.pag.TPAG, // ex: 01, 03, 04, 17
+          vPag: formatDecimal(p.pag.VALORRECEBIDO),
+        }))
+      );
+
+
+      // tools.sefazStatus()
+      //   .then(res => console.log('STATUS SEFAZ:', res))
+      //   .catch(err => console.error('ERRO STATUS:', err));
+     
+      fs.writeFileSync("xmls/nfe.xml", NFe.xml(), { encoding: "utf-8" });
+
+      // ================== 7. GERAR / ASSINAR / ENVIAR ==================
+      const xmlBase = NFe.xml();
+
+      // Garantir que o XML base tenha UTF-8
+      let xmlBaseUtf8 = xmlBase;
+      if (!xmlBaseUtf8.includes('encoding="UTF-8"')) {
+        xmlBaseUtf8 = xmlBaseUtf8.replace(
+          /^<\?xml[^>]*\?>/,
+          '<?xml version="1.0" encoding="UTF-8"?>'
+        );
+      }
+
+      console.log("✅ XML gerado com UTF-8. Tamanho:", xmlBaseUtf8.length);
+
+      const xmlAssinado = await tools.xmlSign(xmlBaseUtf8);
+
+      // Garantir que o XML assinado também tenha UTF-8
+      let xmlAssinadoUtf8 = xmlAssinado;
+      if (!xmlAssinadoUtf8.includes('encoding="UTF-8"')) {
+        xmlAssinadoUtf8 = xmlAssinadoUtf8.replace(
+          /^<\?xml[^>]*\?>/,
+          '<?xml version="1.0" encoding="UTF-8"?>'
+        );
+      }
+
+      console.log("✅ XML assinado com UTF-8. Tamanho:", xmlAssinadoUtf8);
+
+      // const resposta = await tools.sefazEnviaLote(xmlAssinadoUtf8, { indSinc: 1 });
+      // console.log(resposta, 'RESPOSTA SEFAZ');
       return res.json({
-        venda: vendaData,
-
+        sucesso: true,
+        // resposta,
       });
+
     } catch (error) {
-      console.error('Erro ao consultar venda ou gerar XML:', error);
-      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML', details: error.message });
+      console.error(error);
+      return res.status(500).json({
+        sucesso: false,
+        erro: error.message,
+      });
     }
   }
+  
 }
 
 export default new SoapController();
