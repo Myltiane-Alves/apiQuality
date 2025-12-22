@@ -192,7 +192,8 @@ class ConsultaNfeController {
           resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
           continue;
         }
-
+        const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+              process.env.OPENSSL_MODULES = opensslModulesPath;
         try {
           const tools = new Tools(
             {
@@ -201,6 +202,7 @@ class ConsultaNfeController {
               UF,
               versao: "4.00",
               xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+              openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
             },
             certOptions
           );
@@ -215,7 +217,7 @@ class ConsultaNfeController {
 
           resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
         } catch (e) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
+          resultados.push({ IDVENDA, UF, CHAVE,  error: e.message });
         }
       }
 
@@ -2338,7 +2340,50 @@ class ConsultaNfeController {
     }
   }
 
-
+   async statusSefaz(req, res) {
+      try {
+        // ================== 4. CERTIFICADO ==================
+        const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+        const certOptions = await getCertOptions(
+          SENHA_CERT,
+          "./GTO COMERCIO 2025-2026.pfx"
+        );
+        const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+        process.env.OPENSSL_MODULES = opensslModulesPath;
+  
+  
+        // ================== 5. TOOLS ==================
+        const tools = new Tools(
+          {
+            mod: '65',
+            tpAmb: 2,
+            UF: 'MT',
+            versao: '4.00',
+            xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+            openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+          },
+          certOptions
+        );
+  
+  
+        tools.sefazStatus()
+          .then(res => console.log('STATUS SEFAZ:', res))
+          .catch(err => console.error('ERRO STATUS:', err));
+  
+  
+        return res.json({
+          sucesso: true,
+          mensagem: 'Consulta de status enviada. Verifique o console para detalhes.',
+        });
+  
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+          sucesso: false,
+          erro: error.message,
+        });
+      }
+    }
 /*
   async downloadXML(req, res) {
    
