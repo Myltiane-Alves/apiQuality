@@ -504,6 +504,7 @@ class ConsultaNfeController {
       const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
       const tpEmissao = configData.TPEMISSAO || "";
       const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
+      console.log(response.data[0], 'csc');
 
       const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
@@ -548,7 +549,6 @@ class ConsultaNfeController {
           received: payload.emit.enderEmit.UF
         });
       }
-
       // Configurar variáveis de ambiente para OpenSSL 3.x
       const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
@@ -966,54 +966,54 @@ class ConsultaNfeController {
       const idNFeMatch = xmlGerado.match(/Id="(NFe\d+)"/);
       // console.log("   ID infNFe extraído:", idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO");
 
-      tools.xmlSign(xmlGerado).then(async xmlSign => {
-        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
+      // tools.xmlSign(xmlGerado).then(async xmlSign => {
+      //   // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
 
-        // CRÍTICO: Garantir que o XML esteja com declaração UTF-8
-        let xmlParaEnviar = xmlSign;
+      //   // CRÍTICO: Garantir que o XML esteja com declaração UTF-8
+      //   let xmlParaEnviar = xmlSign;
 
-        // Verificar e corrigir declaração XML
-        if (!xmlParaEnviar.includes('encoding="UTF-8"')) {
-          // Se não tiver encoding, adicionar
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /^<\?xml[^>]*\?>/,
-            '<?xml version="1.0" encoding="UTF-8"?>'
-          );
-        } else {
-          // Se tiver mas for diferente de UTF-8, corrigir
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /encoding="[^"]+"/,
-            'encoding="UTF-8"'
-          );
-        }
+      //   // Verificar e corrigir declaração XML
+      //   if (!xmlParaEnviar.includes('encoding="UTF-8"')) {
+      //     // Se não tiver encoding, adicionar
+      //     xmlParaEnviar = xmlParaEnviar.replace(
+      //       /^<\?xml[^>]*\?>/,
+      //       '<?xml version="1.0" encoding="UTF-8"?>'
+      //     );
+      //   } else {
+      //     // Se tiver mas for diferente de UTF-8, corrigir
+      //     xmlParaEnviar = xmlParaEnviar.replace(
+      //       /encoding="[^"]+"/,
+      //       'encoding="UTF-8"'
+      //     );
+      //   }
 
-        fs.writeFileSync(`./xmls/nfe.xml`, xmlParaEnviar, { encoding: "utf-8" });
-        console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlParaEnviar.length);
+      //   fs.writeFileSync(`./xmls/nfe.xml`, xmlParaEnviar, { encoding: "utf-8" });
+      //   console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlParaEnviar.length);
 
-        try {
-          console.log("📤 Iniciando sefazEnviaLote...");
-          const resposta = await tools.sefazEnviaLote(xmlParaEnviar, { indSinc: 1 });
-          console.log("✅ Resposta SEFAZ recebida:", resposta);
-          fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
-        } catch (errSefaz) {
-          console.error("❌ Erro em sefazEnviaLote:", errSefaz);
-          console.error("   Mensagem:", errSefaz.message);
-          console.error("   Stack:", errSefaz.stack);
-          fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-            message: errSefaz.message,
-            stack: errSefaz.stack,
-            code: errSefaz.code
-          }, null, 2), { encoding: "utf-8" });
-        }
-      }).catch(errSign => {
-        console.error("❌ Erro em xmlSign:");
-        console.error("   Mensagem:", errSign.message);
-        console.error("   Stack:", errSign.stack);
-        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-          message: errSign.message,
-          stack: errSign.stack
-        }, null, 2), { encoding: "utf-8" });
-      });
+      //   try {
+      //     console.log("📤 Iniciando sefazEnviaLote...");
+      //     const resposta = await tools.sefazEnviaLote(xmlParaEnviar, { indSinc: 1 });
+      //     console.log("✅ Resposta SEFAZ recebida:", resposta);
+      //     fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
+      //   } catch (errSefaz) {
+      //     console.error("❌ Erro em sefazEnviaLote:", errSefaz);
+      //     console.error("   Mensagem:", errSefaz.message);
+      //     console.error("   Stack:", errSefaz.stack);
+      //     fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+      //       message: errSefaz.message,
+      //       stack: errSefaz.stack,
+      //       code: errSefaz.code
+      //     }, null, 2), { encoding: "utf-8" });
+      //   }
+      // }).catch(errSign => {
+      //   console.error("❌ Erro em xmlSign:");
+      //   console.error("   Mensagem:", errSign.message);
+      //   console.error("   Stack:", errSign.stack);
+      //   fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
+      //     message: errSign.message,
+      //     stack: errSign.stack
+      //   }, null, 2), { encoding: "utf-8" });
+      // });
 
       // Retornar dados completos incluindo XML gerado
       return res.json({
