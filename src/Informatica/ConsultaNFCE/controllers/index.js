@@ -154,7 +154,7 @@ class ConsultaNfeController {
 
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
-
+      console.log(response, 'response')
       let v_TotICMS = 0;
       let v_TotPis = 0;
 
@@ -534,13 +534,13 @@ class ConsultaNfeController {
       console.log("   certOptions:", certOptions ? "✓ carregado" : "❌ vazio");
       console.log("==========================");
 
-      if (!csc || csc.trim() === "") {
-        console.error("❌ ERRO: CSC vazio - não é possível gerar NFC-e");
-        return res.status(400).json({
-          error: "CSC (Token) não configurado",
-          details: { csc: "vazio", cscId }
-        });
-      }
+      // if (!csc || csc.trim() === "") {
+      //   console.error("❌ ERRO: CSC vazio - não é possível gerar NFC-e");
+      //   return res.status(400).json({
+      //     error: "CSC (Token) não configurado",
+      //     details: { csc: "vazio", cscId }
+      //   });
+      // }
 
       if (!ufTools || ufTools === "") {
         console.error("❌ ERRO: UF inválido:", payload.emit.enderEmit.UF);
