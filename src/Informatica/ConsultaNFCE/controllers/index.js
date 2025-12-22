@@ -180,13 +180,12 @@ class ConsultaNfeController {
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
 
-
       // ================== 5. TOOLS ==================
       const tools = new Tools(
         {
           mod: "65",
           tpAmb: 2,
-          UF: 'MT',
+          UF: 'DF',
           versao: "4.00",
           CSC: config.TOKENCSC,
           CSCid: config.IDTOKEN,
