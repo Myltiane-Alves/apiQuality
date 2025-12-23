@@ -1,5 +1,4 @@
 {
-  "message": "",
-  "stack": "AggregateError: \n    at internalConnectMultiple (node:net:1134:18)\n    at afterConnectMultiple (node:net:1715:7)",
-  "code": "ECONNREFUSED"
+  "message": "Cannot read properties of undefined (reading 'mod65')",
+  "stack": "TypeError: Cannot read properties of undefined (reading 'mod65')\n    at file:///C:/quality/react_node/homologacao/apiQuality/node_modules/node-sped-nfe/dist/utils/tools.js:176:49"
 }

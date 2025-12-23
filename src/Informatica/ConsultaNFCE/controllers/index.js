@@ -134,7 +134,7 @@ export function roundTo(valor, casasDecimais) {
 class ConsultaNfeController {
   async consultaNFce(req, res) {
     try {
-      let { idVenda } = req.body;
+      let { idVenda } = req.query;
 
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
@@ -152,9 +152,9 @@ class ConsultaNfeController {
         return map[u] || "35";
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
-
+      
       let v_TotICMS = 0;
       let v_TotPis = 0;
 
@@ -166,7 +166,7 @@ class ConsultaNfeController {
 
       function gerarXML(venda) {
 
-        const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF || "SP";
+        const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
         const ufConverted = ufToCodigo(uf);
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
@@ -186,13 +186,13 @@ class ConsultaNfeController {
         const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
         const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
         const cMunFG = venda.data[0]?.venda.NFE_INFNFE_IDE_CMUNFG || "3550308";
-        const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP || "2";
-        const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS || "1";
+        const tpImp = venda.data[0]?.venda.NFE_INFNFE_IDE_TPIMP;
+        const tpEmis = venda.data[0]?.venda.NFE_INFNFE_IDE_TPEMIS;
         const cDV = venda.data[0]?.venda.NFE_INFNFE_IDE_CDV || "0";
-        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB) || "2";
-        const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE || "1";
-        const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL || "1";
-        const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES || "1";
+        const tpAmb = String(venda.data[0]?.venda.NFE_INFNFE_IDE_TPAMB);
+        const finNFe = venda.data[0]?.venda.NFE_INFNFE_IDE_FINNFE;
+        const indFinal = venda.data[0]?.venda.NFE_INFNFE_IDE_INDFINAL;
+        const indPres = venda.data[0]?.venda.NFE_INFNFE_IDE_INDPRES;
         const cnpj = venda.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
 
         const ufCode = String(ufToCodigo(uf)).padStart(2, '0');
@@ -427,7 +427,7 @@ class ConsultaNfeController {
             };
           });
         }
-
+       
         const payload = {
           ide: {
             cUF: ufToCodigo(uf),
@@ -504,7 +504,7 @@ class ConsultaNfeController {
       const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
       const tpEmissao = configData.TPEMISSAO || "";
       const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
-      console.log(configData, 'csc');
+    
 
       const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
@@ -522,8 +522,9 @@ class ConsultaNfeController {
       }
 
       const tpAmbTools = parseInt(tpAmbiente) || 2;
-      const ufTools = ufToCodigo(payload.emit.enderEmit.UF || 'SP');
+      const ufTools = ufToCodigo(configData.UF || payload.emit.enderEmit.UF);
 
+    
       // VALIDAÇÃO CRÍTICA
       console.log("🔧 === VALIDAÇÃO TOOLS ===");
       console.log("   mod: '65'", csc ? "✓" : "⚠️");
@@ -553,12 +554,12 @@ class ConsultaNfeController {
       const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
-
+      
       let tools = new Tools({
         mod: '65',
         tpAmb: 2,
         // UF: 'MT',
-        UF: payload.emit.enderEmit.UF,
+        UF: ufTools,
         versao: '4.00',
         timeout: 60,
         CSC: csc,
@@ -574,8 +575,9 @@ class ConsultaNfeController {
         versao: "4.00"
       });
 
+      
       NFe.tagIde({
-        cUF: ufToCodigo(payload.ide.cUF),
+        cUF: payload.ide.cUF,
         cNF: payload.ide.cNF,
         natOp: payload.ide.natOp,
         mod: String(payload.ide.mod),
@@ -640,12 +642,12 @@ class ConsultaNfeController {
           CFOP: det.CFOP,
           uCom: det.UCOM,
           qCom: det.QCOM,
-          vUnCom: det.VUNCOM,
+          vUnCom: parseFloat(det.VUNCOM),
           vProd: roundTo(vrUnit * qtd, 2),
           cEANTrib: det.CEANTRIB || "SEM GTIN",
           uTrib: det.UTRIB,
           qTrib: det.QTRIB,
-          vUnTrib: det.VUNTRIB,
+          vUnTrib: parseFloat(det.VUNTRIB),
           indTot: det.INDTOT
         };
 
@@ -892,7 +894,7 @@ class ConsultaNfeController {
 
       NFe.tagTotal(totaisFinais);
 
-
+      console.log(totaisFinais, '<-- Totais Finais');
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
       const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25.24% Federal
       const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19.41% Estadual
