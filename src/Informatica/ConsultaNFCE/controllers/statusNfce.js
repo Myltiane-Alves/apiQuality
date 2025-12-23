@@ -90,7 +90,7 @@ class ConsultaStatusNfeController {
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
-      const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
+      const mod = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65");
       const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
@@ -127,7 +127,7 @@ class ConsultaStatusNfeController {
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
-  
+
   async downloadNFE(req, res) {
     try {
       let { idVenda } = req.body;
@@ -145,7 +145,7 @@ class ConsultaStatusNfeController {
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
-      const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
+      const mod = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "55");
       const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
       const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
       const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";

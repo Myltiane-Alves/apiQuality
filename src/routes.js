@@ -34,7 +34,8 @@ import CaixaControllers from './Informatica/caixas/controllers/controllersCaixas
 import RelatorioBIController from './Informatica/relatorio/ralatoriaBI/controller/controllerRelatorioBi.js';
 import LinkRelatorioBiController from './Informatica/relatorio/linkRelatorioBI/controllers/controllersLinkRelatorioBi.js'
 
-import ConsultaNfeController from './Informatica/ConsultaNFCE/controllers/index.js'
+import ConsultaNFceController  from './Informatica/ConsultaNFCE/controllers/index.js'
+import ConsultaNFeController from './Informatica/ConsultaNFCE/controllers/nfe.js'
 import ConsultaStatusNfeController from './Informatica/ConsultaNFCE/controllers/statusNfce.js'
 
 // Financeiro Início
@@ -486,13 +487,13 @@ routes.post('/criar-funcionarios-loja', InformaticaControllers.postFuncionarioLo
 routes.put('/lista-caixas/:id', InformaticaControllers.putCaixaLoja)
 routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDesconto)
 // routes.post('/consulta-nfec', ConsultaNfeController.consultar)
-// routes.post('/consultar-nfe', upload.single('planilha'), ConsultaNfeController.consultar);
 // routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
 // routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
 // routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
-routes.post('/statusSefaz', ConsultaNfeController.consultaNFce);
+routes.post('/statusSefaz', ConsultaNFceController.consultaNFce);
 routes.get('/status', ConsultaStatusNfeController.statusSefaz);
 routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
+routes.post('/consultar-nfe', ConsultaNFeController.consultaNFe);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática

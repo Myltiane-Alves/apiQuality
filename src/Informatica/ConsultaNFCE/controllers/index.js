@@ -131,7 +131,7 @@ export function roundTo(valor, casasDecimais) {
   const multiplicador = Math.pow(10, Math.abs(casasDecimais));
   return Math.round(valor * multiplicador) / multiplicador;
 }
-class ConsultaNfeController {
+class ConsultaNFceController {
   async consultaNFce(req, res) {
     try {
       let { idVenda } = req.body;
@@ -184,7 +184,7 @@ class ConsultaNfeController {
         const ufConverted = ufToCodigo(uf);
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
-        const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
+        const mod = String(venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65");
         const serie = venda.data[0]?.venda.NFE_INFNFE_IDE_SERIE || "01";
         const nnf = venda.data[0]?.venda.NFE_INFNFE_IDE_NNF || "";
 
@@ -1058,4 +1058,4 @@ class ConsultaNfeController {
   }
 }
 
-export default new ConsultaNfeController();
+export default new ConsultaNFceController();

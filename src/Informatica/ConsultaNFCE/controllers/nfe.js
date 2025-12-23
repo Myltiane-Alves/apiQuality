@@ -82,8 +82,8 @@ export function roundTo(valor, casasDecimais) {
   const multiplicador = Math.pow(10, Math.abs(casasDecimais));
   return Math.round(valor * multiplicador) / multiplicador;
 }
-class ConsultaNfeController {
-  async consultaNFce(req, res) {
+class ConsultaNFeController {
+  async consultaNFe(req, res) {
     try {
       let { idVenda } = req.body;
 
@@ -413,10 +413,6 @@ class ConsultaNfeController {
       const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
 
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
-      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
-      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
-      const tpEmissao = configData.TPEMISSAO || "";
       const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
     
 
@@ -470,7 +466,7 @@ class ConsultaNfeController {
       process.env.OPENSSL_MODULES = opensslModulesPath;
       
       let tools = new Tools({
-        mod: '65',
+        mod: "55",
         tpAmb: 2,
         // UF: 'MT',
         UF: ufTools,
@@ -863,87 +859,22 @@ class ConsultaNfeController {
       })
 
       const xmlGerado = NFe.xml();
-      console.log("\n📄 XML GERADO:");
-      console.log("   Tamanho:", xmlGerado.length, "bytes");
-      console.log("   Contém <infNFe>:", xmlGerado.includes("<infNFe") ? "✓" : "❌");
-      console.log("   Contém <ide>:", xmlGerado.includes("<ide") ? "✓" : "❌");
-      console.log("   Contém <emit>:", xmlGerado.includes("<emit") ? "✓" : "❌");
-      console.log("   Contém <det>:", xmlGerado.includes("<det") ? "✓" : "❌");
-      console.log("   Contém <total>:", xmlGerado.includes("<total") ? "✓" : "❌");
-      console.log("   Contém <pag>:", xmlGerado.includes("<pag") ? "✓" : "❌");
-
-      // Extrair chave para verificar
-      // Tenta encontrar a chave no atributo Id de infNFe (formato: NFe + 44 dígitos)
-      const matchChaveId = xmlGerado.match(/Id="NFe(\d{44})"/);
-      // Se não encontrar, tenta buscar em elemento chNFe
-      const matchChave = matchChaveId || xmlGerado.match(/<chNFe>(\d{44})<\/chNFe>/);
-      const chaveNoXml = matchChave ? (matchChave[1] || (matchChaveId ? matchChaveId[1] : "NÃO ENCONTRADA")) : "NÃO ENCONTRADA";
-      // console.log("   Chave (44 dígitos):", chaveNoXml);
-
-      // Debug: verificar o ID do NFe
-      const idNFeMatch = xmlGerado.match(/Id="(NFe\d+)"/);
-      // console.log("   ID infNFe extraído:", idNFeMatch ? idNFeMatch[1] : "NÃO ENCONTRADO");
 
       tools.xmlSign(xmlGerado).then(async xmlSign => {
-        // console.log("✅ XML assinado com sucesso. Tamanho:", xmlSign.length);
-
-        // CRÍTICO: Garantir que o XML esteja com declaração UTF-8
-        let xmlParaEnviar = xmlSign;
-
-        // Verificar e corrigir declaração XML
-        if (!xmlParaEnviar.includes('encoding="UTF-8"')) {
-          // Se não tiver encoding, adicionar
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /^<\?xml[^>]*\?>/,
-            '<?xml version="1.0" encoding="UTF-8"?>'
-          );
-        } else {
-          // Se tiver mas for diferente de UTF-8, corrigir
-          xmlParaEnviar = xmlParaEnviar.replace(
-            /encoding="[^"]+"/,
-            'encoding="UTF-8"'
-          );
-        }
-
-        fs.writeFileSync(`./xmls/nfe.xml`, xmlParaEnviar, { encoding: "utf-8" });
-        console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlParaEnviar.length);
-
-        try {
-          console.log("📤 Iniciando sefazEnviaLote...");
-          console.log("   XML para envio gerado corretamente");
-          console.log("   Tamanho:", xmlParaEnviar.length, "bytes");
-          
-          // Temporariamente comentado para testes
-          // const resposta = await tools.sefazEnviaLote(xmlParaEnviar, { indSinc: 1 });
-          
-          // Simular resposta bem-sucedida
-          const resposta = {
-            status: "pendente_envio",
-            mensagem: "XML gerado e assinado com sucesso. Pronto para envio ao SEFAZ.",
-            cStat: 999,
-            xMotivo: "[TESTE] Aguardando implementação de integração com SEFAZ"
-          };
-          
-          console.log("✅ XML validado e pronto para envio:", resposta);
-          fs.writeFileSync("./xml-logs/ret.json", JSON.stringify(resposta, null, 2), { encoding: "utf-8" });
-        } catch (errSefaz) {
-          console.error("❌ Erro em sefazEnviaLote:", errSefaz);
-          console.error("   Mensagem:", errSefaz.message);
-          console.error("   Stack:", errSefaz.stack);
-          fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-            message: errSefaz.message,
-            stack: errSefaz.stack,
-            code: errSefaz.code
-          }, null, 2), { encoding: "utf-8" });
-        }
+        fs.writeFileSync(`./xmls/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
+        console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSign.length);
+        tools.sefazEnviaLote(xmlSign).then(consulta => {
+          console.log("✅ Consulta NFe realizada com sucesso.");
+          // Salvar XML de consulta
+          fs.writeFileSync(`./xmls/consulta_nfe${idVenda}.xml`, consulta.xml, { encoding: "utf-8" });
+          console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.xml.length);
+        }).catch(errCons => {
+          console.error("   Stack:", errCons);
+        } );
       }).catch(errSign => {
         console.error("❌ Erro em xmlSign:");
         console.error("   Mensagem:", errSign.message);
         console.error("   Stack:", errSign.stack);
-        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-          message: errSign.message,
-          stack: errSign.stack
-        }, null, 2), { encoding: "utf-8" });
       });
 
       // Retornar dados completos incluindo XML gerado
@@ -958,4 +889,4 @@ class ConsultaNfeController {
   }
 }
 
-export default new ConsultaNfeController();
+export default new ConsultaNFeController();
