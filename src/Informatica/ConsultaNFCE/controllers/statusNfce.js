@@ -103,6 +103,8 @@ class ConsultaStatusNfeController {
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+        process.env.OPENSSL_MODULES = opensslModulesPath;
 
       if (!certOptions) {
         return res.status(500).json({
@@ -114,13 +116,18 @@ class ConsultaStatusNfeController {
         mod: mod,
         tpAmb: tpAmb,
         UF: uf,
+        versao: "4.00",
         CSC: csc || "",
         CSCid: cscId || "",
-        versao: "4.00",
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
 
-
+      tools.sefazStatus().then(res => {
+        console.log('Status da SEFAZ:', res);
+      }).catch(err => {
+        console.error('Erro ao consultar status da SEFAZ:', err);
+      })
 
       return res.json(vendaData);
     } catch (error) {
