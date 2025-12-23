@@ -93,6 +93,12 @@ class ConsultaStatusNfeController {
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
 
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
+      const dsCRT = configData.DSCRT || "";
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
+
+
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
