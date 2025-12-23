@@ -134,7 +134,7 @@ export function roundTo(valor, casasDecimais) {
 class ConsultaNfeController {
   async consultaNFce(req, res) {
     try {
-      let { idVenda } = req.query;
+      let { idVenda } = req.body;
 
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
@@ -165,6 +165,20 @@ class ConsultaNfeController {
       let V_ICMSTot_vNF = 0;
 
       function gerarXML(venda) {
+
+        // ========================= FUNÇÃO DE FORMATAÇÃO DECIMAL =========================
+        const formatDecimal = (value, decimals = 2) => {
+          if (value === null || value === undefined || value === "") {
+            return decimals === 2 ? "0.00" : "0.0000";
+          }
+          const strValue = String(value).trim();
+          const num = parseFloat(strValue);
+          if (isNaN(num)) {
+            return decimals === 2 ? "0.00" : "0.0000";
+          }
+          return num.toFixed(decimals);
+        };
+        // ================================================================================
 
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
         const ufConverted = ufToCodigo(uf);
@@ -372,13 +386,13 @@ class ConsultaNfeController {
                 NCM: det.NCM,
                 CFOP: det.CFOP,
                 uCom: det.UCOM,
-                qCom: det.QCOM,
-                vUnCom: det.VUNCOM,
-                vProd: det.VPROD,
+                qCom: formatDecimal(det.QCOM, 4),
+                vUnCom: formatDecimal(det.VUNCOM),
+                vProd: formatDecimal(det.VPROD),
                 cEANTrib: det.CEANTRIB,
                 uTrib: det.UTRIB,
-                qTrib: det.QTRIB,
-                vUnTrib: det.VUNTRIB,
+                qTrib: formatDecimal(det.QTRIB, 4),
+                vUnTrib: formatDecimal(det.VUNTRIB),
                 indTot: det.INDTOT
               },
 
@@ -388,27 +402,27 @@ class ConsultaNfeController {
                     orig: det.ICMS_ORIG || "0",
                     CST: det.ICMS_CST || "00",
                     modBC: det.ICMS_MODBC || "3",
-                    vBC: det.ICMS_VBC || "0.00",
-                    pICMS: det.ICMS_PICMS || "0.00",
-                    vICMS: det.ICMS_VICMS || "0.00"
+                    vBC: formatDecimal(det.ICMS_VBC),
+                    pICMS: formatDecimal(det.ICMS_PICMS),
+                    vICMS: formatDecimal(det.ICMS_VICMS)
                   }
                 },
 
                 PIS: {
                   PISAliq: {
                     CST: det.PIS_CST || "01",
-                    vBC: det.PIS_VBC || "0.00",
-                    pPIS: det.PIS_PPIS || "0.00",
-                    vPIS: det.PIS_VPIS || "0.00"
+                    vBC: formatDecimal(det.PIS_VBC),
+                    pPIS: formatDecimal(det.PIS_PPIS),
+                    vPIS: formatDecimal(det.PIS_VPIS)
                   }
                 },
 
                 COFINS: {
                   COFINSAliq: {
                     CST: det.COFINS_CST || "01",
-                    vBC: det.COFINS_VBC || "0.00",
-                    pCOFINS: det.COFINS_PCOFINS || "0.00",
-                    vCOFINS: det.COFINS_VCOFINS || "0.00"
+                    vBC: formatDecimal(det.COFINS_VBC),
+                    pCOFINS: formatDecimal(det.COFINS_PCOFINS),
+                    vCOFINS: formatDecimal(det.COFINS_VCOFINS)
                   }
                 },
 
@@ -894,7 +908,7 @@ class ConsultaNfeController {
 
       NFe.tagTotal(totaisFinais);
 
-      console.log(totaisFinais, '<-- Totais Finais');
+    
       // ===== LEI DA TRANSPARÊNCIA (IBPT) - APÓS O LOOP =====
       const OlhoImposto_Fed = roundTo(V_ICMSTot_vNF * 0.2524, 2);  // 25.24% Federal
       const OlhoImposto_UF = roundTo(V_ICMSTot_vNF * 0.1941, 2);   // 19.41% Estadual
