@@ -35,7 +35,7 @@ import RelatorioBIController from './Informatica/relatorio/ralatoriaBI/controlle
 import LinkRelatorioBiController from './Informatica/relatorio/linkRelatorioBI/controllers/controllersLinkRelatorioBi.js'
 
 import ConsultaNfeController from './Informatica/ConsultaNFCE/controllers/index.js'
-
+import ConsultaStatusNfeController from './Informatica/ConsultaNFCE/controllers/statusNfce.js'
 
 // Financeiro Início
 import AdiantamentosControllers from './Financeiro/Adiantamentos/controllers/adiantamentos.js'
@@ -492,7 +492,7 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
 // routes.get('/downloadXML', ConsultaNfeController.consultaSefaz);
 routes.post('/statusSefaz', ConsultaNfeController.consultaNFce);
-// routes.get('/status', ConsultaNfeController.statusSefaz);
+routes.get('/status', ConsultaStatusNfeController.statusSefaz);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática
