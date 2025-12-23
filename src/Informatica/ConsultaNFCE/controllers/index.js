@@ -939,11 +939,13 @@ class ConsultaNfeController {
       // Calcular troco (diferença entre valor pago e valor da nota)
       const totalPago = pagamentosFormatados.reduce((sum, p) => sum + parseFloat(p.vPag), 0);
       const vrTroco = roundTo(totalPago - parseFloat(totaisFinais.vNFTot), 2);
-
-
+      console.log(vrTroco, '<-- Valor do Troco');
+      // if (vrTroco > 0) {
+      // }
+      NFe.tagTroco(vrTroco.toFixed(2));
 
       NFe.tagInfAdic({
-        infCpl: infCpl
+        infCpl: infCpl,
       })
 
       const xmlGerado = NFe.xml();

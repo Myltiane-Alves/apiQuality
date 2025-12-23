@@ -138,7 +138,7 @@ class SoapController {
         cNF: venda.NFE_INFNFE_IDE_CNF,
         natOp: venda.NFE_INFNFE_IDE_NATOP,
         mod: "65",
-        serie: venda.NFE_INFNFE_IDE_SERIE,
+        serie: String(venda.NFE_INFNFE_IDE_SERIE).padStart(3, "0"),
         nNF: venda.NFE_INFNFE_IDE_NNF,
         dhEmi,
         tpNF: "1",
@@ -180,10 +180,16 @@ class SoapController {
       // Função auxiliar para formatar valores decimais com precisão máxima de 2 casas
       const formatDecimal = (value, decimals = 2) => {
         if (value === null || value === undefined || value === "") {
-          return "0.00";
+          return decimals === 2 ? 0.00 : 0.0000;
         }
-        const num = parseFloat(value);
-        return isNaN(num) ? "0.00" : num.toFixed(decimals);
+        // Remove qualquer formatação anterior, converte e formata
+        const strValue = String(value).trim();
+        const num = parseFloat(strValue);
+        if (isNaN(num)) {
+          return decimals === 2 ? 0.00 : 0.0000;
+        }
+        // Retorna como NÚMERO para a biblioteca processar corretamente
+        return parseFloat(num.toFixed(decimals));
       };
 
       NFe.tagProd(
