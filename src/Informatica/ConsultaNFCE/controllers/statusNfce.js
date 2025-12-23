@@ -97,7 +97,7 @@ class ConsultaStatusNfeController {
       const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
-
+       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
 
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
@@ -112,9 +112,9 @@ class ConsultaStatusNfeController {
       const tools = new Tools({
         mod: payload.ide.mod,
         tpAmb: parseInt(payload.ide.tpAmb),
-        UF: payload.emit.enderEmit.UF || "SP",
-        CSC: process.env.CSC || "",
-        CSCid: process.env.CSCid || "",
+        UF: uf,
+        CSC: csc || "",
+        CSCid: cscId || "",
         versao: "4.00",
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
       }, certOptions);
