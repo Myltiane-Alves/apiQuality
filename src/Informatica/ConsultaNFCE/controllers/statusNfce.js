@@ -91,7 +91,7 @@ class ConsultaStatusNfeController {
       const csc = configData.TOKENCSC || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
       const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
-      const tpAmb = vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB
+      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -145,7 +145,10 @@ class ConsultaStatusNfeController {
       const csc = configData.TOKENCSC || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
       const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
-      const tpAmb = vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB
+      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
+      const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+      const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
+      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
       console.log(cscId, '<-- cscId');
       console.log(csc, '<-- csc');
       console.log(uf, '<-- uf');
@@ -168,16 +171,18 @@ class ConsultaStatusNfeController {
         tpAmb: tpAmb,
         UF: uf,
         versao: "4.00",
+        CNPJ: cnpj,
         CSC: csc,
         CSCid: cscId,
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
         openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
 
-      tools.sefazStatus().then(res => {
+      tools.sefazDistDFe({chNFe: chave}).then(res => {
         console.log('Status da SEFAZ:', res);
       }).catch(err => {
         console.error('Erro ao consultar status da SEFAZ:', err);
+
       })
 
       return res.json(vendaData);
