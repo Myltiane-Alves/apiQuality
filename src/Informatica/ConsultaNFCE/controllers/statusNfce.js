@@ -85,6 +85,58 @@ class ConsultaStatusNfeController {
 
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
+      const dsCRT = configData.DSCRT || "";
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
+      const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
+      const tpAmb = vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+        process.env.OPENSSL_MODULES = opensslModulesPath;
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      const tools = new Tools({
+        mod: '65',
+        tpAmb: tpAmb,
+        UF: uf,
+        versao: "4.00",
+        CSC: csc,
+        CSCid: cscId,
+        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+      }, certOptions);
+
+      tools.sefazStatus().then(res => {
+        console.log('Status da SEFAZ:', res);
+      }).catch(err => {
+        console.error('Erro ao consultar status da SEFAZ:', err);
+      })
+
+      return res.json(vendaData);
+    } catch (error) {
+      console.error('Erro ao consultar venda ou gerar XML:', error);
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+    }
+  }
+  async downloadNFE(req, res) {
+    try {
+      let { idVenda } = req.query;
+
+      if (!idVenda) {
+        return res.status(400).json({ error: "idVenda é obrigatório" });
+      }
+
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const vendaData = response.data;
 
 
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
@@ -112,7 +164,7 @@ class ConsultaStatusNfeController {
       }
 
       const tools = new Tools({
-        mod: '65',
+        mod: '55',
         tpAmb: tpAmb,
         UF: uf,
         versao: "4.00",
