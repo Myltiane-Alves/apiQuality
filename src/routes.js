@@ -492,7 +492,7 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
 routes.post('/statusSefaz', ConsultaNfeController.consultaNFce);
 routes.get('/status', ConsultaStatusNfeController.statusSefaz);
-routes.get('/downloadXML', ConsultaStatusNfeController.downloadNFE);
+routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática

@@ -127,9 +127,10 @@ class ConsultaStatusNfeController {
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
+  
   async downloadNFE(req, res) {
     try {
-      let { idVenda } = req.query;
+      let { idVenda } = req.body;
 
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
@@ -149,11 +150,7 @@ class ConsultaStatusNfeController {
       const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
       const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
       const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-      console.log(cscId, '<-- cscId');
-      console.log(csc, '<-- csc');
-      console.log(uf, '<-- uf');
-      console.log(mod, '<-- mod');
-      console.log(tpAmb, '<-- tpAmb');
+
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -177,9 +174,16 @@ class ConsultaStatusNfeController {
         xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
         openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
-
+  
       tools.sefazDistDFe({chNFe: chave}).then(res => {
         console.log('Status da SEFAZ:', res);
+        docZip(res)
+          .then(() => {
+            console.log(`Arquivo NFe-${chave}.xml extraído com sucesso!`);
+          })
+          .catch(err => {
+            console.error('Erro ao extrair o arquivo XML:', err);
+          });
       }).catch(err => {
         console.error('Erro ao consultar status da SEFAZ:', err);
 
