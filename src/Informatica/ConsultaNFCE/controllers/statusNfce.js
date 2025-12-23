@@ -97,8 +97,9 @@ class ConsultaStatusNfeController {
       const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
-       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
-
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
+      const mod = vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD
+      const tpAmb = vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB
       // Usa getCertOptions para carregar o certificado
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -110,8 +111,8 @@ class ConsultaStatusNfeController {
       }
 
       const tools = new Tools({
-        mod: payload.ide.mod,
-        tpAmb: parseInt(payload.ide.tpAmb),
+        mod: mod,
+        tpAmb: tpAmb,
         UF: uf,
         CSC: csc || "",
         CSCid: cscId || "",
