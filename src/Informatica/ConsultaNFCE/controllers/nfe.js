@@ -132,7 +132,6 @@ class ConsultaNfeController {
         // ================================================================================
 
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
-        const ufConverted = ufToCodigo(uf);
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
         const mod = venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65";
@@ -172,7 +171,7 @@ class ConsultaNfeController {
         // Não devemos tentar calcular manualmente - deixar a biblioteca fazer
         // Mas vamos deixar esse debug para comparação
         const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
-        const chaveDebug = chaveBase + "X"; // placeholder, será recalculado pelo Make()
+
 
         console.log("🔧 === CONSTRUÇÃO DA CHAVE (informativo) ===");
         console.log("   ufCode:", ufCode, "(esperado: 53)");
@@ -200,15 +199,10 @@ class ConsultaNfeController {
         const emit_IE = venda.data[0]?.venda.NFE_INFNFE_EMIT_IE || "";
         const emit_CRT = venda.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
         const infCpl = venda.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
-        const vOutro = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO || "0.00";
         const modFrete = venda.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
         const qrCode = venda.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
         const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
         const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
-        const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
-        const nProt = nProtRaw.replace(/^ID/i, '');
- 
-
 
         // Gerar dhEmi no momento da emissão com formato Brasil (-03:00)
         const formatarDataBrasil = () => {
