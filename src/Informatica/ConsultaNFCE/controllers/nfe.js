@@ -862,14 +862,14 @@ class ConsultaNFeController {
 
       tools.xmlSign(xmlGerado).then(async xmlSign => {
         // xmlSign já é a string XML assinada
-        fs.writeFileSync(`./xmls/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
+        fs.writeFileSync(`./xml-nfe/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
         console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSign.length);
         
         tools.sefazEnviaLote(xmlSign).then(consulta => {
           console.log("✅ Consulta NFe realizada com sucesso.");
           // consulta já é a string XML de resposta
           if (consulta && typeof consulta === 'string') {
-            fs.writeFileSync(`./xmls/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
+            fs.writeFileSync(`./xml-consulta/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
             console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.length);
           } else {
             console.warn("⚠️ Resposta da SEFAZ inválida ou vazia:", consulta);
