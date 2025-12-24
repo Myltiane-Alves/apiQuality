@@ -432,7 +432,7 @@ class ConsultaNFeController {
       }
 
       const tpAmbTools = parseInt(tpAmbiente) || 2;
-      const ufTools = ufToCodigo(configData.UF || payload.emit.enderEmit.UF);
+      const ufTools = configData.UF || payload.emit.enderEmit.UF;
 
     
       // VALIDAÇÃO CRÍTICA
@@ -464,12 +464,12 @@ class ConsultaNFeController {
       const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
-      
+      console.log(ufTools, 'ufTools');
       let tools = new Tools({
         mod: "55",
         tpAmb: 2,
-        UF: 'MT',
-        // UF: ufTools,
+        // UF: 'MT',
+        UF: ufTools,
         versao: '4.00',
         timeout: 60,
         CSC: csc,
@@ -877,6 +877,7 @@ class ConsultaNFeController {
           
         }).catch(errCons => {
           console.error("   Stack:", errCons);
+
         } );
       }).catch(errSign => {
         console.error("❌ Erro em xmlSign:");

@@ -140,7 +140,6 @@ class ConsultaNFceController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-
       function ufToCodigo(uf) {
         const map = {
           "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
@@ -511,7 +510,7 @@ class ConsultaNFceController {
       const digVal = response.data.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
       const cStat = response.data.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
       const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
-
+      const mod = response.data.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65"; // NFC-e
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
       const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
@@ -536,7 +535,7 @@ class ConsultaNFceController {
       }
 
       const tpAmbTools = parseInt(tpAmbiente) || 2;
-      const ufTools = ufToCodigo(configData.UF || payload.emit.enderEmit.UF);
+      const ufTools = configData.UF || payload.emit.enderEmit.UF;
 
     
       // VALIDAÇÃO CRÍTICA
@@ -572,8 +571,7 @@ class ConsultaNFceController {
       let tools = new Tools({
         mod: '65',
         tpAmb: 2,
-        // UF: 'MT',
-        UF: ufTools,
+        UF: 'MT',
         versao: '4.00',
         timeout: 60,
         CSC: csc,
@@ -962,13 +960,33 @@ class ConsultaNFceController {
         infCpl: infCpl,
       })
 
-      const xmlGerado = NFe.xml();
+      let xmlGerado = NFe.xml();
+      
+      // Garantir declaração XML com UTF-8
+      if (!xmlGerado.startsWith('<?xml')) {
+        xmlGerado = '<?xml version="1.0" encoding="UTF-8"?>\n' + xmlGerado;
+      } else if (!xmlGerado.includes('encoding="UTF-8"')) {
+        xmlGerado = xmlGerado.replace(/<\?xml[^?]*\?>/, '<?xml version="1.0" encoding="UTF-8"?>');
+      }
   
       tools.xmlSign(xmlGerado).then(async xmlSign => {
     
-
-        fs.writeFileSync(`./xmls/nfe.xml`, xmlParaEnviar, { encoding: "utf-8" });
-
+        fs.writeFileSync(`./xml-nfe/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
+          console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSign.length);
+       
+        tools.sefazEnviaLote(xmlSign).then(consulta => {
+          console.log("✅ Consulta NFe realizada com sucesso.");
+          // consulta já é a string XML de resposta
+          if (consulta && typeof consulta === 'string') {
+            fs.writeFileSync(`./xml-consulta/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
+            console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.length);
+          } else {
+            console.warn("⚠️ Resposta da SEFAZ inválida ou vazia:", consulta);
+          }
+          
+        }).catch(errCons => {
+          console.error("   Stack:", errCons);
+        } );
        
       }).catch(errSign => {
         console.error("❌ Erro em xmlSign:");

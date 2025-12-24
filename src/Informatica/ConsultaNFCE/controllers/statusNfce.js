@@ -83,7 +83,7 @@ class ConsultaStatusNfeController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const dsCRT = configData.DSCRT || "";
@@ -103,11 +103,12 @@ class ConsultaStatusNfeController {
           error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
         });
       }
-
+      console.log('Consultando status da SEFAZ para UF:', uf, 'Mod:', mod, 'TpAmb:', tpAmb);
       const tools = new Tools({
         mod: '65',
         tpAmb: tpAmb,
-        UF: uf,
+        UF: String(uf),
+        // UF: 'MT',
         versao: "4.00",
         CSC: csc,
         CSCid: cscId,
@@ -118,7 +119,7 @@ class ConsultaStatusNfeController {
       tools.sefazStatus().then(res => {
         console.log('Status da SEFAZ:', res);
       }).catch(err => {
-        console.error('Erro ao consultar status da SEFAZ:', err);
+        console.error('Erro ao consultar status da SEFAZ:', err.message);
       })
 
       return res.json(vendaData);

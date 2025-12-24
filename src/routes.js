@@ -490,10 +490,11 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
 // routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
 // routes.get('/validarConsulta', ConsultaNfeController.validarConsulta);
-routes.post('/statusSefaz', ConsultaNFceController.consultaNFce);
-routes.get('/status', ConsultaStatusNfeController.statusSefaz);
+routes.get('/status-sefaz', ConsultaStatusNfeController.statusSefaz);
+routes.post('/consultar-nfce', ConsultaNFceController.consultaNFce);
 routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
 routes.post('/consultar-nfe', ConsultaNFeController.consultaNFe);
+
 
 // routes.put('/configuracao-todos/:id', InformaticaControllers.putCaixaLoja)
 // FIM Informática

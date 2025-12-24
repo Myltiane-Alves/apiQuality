@@ -1,4 +1,0 @@
-{
-  "message": "Cannot read properties of undefined (reading 'mod55')",
-  "stack": "TypeError: Cannot read properties of undefined (reading 'mod55')\n    at file:///C:/quality/react_node/homologacao/apiQuality/node_modules/node-sped-nfe/dist/utils/tools.js:176:49"
-}
