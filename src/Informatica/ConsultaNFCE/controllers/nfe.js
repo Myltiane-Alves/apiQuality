@@ -468,8 +468,8 @@ class ConsultaNFeController {
       let tools = new Tools({
         mod: "55",
         tpAmb: 2,
-        // UF: 'MT',
-        UF: ufTools,
+        UF: 'MT',
+        // UF: ufTools,
         versao: '4.00',
         timeout: 60,
         CSC: csc,
@@ -861,13 +861,20 @@ class ConsultaNFeController {
       const xmlGerado = NFe.xml();
 
       tools.xmlSign(xmlGerado).then(async xmlSign => {
+        // xmlSign já é a string XML assinada
         fs.writeFileSync(`./xmls/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
         console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSign.length);
+        
         tools.sefazEnviaLote(xmlSign).then(consulta => {
           console.log("✅ Consulta NFe realizada com sucesso.");
-          // Salvar XML de consulta
-          fs.writeFileSync(`./xmls/consulta_nfe${idVenda}.xml`, consulta.xml, { encoding: "utf-8" });
-          console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.xml.length);
+          // consulta já é a string XML de resposta
+          if (consulta && typeof consulta === 'string') {
+            fs.writeFileSync(`./xmls/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
+            console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.length);
+          } else {
+            console.warn("⚠️ Resposta da SEFAZ inválida ou vazia:", consulta);
+          }
+          
         }).catch(errCons => {
           console.error("   Stack:", errCons);
         } );
