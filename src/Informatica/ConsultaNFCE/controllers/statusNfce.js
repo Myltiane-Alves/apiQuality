@@ -142,7 +142,8 @@ class ConsultaStatusNfeController {
             {
               mod: "65",
               tpAmb: 2,
-              UF: 'MT',
+              // UF: 'MT',
+              UF: UF,
               versao: "4.00",
               xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
               openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
@@ -151,8 +152,7 @@ class ConsultaStatusNfeController {
           );
 
           const resposta = await tools.sefazStatus(CHAVE);
-          console.log('resposta status sefaz:', resposta);
-        
+          
           const xml = resposta ?? null;
           const cstat =
             resposta?.retConsSitNFe?.cStat ??
@@ -182,7 +182,7 @@ class ConsultaStatusNfeController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const dsCRT = configData.DSCRT || "";
@@ -190,7 +190,7 @@ class ConsultaStatusNfeController {
       const csc = configData.TOKENCSC || "";
       const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
       const mod = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65");
-      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
+      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || 2);
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -204,10 +204,10 @@ class ConsultaStatusNfeController {
       }
       console.log('Consultando status da SEFAZ para UF:', uf, 'Mod:', mod, 'TpAmb:', tpAmb);
       const tools = new Tools({
-        mod: '65',
+        mod: mod,
         tpAmb: tpAmb,
-        // UF: String(uf),
-        UF: 'MT',
+        UF: String(uf),
+        // UF: 'MT',
         versao: "4.00",
         CSC: csc,
         CSCid: cscId,
@@ -267,7 +267,8 @@ class ConsultaStatusNfeController {
       const tools = new Tools({
         mod: '55',
         tpAmb: tpAmb,
-        UF: uf,
+        // UF: 'MT',
+        UF: String(uf),
         versao: "4.00",
         CNPJ: cnpj,
         CSC: csc,
@@ -288,7 +289,7 @@ class ConsultaStatusNfeController {
           });
       }).catch(err => {
         console.error('Erro ao consultar status da SEFAZ:', err.message);
-        fs.writeFileSync(`./xml-download/Erro-NFe-${chave}.txt`, JSON.stringify(err, null, 2));
+        fs.writeFileSync(`./xml-download/Erro-NFe-${chave}.xml`, JSON.stringify(err, null, 2));
       })
 
       return res.json(vendaData);

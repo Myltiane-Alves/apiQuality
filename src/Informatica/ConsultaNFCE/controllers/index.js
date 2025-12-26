@@ -571,7 +571,8 @@ class ConsultaNFceController {
       let tools = new Tools({
         mod: '65',
         tpAmb: 2,
-        UF: 'MT',
+        // UF: 'MT',
+        UF: ufTools,
         versao: '4.00',
         timeout: 60,
         CSC: csc,
