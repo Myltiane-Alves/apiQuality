@@ -75,6 +75,105 @@ function ufToCodigo(uf) {
   return map[u] || "35";
 }
 class ConsultaStatusNfeController {
+  async validarConsulta(req, res) {
+    try {
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+        process.env.OPENSSL_MODULES = opensslModulesPath;
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      let { vendas } = req.body;
+      let { page, pageSize } = req.query;
+      
+      if (!vendas) {
+        page = page || '';
+        pageSize = pageSize || '';
+        
+        const queryParams = new URLSearchParams();
+        if (page) queryParams.append('page', page);
+        if (pageSize) queryParams.append('pageSize', pageSize);
+        
+        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`;
+        const response = await axios.get(apiUrl);
+        vendas = response.data;
+      }
+      // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
+      if (!Array.isArray(vendas)) {
+        if (Array.isArray(vendas.data)) {
+          vendas = vendas.data;
+        } else if (Array.isArray(vendas.rows)) {
+          vendas = vendas.rows;
+        } else if (vendas.data && Array.isArray(vendas.data.rows)) {
+          vendas = vendas.data.rows;
+        } else {
+          // tenta encontrar a primeira propriedade que é array
+          const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
+          if (Array.isArray(possibleArray)) {
+            vendas = possibleArray;
+          }
+        }
+      }
+
+      if (!Array.isArray(vendas) || vendas.length === 0) {
+        return res.status(400).json({ error: "Nenhuma venda para consultar." });
+      }
+
+      const resultados = [];
+
+      for (const row of vendas) {
+        const IDVENDA = String(row.IDVENDA ?? "").trim();
+        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
+        const CHAVE = String(row.CHAVE ?? "").trim();
+
+        if (!CHAVE) {
+          resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
+          continue;
+        }
+
+        try {
+          const tools = new Tools(
+            {
+              mod: "65",
+              tpAmb: 2,
+              UF: 'MT',
+              versao: "4.00",
+              xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+              openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+            },
+            certOptions
+          );
+
+          const resposta = await tools.sefazStatus(CHAVE);
+          console.log('resposta status sefaz:', resposta);
+        
+          const xml = resposta ?? null;
+          const cstat =
+            resposta?.retConsSitNFe?.cStat ??
+            (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
+
+          resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
+        } catch (e) {
+          resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
+        }
+      }
+
+      return res.json({
+        total: resultados.length,
+        processados: resultados.filter((r) => !r.error).length,
+        data: resultados,
+      });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  } 
+
   async statusSefaz(req, res) {
     try {
       let { idVenda } = req.query;
@@ -107,8 +206,8 @@ class ConsultaStatusNfeController {
       const tools = new Tools({
         mod: '65',
         tpAmb: tpAmb,
-        UF: String(uf),
-        // UF: 'MT',
+        // UF: String(uf),
+        UF: 'MT',
         versao: "4.00",
         CSC: csc,
         CSCid: cscId,
@@ -118,6 +217,7 @@ class ConsultaStatusNfeController {
 
       tools.sefazStatus().then(res => {
         console.log('Status da SEFAZ:', res);
+
       }).catch(err => {
         console.error('Erro ao consultar status da SEFAZ:', err.message);
       })
