@@ -178,16 +178,17 @@ class ConsultaStatusNfeController {
   
       tools.sefazDistDFe({chNFe: chave}).then(res => {
         console.log('Status da SEFAZ:', res);
+        fs.writeFileSync(`./xml-download/NFe-${chave}.xml.zip`, res);
         docZip(res)
           .then(() => {
             console.log(`Arquivo NFe-${chave}.xml extraído com sucesso!`);
           })
           .catch(err => {
-            console.error('Erro ao extrair o arquivo XML:', err);
+            console.error('Erro ao extrair o arquivo XML:', err.message);
           });
       }).catch(err => {
-        console.error('Erro ao consultar status da SEFAZ:', err);
-
+        console.error('Erro ao consultar status da SEFAZ:', err.message);
+        fs.writeFileSync(`./xml-download/Erro-NFe-${chave}.txt`, JSON.stringify(err, null, 2));
       })
 
       return res.json(vendaData);
