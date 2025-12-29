@@ -274,7 +274,7 @@ class ConsultaStatusNfeController {
 
   async cancelarNFE(req, res) {
     try {
-      let { idVenda } = req.body;
+      let { idVenda, xJust } = req.body;
 
       if (!idVenda) {
         return res.status(400).json({ error: "idVenda é obrigatório" });
@@ -313,7 +313,7 @@ class ConsultaStatusNfeController {
         CSCid: cscId,
       }, certOptions);
   
-      tools.sefazEvento({
+      const resposta = await tools.sefazEvento({
         chNFe: chave,
         tpEvento: '110111',
         nProt: '123456789012345',
@@ -325,7 +325,67 @@ class ConsultaStatusNfeController {
         console.error('Erro ao cancelar a NFE:', err.message);
       })
 
-      return res.json(vendaData);
+      return res.json(resposta);
+    } catch (error) {
+      console.error('Erro ao consultar venda ou gerar XML:', error);
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+    }
+  }
+
+  async inutilizarNFE(req, res) {
+       try {
+      let { idVenda, xJust } = req.body;
+
+      if (!idVenda) {
+        return res.status(400).json({ error: "idVenda é obrigatório" });
+      }
+
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const vendaData = response.data;
+
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
+      const mod = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "55");
+      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
+      const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+      const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
+      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
+
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      const tools = new Tools({
+        mod: mod,
+        tpAmb: tpAmb,
+        UF: String(uf),
+        versao: "4.00",
+        CNPJ: cnpj,
+        CSC: csc,
+        CSCid: cscId,
+      }, certOptions);
+  
+      const resposta = await tools.sefazEvento({
+        chNFe: chave,
+        tpEvento: '110111',
+        nProt: '123456789012345',
+        xJust: 'Cancelamento de teste'
+      }).then(res => {
+        console.log('Cancelamento da NFE:', res);
+        fs.writeFileSync(`./xml-cancelamento/Cancelamento-NFe-${chave}.xml`, res);
+      }).catch(err => {
+        console.error('Erro ao cancelar a NFE:', err.message);
+      })
+
+      return res.json(resposta);
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
       return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });

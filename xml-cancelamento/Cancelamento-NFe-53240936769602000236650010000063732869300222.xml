@@ -1,0 +1,21 @@
+<retEnvEvento versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+    <idLote>250429141621528</idLote>
+    <tpAmb>2</tpAmb>
+    <verAplic>SVRSnfce2512231049</verAplic>
+    <cOrgao>53</cOrgao>
+    <cStat>128</cStat>
+    <xMotivo>Lote de Evento Processado</xMotivo>
+    <retEvento versao="1.00">
+        <infEvento>
+            <tpAmb>2</tpAmb>
+            <verAplic>SVRSnfce2512231049</verAplic>
+            <cOrgao>53</cOrgao>
+            <cStat>494</cStat>
+            <xMotivo>Rejeicao: Chave de Acesso inexistente</xMotivo>
+            <chNFe>53240936769602000236650010000063732869300222</chNFe>
+            <tpEvento>110111</tpEvento>
+            <nSeqEvento>1</nSeqEvento>
+            <dhRegEvento>2025-12-29T13:48:42-03:00</dhRegEvento>
+        </infEvento>
+    </retEvento>
+</retEnvEvento>

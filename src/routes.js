@@ -489,9 +489,10 @@ routes.put('/funcionarios-desconto/:id', InformaticaControllers.putFuncionarioDe
 // routes.post('/consulta-nfec', ConsultaNfeController.consultar)
 // routes.get('/valida-venda-contingencia', ConsultaNfeController.getListaVendasContigenciaValidas);
 // routes.put('/valida-venda-contingencia/:id', ConsultaNfeController.putValidarVendaContigencia);
-// routes.get('/status-sefaz', ConsultaStatusNfeController.statusSefaz);
+routes.get('/status-sefaz', ConsultaStatusNfeController.statusSefaz);
 routes.post('/consultar-nfce', ConsultaNFceController.consultaNFce);
-// routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
+routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
+routes.post('/cancelar-nfe', ConsultaStatusNfeController.cancelarNFE);
 routes.get('/validarConsulta', ConsultaStatusNfeController.validarConsulta);
 routes.post('/consultar-nfe', ConsultaNFeController.consultaNFe);
 
