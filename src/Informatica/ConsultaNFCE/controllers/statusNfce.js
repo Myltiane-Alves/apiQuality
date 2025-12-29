@@ -64,16 +64,7 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
   return null;
 }
 
-function ufToCodigo(uf) {
-  const map = {
-    "RO": "11", "AC": "12", "AM": "13", "RR": "14", "PA": "15", "AP": "16", "TO": "17",
-    "MA": "21", "PI": "22", "CE": "23", "RN": "24", "PB": "25", "PE": "26", "AL": "27", "SE": "28", "BA": "29",
-    "MG": "31", "ES": "32", "RJ": "33", "SP": "35", "PR": "41", "SC": "42", "RS": "43", "MS": "50", "MT": "51", "GO": "52", "DF": "53"
-  };
-  if (!uf) return "35";
-  const u = uf.toUpperCase();
-  return map[u] || "35";
-}
+
 class ConsultaStatusNfeController {
   async validarConsulta(req, res) {
     try {
@@ -219,6 +210,69 @@ class ConsultaStatusNfeController {
   }
 
   async downloadNFE(req, res) {
+    try {
+      let { idVenda } = req.body;
+
+      if (!idVenda) {
+        return res.status(400).json({ error: "idVenda é obrigatório" });
+      }
+
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const vendaData = response.data;
+
+      const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
+      const cscId = configData.IDTOKEN || "1";
+      const csc = configData.TOKENCSC || "";
+      const uf = vendaData.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
+      const mod = String(vendaData.data[0]?.venda.NFE_INFNFE_IDE_MOD || "55");
+      const tpAmb = parseInt(vendaData.data[0]?.venda.NFE_INFNFE_IDE_TPAMB || "2", 10);
+      const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
+      const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
+      const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
+
+
+      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
+      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+
+      if (!certOptions) {
+        return res.status(500).json({
+          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
+        });
+      }
+
+      const tools = new Tools({
+        mod: mod,
+        tpAmb: tpAmb,
+        UF: String(uf),
+        versao: "4.00",
+        CNPJ: cnpj,
+        CSC: csc,
+        CSCid: cscId,
+      }, certOptions);
+  
+      tools.sefazDistDFe({chNFe: chave}).then(res => {
+        console.log('Status da SEFAZ:', res);
+        fs.writeFileSync(`./xml-download/NFe-${chave}.xml.zip`, res);
+        docZip(res)
+          .then(() => {
+            console.log(`Arquivo NFe-${chave}.xml extraído com sucesso!`);
+          })
+          .catch(err => {
+            console.error('Erro ao extrair o arquivo XML:', err.message);
+          });
+      }).catch(err => {
+        console.error('Erro ao consultar status da SEFAZ:', err.message);
+        fs.writeFileSync(`./xml-download/Erro-NFe-${chave}.xml`, JSON.stringify(err, null, 2));
+      })
+
+      return res.json(vendaData);
+    } catch (error) {
+      console.error('Erro ao consultar venda ou gerar XML:', error);
+      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+    }
+  }
+
+  async cancelarNFE(req, res) {
     try {
       let { idVenda } = req.body;
 
