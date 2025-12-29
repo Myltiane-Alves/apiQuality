@@ -4,6 +4,11 @@
       {
         "src": "src/server.js",
         "use": "@vercel/node"
+      },
+      {
+        "env": {
+           "NODE_OPTIONS": "--openssl-legacy-provider"
+        }
       }
     ],
     "routes": [
