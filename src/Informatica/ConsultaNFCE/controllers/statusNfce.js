@@ -145,8 +145,8 @@ class ConsultaStatusNfeController {
               // UF: 'MT',
               UF: UF,
               versao: "4.00",
-              xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-              openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+              // xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+              // openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
             },
             certOptions
           );
