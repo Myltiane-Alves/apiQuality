@@ -148,6 +148,7 @@ class ConsultaStatusNfeController {
             certOptions
           );
 
+          
           const resposta = await tools.sefazStatus(CHAVE);
           console.log(`Resposta SEFAZ para :`, resposta);
           const xml = resposta ?? null;
