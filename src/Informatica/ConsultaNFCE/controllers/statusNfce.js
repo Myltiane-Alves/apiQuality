@@ -373,10 +373,10 @@ class ConsultaStatusNfeController {
         CSCid: cscId,
       }, certOptions);
   
-      const resposta = await tools.sefazEvento({
-        chNFe: chave,
-        tpEvento: '110111',
-        nProt: '123456789012345',
+      const resposta = await tools.sefazInutiliza({
+        nSerie: '1',
+        nIni: '110111',
+        nFin: '123456789012345',
         xJust: 'Cancelamento de teste'
       }).then(res => {
         console.log('Cancelamento da NFE:', res);
