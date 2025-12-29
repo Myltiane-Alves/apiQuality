@@ -461,9 +461,9 @@ class ConsultaNFeController {
         });
       }
       // Configurar variáveis de ambiente para OpenSSL 3.x
-      const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
-      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
-      process.env.OPENSSL_MODULES = opensslModulesPath;
+      // const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+      // const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+      // process.env.OPENSSL_MODULES = opensslModulesPath;
       console.log(ufTools, 'ufTools');
       let tools = new Tools({
         mod: "55",
@@ -474,8 +474,8 @@ class ConsultaNFeController {
         timeout: 60,
         CSC: csc,
         CSCid: String(cscId),
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+        // xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+        // openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
 
 
