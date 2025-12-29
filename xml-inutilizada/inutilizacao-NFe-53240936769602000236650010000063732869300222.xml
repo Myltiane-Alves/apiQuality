@@ -1,0 +1,16 @@
+<retInutNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+    <infInut>
+        <tpAmb>2</tpAmb>
+        <verAplic>SVRS2501301714</verAplic>
+        <cStat>241</cStat>
+        <xMotivo>Rejeicao: Um numero da faixa ja foi utilizado</xMotivo>
+        <cUF>53</cUF>
+        <ano>25</ano>
+        <CNPJ>36769602000236</CNPJ>
+        <mod>55</mod>
+        <serie>1</serie>
+        <nNFIni>1</nNFIni>
+        <nNFFin>1</nNFFin>
+        <dhRecbto>2025-12-29T14:20:03-03:00</dhRecbto>
+    </infInut>
+</retInutNFe>
