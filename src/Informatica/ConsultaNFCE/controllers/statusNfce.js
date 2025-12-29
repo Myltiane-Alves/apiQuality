@@ -151,8 +151,13 @@ class ConsultaStatusNfeController {
             certOptions
           );
 
-          const resposta = await tools.sefazStatus(CHAVE);
-          
+          const resposta = await tools.sefazStatus().then((res) => {
+              console.log('Status da SEFAZ consultado com sucesso.', res);
+
+          }).catch(err => {
+              console.error('Erro ao consultar status da SEFAZ:', err.message);
+          }); 
+         
           const xml = resposta ?? null;
           const cstat =
             resposta?.retConsSitNFe?.cStat ??
@@ -202,7 +207,7 @@ class ConsultaStatusNfeController {
           error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
         });
       }
-      console.log('Consultando status da SEFAZ para UF:', uf, 'Mod:', mod, 'TpAmb:', tpAmb);
+      ;
       const tools = new Tools({
         mod: mod,
         tpAmb: tpAmb,
