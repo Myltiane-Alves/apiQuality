@@ -313,19 +313,16 @@ class ConsultaStatusNfeController {
         CSCid: cscId,
       }, certOptions);
   
-      tools.sefazDistDFe({chNFe: chave}).then(res => {
-        console.log('Status da SEFAZ:', res);
-        fs.writeFileSync(`./xml-download/NFe-${chave}.xml.zip`, res);
-        docZip(res)
-          .then(() => {
-            console.log(`Arquivo NFe-${chave}.xml extraído com sucesso!`);
-          })
-          .catch(err => {
-            console.error('Erro ao extrair o arquivo XML:', err.message);
-          });
+      tools.sefazEvento({
+        chNFe: chave,
+        tpEvento: '110111',
+        nProt: '123456789012345',
+        xJust: 'Cancelamento de teste'
+      }).then(res => {
+        console.log('Cancelamento da NFE:', res);
+        fs.writeFileSync(`./xml-cancelamento/Cancelamento-NFe-${chave}.xml`, res);
       }).catch(err => {
-        console.error('Erro ao consultar status da SEFAZ:', err.message);
-        fs.writeFileSync(`./xml-download/Erro-NFe-${chave}.xml`, JSON.stringify(err, null, 2));
+        console.error('Erro ao cancelar a NFE:', err.message);
       })
 
       return res.json(vendaData);
