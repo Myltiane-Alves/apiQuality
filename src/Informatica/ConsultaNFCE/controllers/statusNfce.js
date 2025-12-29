@@ -33,19 +33,6 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
   }
 
   // -----------------------------
-  // 3) PEM BASE64 (cert + key)
-  // -----------------------------
-  if (process.env.CERT_PEM_CERT_BASE64 && process.env.CERT_PEM_KEY_BASE64) {
-    try {
-      const cert = Buffer.from(process.env.CERT_PEM_CERT_BASE64, "base64");
-      const key = Buffer.from(process.env.CERT_PEM_KEY_BASE64, "base64");
-      return { cert, key };
-    } catch (e) {
-      console.error("ERRO: CERT_PEM_*_BASE64 inválido:", e.message);
-    }
-  }
-
-  // -----------------------------
   // 4) PEM POR CAMINHO
   // -----------------------------
   if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
