@@ -493,6 +493,7 @@ routes.get('/status-sefaz', ConsultaStatusNfeController.statusSefaz);
 routes.post('/consultar-nfce', ConsultaNFceController.consultaNFce);
 routes.post('/downloadXML', ConsultaStatusNfeController.downloadNFE);
 routes.post('/cancelar-nfe', ConsultaStatusNfeController.cancelarNFE);
+routes.post('/inutilizar-nfe', ConsultaStatusNfeController.inutilizarNFE);
 routes.get('/validarConsulta', ConsultaStatusNfeController.validarConsulta);
 routes.post('/consultar-nfe', ConsultaNFeController.consultaNFe);
 

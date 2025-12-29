@@ -333,7 +333,7 @@ class ConsultaStatusNfeController {
   }
 
   async inutilizarNFE(req, res) {
-       try {
+    try {
       let { idVenda, xJust } = req.body;
 
       if (!idVenda) {
@@ -379,16 +379,16 @@ class ConsultaStatusNfeController {
         nFin: 1,
         xJust: xJust
       }).then(res => {
-        console.log('Cancelamento da NFE:', res);
+        console.log('Inutilização da NFE:', res);
         fs.writeFileSync(`./xml-inutilizada/inutilizacao-NFe-${chave}.xml`, res);
       }).catch(err => {
-        console.error('Erro ao cancelar a NFE:', err.message);
+        console.error('Erro ao inutilizar a NFE:', err.message);
       })
 
       return res.json(resposta);
     } catch (error) {
-      console.error('Erro ao consultar venda ou gerar XML:', error);
-      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+      console.error('Erro ao inutilizar a NFE:', error);
+      return res.status(500).json({ error: 'Erro ao inutilizar a NFE' });
     }
   }
 }
