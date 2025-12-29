@@ -32,18 +32,6 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
     }
   }
 
-  // -----------------------------
-  // 4) PEM POR CAMINHO
-  // -----------------------------
-  if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
-    try {
-      const cert = fs.readFileSync(process.env.CERT_PEM_CERT_PATH);
-      const key = fs.readFileSync(process.env.CERT_PEM_KEY_PATH);
-      return { cert, key };
-    } catch (e) {
-      console.error("ERRO ao ler caminhos PEM:", e.message);
-    }
-  }
 
   // -----------------------------
   // 5) NADA ENCONTRADO
@@ -137,11 +125,18 @@ class ConsultaStatusNfeController {
           );
 
           const resposta = await tools.sefazStatus(CHAVE);
-          console.log(`Resposta SEFAZ para :`, resposta);
-          const xml = resposta ?? null;
+         
+          const xml =
+  typeof resposta === "string"
+    ? resposta
+    : resposta?.xml ?? resposta ?? null;
           const cstat =
-            resposta?.retConsSitNFe?.cStat ??
-            (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
+  resposta?.retConsSitNFe?.cStat ??
+  (typeof xml === "string"
+    ? xml.match(/<cStat>(\d+)<\/cStat>/)?.[1]
+    : null);
+          console.log("TIPO RESPOSTA:", typeof resposta);
+console.log("RESPOSTA BRUTA:", resposta);
 
           resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
         } catch (e) {
