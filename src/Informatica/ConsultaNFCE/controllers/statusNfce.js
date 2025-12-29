@@ -352,7 +352,7 @@ class ConsultaStatusNfeController {
       const cnpj = vendaData.data[0]?.venda?.NFE_INFNFE_EMIT_CNPJ;
       const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
       const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
-
+      const serie = vendaData.data[0]?.venda.NFE_INFNFE_IDE_SERIE;
 
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
       const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
@@ -374,13 +374,13 @@ class ConsultaStatusNfeController {
       }, certOptions);
   
       const resposta = await tools.sefazInutiliza({
-        nSerie: '1',
-        nIni: '110111',
-        nFin: '123456789012345',
-        xJust: 'Cancelamento de teste'
+        nSerie: serie,
+        nIni: 1,
+        nFin: 1,
+        xJust: xJust
       }).then(res => {
         console.log('Cancelamento da NFE:', res);
-        fs.writeFileSync(`./xml-cancelamento/Cancelamento-NFe-${chave}.xml`, res);
+        fs.writeFileSync(`./xml-inutilizada/inutilizacao-NFe-${chave}.xml`, res);
       }).catch(err => {
         console.error('Erro ao cancelar a NFE:', err.message);
       })
