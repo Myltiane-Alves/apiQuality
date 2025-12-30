@@ -1,58 +1,9 @@
-import { docZip, Make, Tools } from 'node-sped-nfe';
+import { Make, Tools } from 'node-sped-nfe';
 import fs from 'fs';
-// import path from 'path';
 import path from "node:path";
 import axios from 'axios';
 import 'dotenv/config';
-import dns from 'dns';
-import { time } from 'console';
-dns.setDefaultResultOrder('ipv4first');
 
-// export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
-//   if (process.env.CERT_PFX_BASE64) {
-//     try {
-//       const buf = Buffer.from(process.env.CERT_PFX_BASE64, "base64");
-//       if (buf.length > 0) {
-//         return { pfx: buf, senha };
-//       }
-//     } catch (e) {
-//       console.error("ERRO: CERT_PFX_BASE64 inválido:", e.message);
-//     }
-//   }
-
-
-//   if (fallbackPfxPath && fs.existsSync(fallbackPfxPath)) {
-//     try {
-//       const buf = fs.readFileSync(path.resolve(fallbackPfxPath));
-//       if (buf.length > 0) {
-//         return { pfx: buf, senha };
-//       }
-//     } catch (e) {
-//       console.error("ERRO ao ler arquivo PFX local:", e.message);
-//     }
-//   }
-
-//   if (process.env.CERT_PEM_CERT_BASE64 && process.env.CERT_PEM_KEY_BASE64) {
-//     try {
-//       const cert = Buffer.from(process.env.CERT_PEM_CERT_BASE64, "base64");
-//       const key = Buffer.from(process.env.CERT_PEM_KEY_BASE64, "base64");
-//       return { cert, key };
-//     } catch (e) {
-//       console.error("ERRO: CERT_PEM_*_BASE64 inválido:", e.message);
-//     }
-//   }
-
-//   if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
-//     try {
-//       const cert = fs.readFileSync(process.env.CERT_PEM_CERT_PATH);
-//       const key = fs.readFileSync(process.env.CERT_PEM_KEY_PATH);
-//       return { cert, key };
-//     } catch (e) {
-//       console.error("ERRO ao ler caminhos PEM:", e.message);
-//     }
-//   }
-//   return null;
-// }
 
 async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
   // 1) PFX via env base64
@@ -180,7 +131,6 @@ class ConsultaNFceController {
         // ================================================================================
 
         const uf = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_UF;
-        const ufConverted = ufToCodigo(uf);
         const cnf = venda.data[0]?.venda.NFE_INFNFE_IDE_CNF || "00000000";
         const natOp = venda.data[0]?.venda.NFE_INFNFE_IDE_NATOP || "VENDA";
         const mod = String(venda.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65");
@@ -192,9 +142,6 @@ class ConsultaNFceController {
         const dia = String(dataObj.getDate()).padStart(2, '0');
         const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
         const data = dia + mes; // DDMM correto
-
-        // const chaveRaw = venda.data[0]?.venda.CHAVE || "";
-        // const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
 
         const tpNF = venda.data[0]?.venda.NFE_INFNFE_IDE_TPNF || "1";
         const idDest = venda.data[0]?.venda.NFE_INFNFE_IDE_IDDEST || "1";
@@ -222,24 +169,12 @@ class ConsultaNFceController {
         const chaveBase = ufCode + dataPadded + cnpjPadded + modPadded + seriePadded + nnfPadded + cnfPadded;
         const chaveDebug = chaveBase + "X"; // placeholder, será recalculado pelo Make()
 
-        console.log("🔧 === CONSTRUÇÃO DA CHAVE (informativo) ===");
-        console.log("   ufCode:", ufCode, "(esperado: 53)");
-        console.log("   dataPadded:", dataPadded);
-        console.log("   cnpjPadded:", cnpjPadded);
-        console.log("   modPadded:", modPadded);
-        console.log("   seriePadded:", seriePadded);
-        console.log("   nnfPadded:", nnfPadded);
-        console.log("   cnfPadded:", cnfPadded);
-        console.log("   NOTA: Chave será calculada pelo Make()");
-        console.log("===========================");
-
         const cnpjAutxml = venda.data[0]?.venda?.NFE_INFNFE_AUTXML_CNPJ || "00000000000000";
         const nome = venda.data[0]?.venda.NFE_INFNFE_EMIT_NOME || "Emitente Padrão";
         const nomeFantasia = venda.data[0]?.venda.NFE_INFNFE_EMIT_FANT || "Fantasia Padrão";
         const cep = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CEP || "01000000";
         const xPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XPAIS || "1058";
         const cPais = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CPAIS || "BRASIL";
-        const fone = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_FONE || "0000000000";
         const cMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_CMUN || "3550308";
         const xMun = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XMUN || "Sao Paulo";
         const xBairro = venda.data[0]?.venda.NFE_INFNFE_EMIT_ENDEREMIT_XBAIRRO || "Bairro";
@@ -248,60 +183,10 @@ class ConsultaNFceController {
         const emit_IE = venda.data[0]?.venda.NFE_INFNFE_EMIT_IE || "";
         const emit_CRT = venda.data[0]?.venda.NFE_INFNFE_EMIT_CRT || "1";
         const infCpl = venda.data[0]?.venda.NFE_INFNFE_INFADIC_INFCPL || "Nenhuma informação adicional";
-        const vOutro = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VOUTRO || "0.00";
         const modFrete = venda.data[0]?.venda.NFE_INFNFE_TRANSP_MODFRETE || "9";
-        const vIPIDevol = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPIDEVOL || "0";
-        const vIPI = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VIPI || "0.00";
-        const vDesc = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VDESC || "0.00";
-        const vII = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VII || "0.00";
-        const vSeg = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VSEG || "0.00";
-        const vFCP = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCP || "0.00";
-        const vBCST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VBCST || "0.00";
-        const vST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VST || "0.00";
-        const vFCPST = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPST || "0.00";
-        const vFCPSTRet = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFCPSTRET || "0.00";
-        const vProd = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VPROD || "0.01";
-        const icmsVFrete = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VFRETE || "0.00";
         const qrCode = venda.data[0]?.venda.NFE_INFNFESUPL_QRCODE || "";
-        const icms_vicmsdeson = venda.data[0]?.venda.NFE_INFNFE_TOTAL_ICMSTOT_VICMSDESON || "0.00";
         const procEmi = venda.data[0]?.venda.NFE_INFNFE_IDE_PROCEMI || "0";
         const urlChave = venda.data[0]?.venda.NFE_INFNFESUPL_URLCHAVE || "www.fazenda.df.gov.br/nfce/consulta";
-        const nProtRaw = venda.data[0]?.venda.PROTNFE_INFPROT_ID || "";
-        const nProt = nProtRaw.replace(/^ID/i, '');
-        const digVal = venda.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
-        const cprod = venda.data[0]?.detalhe?.map(item => item.det.CPROD) || "0001";
-        const cean = venda.data[0]?.detalhe?.map(item => item.det.CEAN) || "0000000000000";
-        const xprod = venda.data[0]?.detalhe?.map(item => item.det.XPROD) || "Produto Teste";
-
-        const ncm = venda.data[0]?.detalhe?.map(item => item.det.NCM) || "00000000";
-        // const tpCredPresIBSZFM 
-        const CFOP = venda.data[0]?.detalhe?.map(item => item.det.CFOP) || "5102";
-        const uCom = venda.data[0]?.detalhe?.map(item => item.det.UCOM) || "UN";
-        const qCom = venda.data[0]?.detalhe?.map(item => item.det.QCOM) || "1.0000";
-        const vUnCom = venda.data[0]?.detalhe?.map(item => item.det.VUNCOM) || "0.01";
-        const cEANTrib = venda.data[0]?.detalhe?.map(item => item.det.CEANTRIB) || "0000000000000";
-        const uTrib = venda.data[0]?.detalhe?.map(item => item.det.UTRIB) || "UN";
-        const qTrib = venda.data[0]?.detalhe?.map(item => item.det.QTRIB) || "1.0000";
-        const vUnTrib = venda.data[0]?.detalhe?.map(item => item.det.VUNTRIB) || "0.01";
-        const indTot = venda.data[0]?.detalhe?.map(item => item.det.INDTOT) || "1";
-        const orig = venda.data[0]?.detalhe?.map(item => item.det.ICMS_ORIG) || "0";
-        const CST = venda.data[0]?.detalhe?.map(item => item.det.ICMS_CST) || "00";
-        const modBC = venda.data[0]?.detalhe?.map(item => item.det.ICMS_MODBC) || "3";
-        const vBC = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VBC || "0.00";
-        const vICMS = venda.data[0]?.NFE_INFNFE_TOTAL_ICMSTOT_VICMS || "0.00";
-        const pICMS = venda.data[0]?.detalhe?.map(item => item.det.ICMS_PICMS) || "0.00";
-        const PIS_CST = venda.data[0]?.detalhe?.map(item => item.det.PIS_CST) || "01";
-        const PIS_VBC = venda.data[0]?.detalhe?.map(item => item.det.PIS_VBC) || "0.00";
-        const PIS_PPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_PPIS) || "0.00";
-        const VPIS_VPIS = venda.data[0]?.detalhe?.map(item => item.det.PIS_VPIS) || "0.00";
-        const COFINS_CST = venda.data[0]?.detalhe?.map(item => item.det.COFINS_CST) || "01";
-        const COFINS_VBC = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VBC) || "0.00";
-        const COFINS_PCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_PCOFINS) || "0.00";
-        const VCOFINS_VCOFINS = venda.data[0]?.detalhe?.map(item => item.det.COFINS_VCOFINS) || "0.00";
-        const CSTIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CST) || "41";
-        const cClassTribIS = venda.data[0]?.detalhe?.map(item => item.det.IS_CCLASSTRIBIS) || "00000000";
-        const vFrete = venda.data[0]?.detalhe?.map(item => item.det.VFRETE) || "0.00";
-
 
         // Gerar dhEmi no momento da emissão com formato Brasil (-03:00)
         const formatarDataBrasil = () => {
@@ -507,19 +392,8 @@ class ConsultaNFceController {
       // Extrair variáveis de protocolo para usar no tagInfAdic
       const nProtRaw = response.data.data[0]?.venda.PROTNFE_INFPROT_ID || "";
       const nProt = nProtRaw.replace(/^ID/i, '');
-      const digVal = response.data.data[0]?.venda.PROTNFE_INFPROT_DIGVAL || "";
-      const cStat = response.data.data[0]?.venda.PROTNFE_INFPROT_CSTAT || "100";
-      const xMotivo = response.data.data[0]?.venda.PROTNFE_INFPROT_XMOTIVO || "Autorizado o uso da NF-e";
-      const mod = response.data.data[0]?.venda.NFE_INFNFE_IDE_MOD || "65"; // NFC-e
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
-      const tpFormaEmissao = configData.TPFORMAEMISSAO || "";
-      const tpModeloFiscal = configData.TPMODELODOCFISCAL || "";
-      const tpVersaoFiscal = configData.TPVERSAOMODFISCAL || "";
-      const tpEmissao = configData.TPEMISSAO || "";
       const tpAmbiente = configData.TPAMBIENTE || "2"; // CRÍTICO!
-    
-
-      const dsCRT = configData.DSCRT || "";
       const cscId = configData.IDTOKEN || "1";
       const csc = configData.TOKENCSC || "";
 
@@ -563,22 +437,15 @@ class ConsultaNFceController {
           received: payload.emit.enderEmit.UF
         });
       }
-      // Configurar variáveis de ambiente para OpenSSL 3.x
-      const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
-      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
-      process.env.OPENSSL_MODULES = opensslModulesPath;
-      
+
       let tools = new Tools({
         mod: '65',
         tpAmb: 2,
-        // UF: 'MT',
         UF: ufTools,
         versao: '4.00',
         timeout: 60,
         CSC: csc,
         CSCid: String(cscId),
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
 
 
