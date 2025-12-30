@@ -99,7 +99,7 @@ class ConsultaNFceController {
         };
         if (!uf) return "35";
         const u = uf.toUpperCase();
-        return map[u] || "35";
+        return map[u] || "51";
       }
 
       const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);

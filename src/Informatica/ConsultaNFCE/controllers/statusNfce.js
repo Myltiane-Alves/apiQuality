@@ -203,7 +203,7 @@ class ConsultaStatusNfeController {
  
       return res.json({
         vendaData,
-        data: resposta
+        xml: resposta
       });
     } catch (error) {
       console.error('Erro ao consultar venda ou gerar XML:', error);
