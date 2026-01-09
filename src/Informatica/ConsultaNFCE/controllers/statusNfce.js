@@ -3,8 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import os from 'os';
+import https from 'https';
 import 'dotenv/config';
 const url = process.env.API_URL
+
+// IMPORTANTE: Desabilitar rejeição de certificado NO INÍCIO
+// This is for internal SEFAZ calls que possuem certificado auto-assinado
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Detectar SO e retornar extensão correta
 const getToolPath = (basePath, executable) => {
@@ -238,10 +243,6 @@ class ConsultaStatusNfeController {
       if (os.platform() === 'win32') {
         toolsConfig.xmllint = getToolPath('./libs/libxml/bin/', 'xmllint');
       }
-      
-      // Desabilitar validação de certificado para evitar problemas com hostname mismatch
-      // This is safe para chamadas internas e testes
-      process.env.NODE_TLS_REJECT_AUTHORIZED = '0';
       
       console.log('✅ Dados da venda carregados com sucesso');
       console.log('⏳ Inicializando Tools...');
