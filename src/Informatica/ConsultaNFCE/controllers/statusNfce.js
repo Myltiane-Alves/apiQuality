@@ -4,6 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import os from 'os';
 import https from 'https';
+import http from 'http';
 import 'dotenv/config';
 const url = process.env.API_URL
 
@@ -11,15 +12,17 @@ const url = process.env.API_URL
 // This is for internal SEFAZ calls que possuem certificado auto-assinado
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// Criar HTTPS Agent global que desabilita verificação de certificado
+// Criar HTTPS/HTTP Agent global que desabilita verificação de certificado
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
   checkServerIdentity: () => undefined // Ignora validação de hostname
 });
 
+const httpAgent = new http.Agent({ keepAlive: true });
+
 // Aplicar ao axios globalmente
 axios.defaults.httpsAgent = httpsAgent;
-axios.defaults.httpAgent = new https.Agent({ keepAlive: true });
+axios.defaults.httpAgent = httpAgent;
 
 // Detectar SO e retornar extensão correta
 const getToolPath = (basePath, executable) => {
