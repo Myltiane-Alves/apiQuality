@@ -2,8 +2,16 @@ import { Make, Tools, docZip } from 'node-sped-nfe';
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import os from 'os';
 import 'dotenv/config';
 const url = process.env.API_URL
+
+// Detectar SO e retornar extensão correta
+const getToolPath = (basePath, executable) => {
+  const isWindows = os.platform() === 'win32';
+  const ext = isWindows ? '.exe' : '';
+  return path.resolve(`${basePath}${executable}${ext}`);
+};
 
 
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
@@ -192,7 +200,7 @@ class ConsultaStatusNfeController {
         });
       }
       
-           const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+           const opensslPath = getToolPath('./libs/openssl/bin/', 'openssl');
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
       const tools = new Tools({
@@ -203,8 +211,8 @@ class ConsultaStatusNfeController {
         timeout: 60000,
         CSC: csc,
         CSCid: cscId,
-        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
-        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
+        xmllint: getToolPath('./libs/libxml/bin/', 'xmllint'),
+        openssl: getToolPath('./libs/openssl/bin/', 'openssl'),
       }, certOptions);
 
       const resposta = await tools.sefazStatus(chave).catch(err => {
