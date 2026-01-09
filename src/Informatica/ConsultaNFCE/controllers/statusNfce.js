@@ -51,15 +51,15 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
   // -----------------------------
   // 4) PEM POR CAMINHO
   // -----------------------------
-  if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
-    try {
-      const cert = fs.readFileSync(process.env.CERT_PEM_CERT_PATH);
-      const key = fs.readFileSync(process.env.CERT_PEM_KEY_PATH);
-      return { cert, key };
-    } catch (e) {
-      console.error("ERRO ao ler caminhos PEM:", e.message);
-    }
-  }
+  // if (process.env.CERT_PEM_CERT_PATH && process.env.CERT_PEM_KEY_PATH) {
+  //   try {
+  //     const cert = fs.readFileSync(process.env.CERT_PEM_CERT_PATH);
+  //     const key = fs.readFileSync(process.env.CERT_PEM_KEY_PATH);
+  //     return { cert, key };
+  //   } catch (e) {
+  //     console.error("ERRO ao ler caminhos PEM:", e.message);
+  //   }
+  // }
 
   // -----------------------------
   // 5) NADA ENCONTRADO
@@ -171,7 +171,7 @@ class ConsultaStatusNfeController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-      const response = await axios.get(`${url}/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const cscId = configData.IDTOKEN || "1";
@@ -195,6 +195,7 @@ class ConsultaStatusNfeController {
         tpAmb: tpAmb,
         UF: String(uf),
         versao: "4.00",
+        timeout: 60000,
         CSC: csc,
         CSCid: cscId
       }, certOptions);
