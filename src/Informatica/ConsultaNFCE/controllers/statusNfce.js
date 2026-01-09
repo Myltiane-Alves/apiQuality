@@ -171,9 +171,9 @@ class ConsultaStatusNfeController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-      const url = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`;
-      console.log('🔗 Chamando URL:', url);
-      const response = await axios.get(url);
+      const apiUrl = `${url}/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`;
+      console.log('🔗 Chamando URL:', apiUrl);
+      const response = await axios.get(apiUrl);
       const vendaData = response.data;
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const cscId = configData.IDTOKEN || "1";
