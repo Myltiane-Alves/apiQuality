@@ -217,6 +217,7 @@ class ConsultaStatusNfeController {
         xml: resposta
       });
     } catch (error) {
+      console.error('❌ Erro completo:', error);
       console.error('Erro ao consultar XML:', error.message);
       console.error('Stack:', error.stack);
       return res.status(500).json({ error: error.message || 'Erro ao consultar venda ou gerar XML' });
