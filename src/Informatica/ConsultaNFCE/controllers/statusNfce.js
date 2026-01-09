@@ -11,6 +11,16 @@ const url = process.env.API_URL
 // This is for internal SEFAZ calls que possuem certificado auto-assinado
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+// Criar HTTPS Agent global que desabilita verificação de certificado
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+  checkServerIdentity: () => undefined // Ignora validação de hostname
+});
+
+// Aplicar ao axios globalmente
+axios.defaults.httpsAgent = httpsAgent;
+axios.defaults.httpAgent = new https.Agent({ keepAlive: true });
+
 // Detectar SO e retornar extensão correta
 const getToolPath = (basePath, executable) => {
   const isWindows = os.platform() === 'win32';
