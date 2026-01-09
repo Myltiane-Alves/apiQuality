@@ -228,7 +228,7 @@ class ConsultaStatusNfeController {
         tpAmb: tpAmb,
         UF: String(uf),
         versao: "4.00",
-        timeout: 60000,
+        timeout: 180000, // Aumentado para 3 minutos
         CSC: csc,
         CSCid: cscId,
         openssl: getToolPath('./libs/openssl/bin/', 'openssl'),
@@ -241,14 +241,19 @@ class ConsultaStatusNfeController {
       
       // Desabilitar validação de certificado para evitar problemas com hostname mismatch
       // This is safe para chamadas internas e testes
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      process.env.NODE_TLS_REJECT_AUTHORIZED = '0';
       
+      console.log('✅ Dados da venda carregados com sucesso');
+      console.log('⏳ Inicializando Tools...');
       const tools = new Tools(toolsConfig, certOptions);
-
+      
+      console.log('⏳ Consultando status SEFAZ para chave:', chave);
       const resposta = await tools.sefazStatus(chave).catch(err => {
-        console.error('Erro ao consultar status da SEFAZ:', err.message);
+        console.error('❌ Erro ao consultar status da SEFAZ:', err.message);
         throw err;
       });
+      
+      console.log('✅ Resposta SEFAZ recebida com sucesso');
  
       return res.json({
         vendaData,
