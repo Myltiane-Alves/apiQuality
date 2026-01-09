@@ -192,6 +192,9 @@ class ConsultaStatusNfeController {
         });
       }
       
+           const opensslPath = path.resolve("./libs/openssl/bin/openssl.exe");
+      const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
+      process.env.OPENSSL_MODULES = opensslModulesPath;
       const tools = new Tools({
         mod: mod,
         tpAmb: tpAmb,
@@ -199,7 +202,9 @@ class ConsultaStatusNfeController {
         versao: "4.00",
         timeout: 60000,
         CSC: csc,
-        CSCid: cscId
+        CSCid: cscId,
+        xmllint: path.resolve("./libs/libxml/bin/xmllint.exe"),
+        openssl: path.resolve("./libs/openssl/bin/openssl.exe"),
       }, certOptions);
 
       const resposta = await tools.sefazStatus(chave).catch(err => {
