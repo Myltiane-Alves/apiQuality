@@ -203,7 +203,7 @@ class ConsultaStatusNfeController {
            const opensslPath = getToolPath('./libs/openssl/bin/', 'openssl');
       const opensslModulesPath = path.resolve("./libs/openssl/lib/ossl-modules");
       process.env.OPENSSL_MODULES = opensslModulesPath;
-      const tools = new Tools({
+      const toolsConfig = {
         mod: mod,
         tpAmb: tpAmb,
         UF: String(uf),
@@ -211,9 +211,15 @@ class ConsultaStatusNfeController {
         timeout: 60000,
         CSC: csc,
         CSCid: cscId,
-        xmllint: getToolPath('./libs/libxml/bin/', 'xmllint'),
         openssl: getToolPath('./libs/openssl/bin/', 'openssl'),
-      }, certOptions);
+      };
+      
+      // Adicionar xmllint apenas se for Windows
+      if (os.platform() === 'win32') {
+        toolsConfig.xmllint = getToolPath('./libs/libxml/bin/', 'xmllint');
+      }
+      
+      const tools = new Tools(toolsConfig, certOptions);
 
       const resposta = await tools.sefazStatus(chave).catch(err => {
         console.error('Erro ao consultar status da SEFAZ:', err.message);
