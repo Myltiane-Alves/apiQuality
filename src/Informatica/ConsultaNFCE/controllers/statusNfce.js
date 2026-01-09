@@ -2,6 +2,9 @@ import { Make, Tools, docZip } from 'node-sped-nfe';
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import 'dotenv/config';
+const url = process.env.API_URL
+
 
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
   // -----------------------------
@@ -168,7 +171,7 @@ class ConsultaStatusNfeController {
         return res.status(400).json({ error: "idVenda é obrigatório" });
       }
 
-      const response = await axios.get(`http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
+      const response = await axios.get(`${url}/api/venda/lista-venda-new-xml.xsjs?id=${idVenda}`);
       const vendaData = response.data;
       const configData = response.data.data[0]?.configuracao?.[0]?.config || {};
       const cscId = configData.IDTOKEN || "1";
@@ -179,7 +182,7 @@ class ConsultaStatusNfeController {
       const chaveRaw = vendaData.data[0]?.venda.CHAVE || "";
       const chave = chaveRaw.replace(/^NFe/i, '').replace(/\D/g, '').slice(0, 44);
       const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
+      const certOptions = await getCertOptions(SENHA_CERT, './caminho/para/seu/certificado.pfx');
 
       if (!certOptions) {
         return res.status(500).json({
@@ -207,7 +210,7 @@ class ConsultaStatusNfeController {
       });
     } catch (error) {
       console.error('Erro ao consultar XML:', error.message);
-      return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
+      // return res.status(500).json({ error: 'Erro ao consultar venda ou gerar XML' });
     }
   }
 
