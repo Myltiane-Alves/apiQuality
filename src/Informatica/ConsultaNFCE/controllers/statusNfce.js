@@ -39,7 +39,6 @@ const getToolPath = (basePath, executable) => {
   return path.resolve(`${basePath}${executable}${ext}`);
 };
 
-
 export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 2025-2026.pfx') {
   // -----------------------------
   // 1) PFX BASE64 VIA ENV
