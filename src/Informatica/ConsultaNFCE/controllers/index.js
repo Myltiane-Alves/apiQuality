@@ -1,6 +1,7 @@
 import { Make, Tools } from 'node-sped-nfe';
 import fs from 'fs';
 import path from "node:path";
+import os from 'os';
 import axios from 'axios';
 import 'dotenv/config';
 
@@ -446,6 +447,7 @@ class ConsultaNFceController {
         timeout: 60,
         CSC: csc,
         CSCid: String(cscId),
+        xmllint: path.resolve("")
       }, certOptions);
 
 
@@ -837,32 +839,67 @@ class ConsultaNFceController {
         xmlGerado = xmlGerado.replace(/<\?xml[^?]*\?>/, '<?xml version="1.0" encoding="UTF-8"?>');
       }
   
-      tools.xmlSign(xmlGerado).then(async xmlSign => {
-    
-        fs.writeFileSync(`./xml-nfe/nfe${idVenda}.xml`, xmlSign, { encoding: "utf-8" });
-          console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSign.length);
+      tools.xmlSign(xmlGerado).then(async xmlSignado => {
+        try {
+          // Validar se o retorno é válido
+          if (!xmlSignado || typeof xmlSignado !== 'string') {
+            console.error('❌ xmlSign retornou tipo inválido:', typeof xmlSignado);
+            return res.status(500).json({
+              error: 'Erro ao assinar XML',
+              details: 'xmlSign retornou tipo inválido'
+            });
+          }
+
+          fs.writeFileSync(`./xml-nfe/nfe${idVenda}.xml`, xmlSignado, { encoding: "utf-8" });
+          console.log("✅ XML assinado e salvo com UTF-8. Tamanho:", xmlSignado.length);
        
-        tools.sefazEnviaLote(xmlSign).then(consulta => {
-          console.log("✅ Consulta NFe realizada com sucesso.");
-          // consulta já é a string XML de resposta
-          if (consulta && typeof consulta === 'string') {
-            fs.writeFileSync(`./xml-consulta/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
-            console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.length);
-          } else {
-            console.warn("⚠️ Resposta da SEFAZ inválida ou vazia:", consulta);
+          tools.sefazEnviaLote(xmlSignado).then(consulta => {
+            console.log("✅ Consulta NFe realizada com sucesso.");
+            // consulta já é a string XML de resposta
+            if (consulta && typeof consulta === 'string') {
+              fs.writeFileSync(`./xml-consulta/consulta_nfe${idVenda}.xml`, consulta, { encoding: "utf-8" });
+              console.log("✅ XML de consulta salvo com UTF-8. Tamanho:", consulta.length);
+            } else {
+              console.warn("⚠️ Resposta da SEFAZ inválida ou vazia:", consulta);
+            }
+            
+          }).catch(errCons => {
+            console.error("❌ Erro em sefazEnviaLote:");
+            console.error("   Mensagem:", errCons?.message);
+            console.error("   Stack:", errCons?.stack);
+          });
+        } catch (errSign) {
+          console.error("❌ Erro ao processar XML assinado:");
+          console.error("   Mensagem:", errSign.message);
+          console.error("   Stack:", errSign.stack);
+          
+          // Criar diretório se não existir
+          if (!fs.existsSync('./xml-logs-erros')) {
+            fs.mkdirSync('./xml-logs-erros', { recursive: true });
           }
           
-        }).catch(errCons => {
-          console.error("   Stack:", errCons);
-        } );
+
+          fs.writeFileSync("./xml-logs-erros/err.json", JSON.stringify({
+            message: errSign.message,
+            stack: errSign.stack,
+            timestamp: new Date().toISOString()
+          }, null, 2), { encoding: "utf-8" });
+        }
        
       }).catch(errSign => {
         console.error("❌ Erro em xmlSign:");
-        console.error("   Mensagem:", errSign.message);
-        console.error("   Stack:", errSign.stack);
-        fs.writeFileSync("./xmlogs-erros/err.json", JSON.stringify({
-          message: errSign.message,
-          stack: errSign.stack
+        console.error("   Mensagem:", errSign?.message);
+        console.error("   Stack:", errSign?.stack);
+        
+        // Criar diretório se não existir
+        if (!fs.existsSync('./xml-logs-erros')) {
+          fs.mkdirSync('./xml-logs-erros', { recursive: true });
+        }
+        
+        fs.writeFileSync("./xml-logs-erros/err.json", JSON.stringify({
+          message: errSign?.message,
+          stack: errSign?.stack,
+          timestamp: new Date().toISOString()
         }, null, 2), { encoding: "utf-8" });
       });
 

@@ -104,95 +104,13 @@ export async function getCertOptions(senha, fallbackPfxPath = './GTO COMERCIO 20
 class ConsultaStatusNfeController {
   async validarConsulta(req, res) {
     try {
-
-      const SENHA_CERT = process.env.SENHA || "#senhagto2024#";
-      const certOptions = await getCertOptions(SENHA_CERT, './GTO COMERCIO 2025-2026.pfx');
-
-      if (!certOptions) {
-        return res.status(500).json({
-          error: 'Não foi possível carregar o certificado. Verifique as variáveis de ambiente ou o arquivo local.'
-        });
-      }
-
-      let { vendas } = req.body;
-      let { page, pageSize } = req.query;
-      
-      if (!vendas) {
-        page = page || '';
-        pageSize = pageSize || '';
-        
-        const queryParams = new URLSearchParams();
-        if (page) queryParams.append('page', page);
-        if (pageSize) queryParams.append('pageSize', pageSize);
-        
-        const apiUrl = `http://164.152.245.77:8000/quality/concentrador_homologacao/api/venda/valida-venda-contingencia.xsjs?page=${page}&pageSize=${pageSize}`;
-        const response = await axios.get(apiUrl);
-        vendas = response.data;
-      }
-      // Normaliza formatos paginados/wrapped: { data: [...] } ou { rows: [...] } ou { page, data: [...] }
-      if (!Array.isArray(vendas)) {
-        if (Array.isArray(vendas.data)) {
-          vendas = vendas.data;
-        } else if (Array.isArray(vendas.rows)) {
-          vendas = vendas.rows;
-        } else if (vendas.data && Array.isArray(vendas.data.rows)) {
-          vendas = vendas.data.rows;
-        } else {
-          // tenta encontrar a primeira propriedade que é array
-          const possibleArray = Object.values(vendas).find(v => Array.isArray(v));
-          if (Array.isArray(possibleArray)) {
-            vendas = possibleArray;
-          }
-        }
-      }
-
-      if (!Array.isArray(vendas) || vendas.length === 0) {
-        return res.status(400).json({ error: "Nenhuma venda para consultar." });
-      }
-
-      const resultados = [];
-
-      for (const row of vendas) {
-        const IDVENDA = String(row.IDVENDA ?? "").trim();
-        const UF = String(row.NFE_INFNFE_EMIT_ENDEREMIT_UF ?? "").trim();
-        const CHAVE = String(row.CHAVE ?? "").trim();
-
-        if (!CHAVE) {
-          resultados.push({ IDVENDA, UF, error: "CHAVE ausente" });
-          continue;
-        }
-
-        try {
-          const tools = new Tools(
-            {
-              mod: "65",
-              tpAmb: 2,
-              UF: UF,
-              versao: "4.00",
-            },
-            certOptions
-          );
-
-          const resposta = await tools.sefazStatus(CHAVE);
-          
-          const xml = resposta ?? null;
-          const cstat =
-            resposta?.retConsSitNFe?.cStat ??
-            (xml?.match(/<cStat>(\d+)<\/cStat>/)?.[1] ?? null);
-
-          resultados.push({ IDVENDA, UF, CHAVE, CSTAT: cstat, XML: xml });
-        } catch (e) {
-          resultados.push({ IDVENDA, UF, CHAVE, error: e.message });
-        }
-      }
-
-      return res.json({
-        total: resultados.length,
-        processados: resultados.filter((r) => !r.error).length,
-        data: resultados,
-      });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
+      const apiUrl = `http://gto.inf.br/validarConsulta`
+      const response = await axios.get(apiUrl)
+      console.log(apiUrl)
+      // return res.json(response.data); 
+    } catch (error) {
+      console.error("Unable to connect to the database:", error);
+      throw error; 
     }
   } 
 

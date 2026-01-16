@@ -5,8 +5,7 @@ import { OTClient } from "../OT/Client/index.js";
 import { OTService } from "../OT/Services/index.js";
 import criarOTSchema from '../OT/Schema/criarOTSchema.js';
 import atualizarOTSchema from '../OT/Schema/atualizarOTSchema.js';
-// const url = process.env.API_URL;
-const url = 'http://164.152.245.77:8000/quality/concentrador_node';
+const url = process.env.API_URL;
 const otClient = new OTClient(url);
 const otService = new OTService(otClient);
 
@@ -47,6 +46,7 @@ class ExpedicaoControllers {
         try {
            
             const apiUrl = `${url}/api/expedicao/resumo-ordem-transferencia.xsjs?idtipofiltro=${Number(idTipoFiltro)}&idEmpresaOrigem=${Number(idEmpresaOrigem)}&idEmpresaDestino=${Number(idEmpresaDestino)}&datapesqinicio=${dataPesquisaInicio}&datapesqfim=${dataPesquisaFim}`
+            
             const response = await axios.get(apiUrl)
            
 
