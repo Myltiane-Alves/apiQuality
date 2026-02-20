@@ -212,7 +212,7 @@ class ModulosControllers  {
         }
     }
 
-    async postPerfilUsuarioMenu(req, res) {
+/*     async postPerfilUsuarioMenu(req, res) {
         try {
             let {
                 IDUSUARIO,
@@ -296,7 +296,7 @@ class ModulosControllers  {
             throw error;
         }
     }
-
+ */
     async putPerfilPermissoes(req, res) {
         try {
             const dados = Array.isArray(req.body) ? req.body : [req.body]; 
@@ -305,7 +305,7 @@ class ModulosControllers  {
             // console.log("response", response)
             return res.json(response);
         } catch (error) {
-            console.error("Erro no ModulosControllers. putPerfilPermissoesu: ", error);
+            console.error("Erro no ModulosControllers.putPerfilPermissoesu: ", error);
             throw error;
         }
     }

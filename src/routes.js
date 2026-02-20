@@ -67,6 +67,8 @@ import DashBoardFuncionariosControllers from './DashBoard/Funcionario/controller
 import DashBoardAdiantamentoSalarialControllers from './DashBoard/AdiantamentoSalarial/controllers/index.js';
 import GerenciaControllers from './Gerencia/controllers/index.js';
 
+import DuplicarPermicaoController from '../src/Modulos/DuplicarPermicao/controller/controller.js';
+
 import ServiceLayerControllers from './ServiceLayer/controllers/index.js'
 
 //  Gerencia
@@ -123,7 +125,8 @@ routes.get('/menus-filho-usuario', ModulosControllers.getListaMenusFilhosUsuario
 
 routes.put('/perfil-permissao/:id', ModulosControllers.putPerfilPermissoes)
 routes.put('/perfil-usuario/:id', ModulosControllers.putPerfilUsuarioMenu)
-routes.post('/criar-perfil-usuario', ModulosControllers.postPerfilUsuarioMenu)
+//routes.post('/criar-perfil-usuario', ModulosControllers.postPerfilUsuarioMenu)
+routes.post('/criar-perfil-usuario', DuplicarPermicaoController.postDuplicarPermicao)
 
 // routes.get('/listaCaixasMovimento', AdministrativoControllers.getListaCaixasMovimento);
 //Início Administrativo
